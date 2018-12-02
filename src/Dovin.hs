@@ -62,6 +62,9 @@ data Effect = Effect (Card -> Card) (Card -> Card)
 makeLenses ''Board
 makeLenses ''Card
 
+cardPower = cardStrength . _1
+cardToughness = cardStrength . _2
+
 emptyBoard = Board
                { _cards = mempty
                , _counters = mempty
@@ -373,7 +376,7 @@ modifyStrength cn (x, y) = do
 
   -- TODO: Handle tokens
   let c'' =
-        if view (cardStrength . _2) c' <= 0 then
+        if view cardToughness c' <= 0 then
           over location (\(player, _) -> (player, Graveyard)) c'
         else
           c'
@@ -392,7 +395,7 @@ attackWith cs =
     tap cn
     modifying
       (life . at Opponent . non 0)
-      (\x -> x - view (cardStrength . _1) c)
+      (\x -> x - view cardPower c)
 
 numbered n name = name <> " " <> show n
 fight :: CardName -> CardName -> GameMonad ()
@@ -411,7 +414,7 @@ fight x y = do
       cx <- requireCard x (matchAttribute "creature")
       cy <- requireCard y (matchAttribute "creature")
 
-      let xdmg = max 0 $ view (cardStrength . _1) cx
+      let xdmg = max 0 $ view cardPower cx
       let cy' = over cardDamage (+ xdmg) cy
 
       assign
@@ -423,7 +426,7 @@ fight x y = do
           let owner = fst . view location $ cx
           modifying (life . at owner . non 0) (+ xdmg)
 
-      when (view cardDamage cy' >= view (cardStrength . _2) cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
+      when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
         destroy y
 
 forCards :: CardMatcher -> (Card -> Card) -> GameMonad ()
@@ -521,9 +524,9 @@ printBoard board = do
       " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
       <> if hasAttribute "creature" c then
            " ("
-             <> show (view (cardStrength . _1) c)
+             <> show (view cardPower c)
              <> "/"
-             <> show (view (cardStrength . _2) c)
+             <> show (view cardToughness c)
              <> ", "
              <> show (view cardDamage c)
              <> ")"
