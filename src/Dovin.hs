@@ -208,7 +208,9 @@ castFromLocation name loc = do
 jumpstart discardName castName = do
   discard discardName
   castFromLocation castName (Active, Graveyard)
-  -- TODO: Exile when resolved
+  modifying
+    (cards . at castName . _Just)
+    (setAttribute "exile-when-leave-stack")
 
 discard name = move name (Active, Hand) (Active, Graveyard)
 
@@ -241,7 +243,14 @@ resolve expectedName = do
 
         if (hasAttribute "sorcery" c || hasAttribute "instant" c) then
           when (spellType == Cast) $
-            move name (Active, Playing) (Active, Graveyard)
+            if hasAttribute "exile-when-leave-stack" c then
+              do
+                modifying
+                  (cards . at name . _Just)
+                  (removeAttribute "exile-when-leave-stack")
+                move name (Active, Playing) (Active, Exile)
+            else
+              move name (Active, Playing) (Active, Graveyard)
         else
           move name (Active, Playing) (Active, Play)
 
