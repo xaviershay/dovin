@@ -1,14 +1,13 @@
 name:                dovin
 version:             0.1.0.0
-github:              "githubuser/dovin"
+github:              "xaviershay/dovin"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2018 Author name here"
+author:              "Xavier Shay"
+maintainer:          "contact@xaviershay.com"
+copyright:           "2018 Xavier Shay"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -20,26 +19,20 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/githubuser/dovin#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+  - base >= 4.7 && < 5
+  - containers
+  - hashable
+  - lens
+  - mtl
+  - unordered-containers
 
 library:
   source-dirs: src
 
 executables:
-  dovin-exe:
+  dovin:
     main:                Main.hs
     source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - dovin
-
-tests:
-  dovin-test:
-    main:                Spec.hs
-    source-dirs:         test
     ghc-options:
     - -threaded
     - -rtsopts

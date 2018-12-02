@@ -1,6 +1,11 @@
 module Main where
 
-import Lib
+import Dovin
+
+import qualified Solutions.GuildsOfRavnica8
+import qualified Solutions.GuildsOfRavnica9
 
 main :: IO ()
-main = someFunc
+main = do
+  runVerbose Solutions.GuildsOfRavnica8.solution
+  runVerbose Solutions.GuildsOfRavnica9.solution
