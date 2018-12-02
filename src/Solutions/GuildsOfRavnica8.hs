@@ -9,25 +9,6 @@ import Dovin
 -- http://www.possibilitystorm.com/089-guilds-of-ravnica-season-puzzle-7-2/
 solution :: GameMonad ()
 solution = do
-  setLife Opponent 7
-
-  addCreature "Epicure of Blood" (4, 4) (Active, Play) []
-  addCreature "Muldrotha, the Gravetide" (6, 6) (Active, Play) []
-  addCreature "Diamond Mare" (1, 3) (Active, Graveyard) ["artifact"]
-  addCard "Detection Tower" (Active, Graveyard) ["land"]
-  addCard "Mox Amber" (Active, Graveyard) ["artifact"]
-
-  addCards 3 "Memorial to Folly" (Active, Play) ["land"]
-  addCards 4 "Watery Grave" (Active, Play) ["land"]
-  addCards 4 "Overgrown Tomb" (Active, Play) ["land"]
-
-  addCard "March of the Drowned" (Active, Hand) ["sorcery", "black"]
-  addCard "Gruesome Menagerie" (Active, Hand) ["sorcery", "black"]
-  addCard "Dead Weight" (Active, Hand) ["aura", "black"]
-  addCard "Find" (Active, Hand) ["sorcery", "black"]
-  addCreature "Vicious Conquistador" (1, 2) (Active, Graveyard) ["black"]
-  addCreature "Sailor of Means" (1, 4) (Active, Graveyard) []
-
   -- This solutions relies on triggering Diamond Mare to gain life, which in
   -- turns triggers Epicure of Blood to cause the opponent to lose life. This
   -- helper can wrap cast actions with that combination.
@@ -60,6 +41,26 @@ solution = do
             castFromLocation cn (Active, Graveyard)
             resolve cn
             assign (counters . at counterName) (Just 1)
+
+  step "Initial state" $ do
+    setLife Opponent 7
+
+    addCreature "Epicure of Blood" (4, 4) (Active, Play) []
+    addCreature "Muldrotha, the Gravetide" (6, 6) (Active, Play) []
+    addCreature "Diamond Mare" (1, 3) (Active, Graveyard) ["artifact"]
+    addCard "Detection Tower" (Active, Graveyard) ["land"]
+    addCard "Mox Amber" (Active, Graveyard) ["artifact"]
+
+    addCards 3 "Memorial to Folly" (Active, Play) ["land"]
+    addCards 4 "Watery Grave" (Active, Play) ["land"]
+    addCards 4 "Overgrown Tomb" (Active, Play) ["land"]
+
+    addCard "March of the Drowned" (Active, Hand) ["sorcery", "black"]
+    addCard "Gruesome Menagerie" (Active, Hand) ["sorcery", "black"]
+    addCard "Dead Weight" (Active, Hand) ["aura", "black"]
+    addCard "Find" (Active, Hand) ["sorcery", "black"]
+    addCreature "Vicious Conquistador" (1, 2) (Active, Graveyard) ["black"]
+    addCreature "Sailor of Means" (1, 4) (Active, Graveyard) []
 
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
     castWithMuldrotha "land" "Detection Tower"
