@@ -18,6 +18,10 @@ It does not try to provide a full ruleset implementation, instead it's more
 akin to letting you lay out cards and counters in front of you and manipulate
 them as you would in a real game of paper magic.
 
+I've only added actions "as needed" to solve problems, so the built-in
+functions are rather incomplete right now. It is straightforward to add more
+though. See `src/Dovin.hs` for implemented actions.
+
 ## Example
 
 ``` haskell
