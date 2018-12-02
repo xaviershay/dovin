@@ -478,8 +478,6 @@ runMonad state m =
 printBoard board = do
   putStr "Opponent Life: "
   putStrLn . show $ view (life . at Opponent . non 0) board
-  putStr "Storm: "
-  putStrLn . show $ view (counters . at "storm" . non 0) board
   putStrLn ""
   let sections = groupByWithKey (view location) (M.elems $ view cards board)
 

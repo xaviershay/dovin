@@ -20,20 +20,56 @@ them as you would in a real game of paper magic.
 
 ## Example
 
-    main = do
-      runVerbose $ do
-        setLife 3
+``` haskell
+import Control.Monad (forM_)
 
-        addCard "Plummet" (Active, Hand) ["instant"]
-        addCards 2 "Forest" (Active, Play) ["land"]
-        addCard "Angel" (4, 4) (Opponent, Play) ["angel", "flying", "token"]
+import Dovin
 
-        cast "Plummet"
-        resolve "Plummet"
-        with "Angel" $ \enemy -> do
-          target enemy
-          validate enemy $ matchAttribute "flying"
-          destroy enemy
+main = runVerbose solution
+
+solution :: GameMonad ()
+solution = do
+  step "Initial state" $ do
+    setLife Opponent 3
+
+    addCard "Plummet" (Active, Hand) ["instant"]
+    addCards 2 "Forest" (Active, Play) ["land"]
+    addToken "Angel" (4, 4) (Opponent, Play) ["angel", "flying"]
+
+  step "Plummet to destroy angel" $ do
+    forM_ [1..2] $ \n -> (tap $ numbered n "Forest")
+    cast "Plummet"
+    resolve "Plummet"
+    with "Angel" $ \enemy -> do
+      target enemy
+      validate enemy $ matchAttribute "flying"
+      destroy enemy
+```
+
+`runVerbose` prints out the board state at each step:
+
+    1. Initial state
+
+    Opponent Life: 3
+
+    (Active,Hand)
+      Plummet (instant)
+    (Active,Play)
+      Forest 1 (land)
+      Forest 2 (land)
+    (Opponent,Play)
+      Angel (angel,creature,flying,token) (4/4, 0)
+
+
+    2. Plummet to destroy angel
+
+    Opponent Life: 3
+
+    (Active,Graveyard)
+      Plummet (instant)
+    (Active,Play)
+      Forest 1 (land,tapped)
+      Forest 2 (land,tapped)
 
 See `src/Solutions` for more extensive usage (spoiler alert: these are
 solutions for published Possibility Storm puzzles!)
@@ -41,4 +77,4 @@ solutions for published Possibility Storm puzzles!)
 ## Development
 
     stack build
-    stack exec dovin -- Runs all solutions
+    stack exec dovin # Runs all solutions
