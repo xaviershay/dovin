@@ -26,6 +26,7 @@ type CardAttribute = String
 type CardLocation = (Player, Location)
 
 data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
+-- TODO: Stack shouldn't be in here because there is only one of them
 data Location = Hand | Graveyard | Play | Stack | Exile
   deriving (Show, Eq, Ord)
 
@@ -501,31 +502,33 @@ printBoard board = do
   let sections = groupByWithKey (view location) (M.elems $ view cards board)
 
   forM_ sections $ \(loc, cs) -> do
-    print loc
-    forM_ (sortBy (compare `on` view cardName) cs) $ \c ->
-      putStrLn $ "  " <> view cardName c <>
-        " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
-        <> if hasAttribute "creature" c then
-             " ("
-               <> show (view (cardStrength . _1) c)
-               <> "/"
-               <> show (view (cardStrength . _2) c)
-               <> ", "
-               <> show (view cardDamage c)
-               <> ")"
-           else
-            ""
+    unless (snd loc == Stack) $ do
+      print loc
+      forM_ (sortBy (compare `on` view cardName) cs) $ \c ->
+        putStrLn $ formatCard c
 
   unless (null $ view stack board) $ do
     putStrLn "Stack"
     forM_ (view stack board) $ \cn ->
       case view (cards . at cn) board of
-        Just card -> putStrLn $ "  "
-                       <> cn
-                       <> (if hasAttribute "copy" card then "copy" else "")
+        Just c -> putStrLn $ formatCard c
         Nothing -> fail $ cn <> " was on stack but doesn't exist"
 
   where
+    formatCard c =
+      "  " <> view cardName c <>
+      " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
+      <> if hasAttribute "creature" c then
+           " ("
+             <> show (view (cardStrength . _1) c)
+             <> "/"
+             <> show (view (cardStrength . _2) c)
+             <> ", "
+             <> show (view cardDamage c)
+             <> ")"
+         else
+          ""
+
     -- https://stackoverflow.com/questions/15412027/haskell-equivalent-to-scalas-groupby
     groupByWithKey :: (Ord b) => (a -> b) -> [a] -> [(b, [a])]
     groupByWithKey f = map (f . head &&& id)
