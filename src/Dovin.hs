@@ -26,8 +26,8 @@ import Data.Function
 type CardName = String
 type CardAttribute = String
 type CardLocation = (Player, Location)
-data SpellType = Cast | Copy
-type Spell = (CardName, Bool) -- Bool = Whether spell was cast, false if copy. TODO: Use SpellType
+data SpellType = Cast | Copy deriving (Show, Eq)
+type Spell = (CardName, SpellType)
 
 data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
 data Location = Hand | Graveyard | Play | Playing | Exile
@@ -207,7 +207,7 @@ cast name = do
 
   modifying
     stack
-    (\s -> (name, True) : s)
+    (\s -> (name, Cast) : s)
 
 -- TODO: DRY up with cast
 castFromLocation name loc = do
@@ -225,7 +225,7 @@ castFromLocation name loc = do
 
   modifying
     stack
-    (\s -> (name, True) : s)
+    (\s -> (name, Cast) : s)
 
 jumpstart discard name = do
   -- TODO: Discard
@@ -241,7 +241,7 @@ jumpstart discard name = do
 
   modifying
     stack
-    (\s -> (name, True) : s)
+    (\s -> (name, Cast) : s)
 
 resolve :: CardName -> GameMonad ()
 resolve expectedName = do
@@ -249,7 +249,7 @@ resolve expectedName = do
 
   case s of
     [] -> throwError $ "No spell on stack to resolve for: " <> expectedName
-    ((name, cast):ss) ->
+    ((name, spellType):ss) ->
 
       if name /= expectedName then
         throwError $ "Top spell on stack does not match: " <> name
@@ -264,7 +264,7 @@ resolve expectedName = do
             (setAttribute "summoned")
 
         if (hasAttribute "sorcery" c || hasAttribute "instant" c) then
-          when cast $
+          when (spellType == Cast) $
             assign
               (cards . at name . _Just . location)
               (Active, Graveyard)
@@ -329,7 +329,7 @@ copy targetName = do
 
   modifying
     stack
-    (\s -> (targetName, False) : s)
+    (\s -> (targetName, Copy) : s)
 
 storm :: (Int -> GameMonad ()) -> GameMonad ()
 storm action = do
@@ -533,8 +533,8 @@ printBoard board = do
 
   when (not . null $ view stack board) $ do
     putStrLn "Stack"
-    forM_ (view stack board) $ \(cn, cast) -> do
-      putStrLn $ "  " <> cn <> (if cast then "" else " (copy)")
+    forM_ (view stack board) $ \(cn, spellType) -> do
+      putStrLn $ "  " <> cn <> (if spellType == Cast then "" else " (copy)")
 
   where
     -- https://stackoverflow.com/questions/15412027/haskell-equivalent-to-scalas-groupby
