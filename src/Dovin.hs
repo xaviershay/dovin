@@ -137,7 +137,10 @@ invert :: CardMatcher -> CardMatcher
 invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f
 
 applyMatcher :: CardMatcher -> Card -> Bool
-applyMatcher (CardMatcher _ f) c = f c
+applyMatcher matcher c =
+  case applyMatcherWithDesc matcher c of
+    Left _ -> False
+    Right _ -> True
 
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
 applyMatcherWithDesc (CardMatcher d f) c =
@@ -160,7 +163,7 @@ instance Semigroup Effect where
 instance Monoid Effect where
   mempty = Effect id id
 
-addEffect cn f effect = do
+addEffect cn f effect =
   modifying effects (M.insert cn (f, effect))
 
 requireEffect effectName = do
@@ -253,7 +256,7 @@ resolve expectedName = do
             (cards . at name . _Just)
             (setAttribute "summoned")
 
-        if (hasAttribute "sorcery" c || hasAttribute "instant" c) then
+        if hasAttribute "sorcery" c || hasAttribute "instant" c then
           if hasAttribute "copy" c then
             remove name
           else if hasAttribute "exile-when-leave-stack" c then
@@ -299,24 +302,22 @@ remove = modifying cards . M.delete
 destroy targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
 
-  case S.member "token" (view cardAttributes card) of
-    True -> remove targetName
-    False ->
-          modifying
-            (cards . at targetName . _Just . location)
-            (\(x, _) -> (x, Graveyard))
-
-  return ()
+  if S.member "token" (view cardAttributes card) then
+    remove targetName
+  else
+    modifying
+      (cards . at targetName . _Just . location)
+      (\(x, _) -> (x, Graveyard))
 
 sacrifice targetName = do
   card <- requireCard targetName matchInPlay
 
-  case S.member "token" (view cardAttributes card) of
-    True -> remove targetName
-    False ->
-          modifying
-            (cards . at targetName . _Just . location)
-            (\(x, _) -> (x, Graveyard))
+  if S.member "token" (view cardAttributes card) then
+    remove targetName
+  else
+    modifying
+      (cards . at targetName . _Just . location)
+      (\(x, _) -> (x, Graveyard))
 
   return ()
 
@@ -338,7 +339,7 @@ storm action = do
   maybeStorm <- use $ counters . at "storm"
 
   case maybeStorm of
-    Nothing -> throwError $ "No counter in state: storm"
+    Nothing -> throwError "No counter in state: storm"
     Just c -> forM [1..c-1] $ \n -> action n
 
   return ()
@@ -380,7 +381,7 @@ modifyStrength cn (x, y) = do
     c''
 
 attackWith :: [CardName] -> GameMonad ()
-attackWith cs = do
+attackWith cs =
   forM_ cs $ \cn -> do
     c <- requireCard cn
            (matchLocation (Active, Play)
@@ -415,17 +416,13 @@ fight x y = do
         (cards . at y . _Just)
         cy'
 
-      if hasAttribute "lifelink" cx then
+      when (hasAttribute "lifelink" cx) $
         do
           let owner = fst . view location $ cx
           modifying (life . at owner . non 0) (+ xdmg)
-      else
-        return ()
 
-      if view cardDamage cy' >= view (cardStrength . _2) cy' || (xdmg > 0 && hasAttribute "deathtouch" cx ) then
+      when (view cardDamage cy' >= view (cardStrength . _2) cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
         destroy y
-      else
-        return ()
 
 forCards :: CardMatcher -> (Card -> Card) -> GameMonad ()
 forCards matcher f = do
@@ -441,12 +438,9 @@ forCards matcher f = do
 gainLife player amount =
   modifying
     (life . at player . non 0)
-    (\x -> x + amount)
+    (+ amount)
 
-loseLife player amount =
-  modifying
-    (life . at player . non 0)
-    (\x -> x - amount)
+loseLife player amount = gainLife player (-amount)
 
 setLife p n = assign (life . at p) (Just n)
 
@@ -463,8 +457,8 @@ addCardRaw name strength loc attrs = do
 
   modifying cards (M.insert name c)
 
-addCard name loc attrs = do
-  addCardRaw name (0, 0) loc attrs
+addCard name =
+  addCardRaw name (0, 0)
 
 addCreature name strength loc attrs =
   addCardRaw name strength loc ("creature":attrs)
@@ -502,23 +496,29 @@ runMonad state m =
 
 printBoard board = do
   putStr "Opponent Life: "
-  putStrLn . show $ view (life . at Opponent . non 0) board
+  print $ view (life . at Opponent . non 0) board
   putStrLn ""
   let sections = groupByWithKey (view location) (M.elems $ view cards board)
 
   forM_ sections $ \(loc, cs) -> do
-    putStrLn . show $ loc
-    forM_ (sortBy (compare `on` view cardName) cs) $ \c -> do
+    print loc
+    forM_ (sortBy (compare `on` view cardName) cs) $ \c ->
       putStrLn $ "  " <> view cardName c <>
         " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
         <> if hasAttribute "creature" c then
-             " (" <> (show $ view (cardStrength . _1) c) <> "/" <> (show $ view (cardStrength . _2) c) <> ", " <> (show $ view cardDamage c) <> ")"
+             " ("
+               <> show (view (cardStrength . _1) c)
+               <> "/"
+               <> show (view (cardStrength . _2) c)
+               <> ", "
+               <> show (view cardDamage c)
+               <> ")"
            else
             ""
 
-  when (not . null $ view stack board) $ do
+  unless (null $ view stack board) $ do
     putStrLn "Stack"
-    forM_ (view stack board) $ \cn -> do
+    forM_ (view stack board) $ \cn ->
       putStrLn $ "  " <> cn -- TODO: <> (if spellType == Cast then "" else " (copy)")
 
   where
@@ -534,8 +534,8 @@ runVerbose solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
   forM_ (zip log [1..]) $ \((step, board), n) -> do
-    putStr $ (show n) <> ". "
-    putStrLn $ step
+    putStr $ show n <> ". "
+    putStrLn step
     putStrLn ""
     printBoard board
     putStrLn ""
