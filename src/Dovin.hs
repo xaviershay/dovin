@@ -307,14 +307,16 @@ validate targetName reqs = do
   _ <- requireCard targetName reqs
   return ()
 
-remove = modifying cards . M.delete
-
 destroy targetName = do
   _ <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
 
   removeFromPlay targetName
 
 sacrifice targetName = removeFromPlay targetName
+
+remove cn = do
+  modifying cards (M.delete cn)
+  modifying stack (filter (/= cn))
 
 removeFromPlay cardName = do
   card <- requireCard cardName matchInPlay
