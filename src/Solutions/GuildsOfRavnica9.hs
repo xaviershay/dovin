@@ -115,6 +115,7 @@ solution = do
     resolve "Plummet"
     with "Lyra Dawnbringer" $ \enemy -> do
       target enemy
+      validate enemy $ matchAttribute "flying"
       destroy enemy
       validate enemy $ matchLocation (Opponent, Graveyard)
       removeEffect enemy
@@ -123,6 +124,7 @@ solution = do
       resolve "Plummet"
       with (numbered n "Angel") $ \enemy -> do
         target enemy
+        validate enemy $ matchAttribute "flying"
         destroy enemy
         validateRemoved enemy
 
