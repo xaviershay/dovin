@@ -137,7 +137,7 @@ solution = do
       forM_ [1..4] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve "Quasiduplicate"
-        createToken tokenName (1, 4) (Active, Play)
+        addToken tokenName (1, 4) (Active, Play) ["summoned"]
         fight tokenName enemy
 
       validate enemy $ requireLocation (Opponent, Graveyard)
@@ -152,7 +152,7 @@ solution = do
       forM_ [1..2] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve "Quasiduplicate"
-        createToken tokenName (1, 4) (Active, Play)
+        addToken tokenName (1, 4) (Active, Play) ["summoned"]
         fight tokenName enemy
 
       validate enemy $ requireLocation (Opponent, Graveyard)
@@ -162,7 +162,7 @@ solution = do
       forM_ [3..4] $ \n -> do
         let tokenName = numbered n "Afzocan Archer"
         resolve "Quasiduplicate"
-        createToken tokenName (1, 4) (Active, Play)
+        addToken tokenName (1, 4) (Active, Play) ["summoned"]
         fight tokenName enemy
 
       validate enemy $ requireLocation (Opponent, Graveyard)
@@ -170,7 +170,7 @@ solution = do
     forM_ [5] $ \n -> do
       let tokenName = numbered n "Afzocan Archer"
       resolve "Quasiduplicate"
-      createToken tokenName (1, 4) (Active, Play)
+      addToken tokenName (1, 4) (Active, Play) ["summoned"]
 
   step "Torgaar, sacrificing archers to reduce cost" $ do
     tap $ numbered 3 "Submerged Boneyard"

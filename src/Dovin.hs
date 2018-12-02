@@ -116,7 +116,7 @@ requireLocation :: CardLocation -> CardMatcher
 requireLocation loc = CardMatcher $ (==) loc . view location
 
 -- TODO: Rename requireInPlay
-inPlay = CardMatcher $ \c -> case view location c of
+requireInPlay = CardMatcher $ \c -> case view location c of
                                (_, Play) -> True
                                _         -> False
 
@@ -192,24 +192,8 @@ tap name = do
     (cards . at name . _Just . cardAttributes)
     (S.insert tapA)
 
-cast name = do
-  card <- requireCard name (requireLocation (Active, Hand))
+cast name = castFromLocation name (Active, Hand)
 
-  assign
-    (cards . at name . _Just . location)
-    (Active, Playing)
-
-  when
-    (hasAttribute "sorcery" card || hasAttribute "instant" card) $
-    modifying
-      (counters . at "storm" . non 0)
-      (+ 1)
-
-  modifying
-    stack
-    (\s -> (name, Cast) : s)
-
--- TODO: DRY up with cast
 castFromLocation name loc = do
   card <- requireCard name (requireLocation loc)
 
@@ -229,19 +213,8 @@ castFromLocation name loc = do
 
 jumpstart discard name = do
   -- TODO: Discard
-  card <- requireCard name (requireLocation (Active, Graveyard))
-
-  assign
-    (cards . at name . _Just . location)
-    (Active, Playing)
-
-  modifying
-    (counters . at "storm" . non 0)
-    (+ 1)
-
-  modifying
-    stack
-    (\s -> (name, Cast) : s)
+  castFromLocation name (Active, Graveyard)
+  -- TODO: Exile when resolved
 
 resolve :: CardName -> GameMonad ()
 resolve expectedName = do
@@ -274,7 +247,7 @@ resolve expectedName = do
             (set location (Active, Play))
 
 target targetName = do
-  card <- requireCard targetName (inPlay <> missingAttribute "hexproof")
+  card <- requireCard targetName (requireInPlay <> missingAttribute "hexproof")
 
   return ()
 
@@ -286,7 +259,7 @@ targetInLocation targetName zone = do
 trigger targetName = do
   -- TODO: Technically some cards can trigger from other zones, figure out best
   -- way to represent.
-  card <- requireCard targetName inPlay
+  card <- requireCard targetName requireInPlay
 
   return ()
 
@@ -301,7 +274,7 @@ validate targetName reqs = do
   return ()
 
 destroy targetName = do
-  card <- requireCard targetName (inPlay <> missingAttribute "indestructible")
+  card <- requireCard targetName (requireInPlay <> missingAttribute "indestructible")
 
   case S.member "token" (view cardAttributes card) of
     True -> modifying cards (M.delete targetName)
@@ -313,7 +286,7 @@ destroy targetName = do
   return ()
 
 sacrifice targetName = do
-  card <- requireCard targetName inPlay
+  card <- requireCard targetName requireInPlay
 
   case S.member "token" (view cardAttributes card) of
     True -> modifying cards (M.delete targetName)
@@ -362,7 +335,7 @@ moveToGraveyard cn = do
 
 modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
 modifyStrength cn (x, y) = do
-  c <- requireCard cn (inPlay <> requireAttribute "creature")
+  c <- requireCard cn (requireInPlay <> requireAttribute "creature")
 
   let c' = over cardStrength (\(a, b) -> (a + x, b + y)) c
 
@@ -392,8 +365,8 @@ attackWith cs = do
 numbered n name = name <> " " <> show n
 fight :: CardName -> CardName -> GameMonad ()
 fight x y = do
-  _ <- requireCard x inPlay
-  _ <- requireCard y inPlay
+  _ <- requireCard x requireInPlay
+  _ <- requireCard y requireInPlay
 
   target x
   target y
@@ -436,15 +409,6 @@ forCards matcher f = do
       (cards . at (view cardName c) . _Just)
       (f c)
 
--- TODO: Not needed anymore, replace usage with addCard
-createToken name strength location = do
-  board <- get
-
-  let board' = execState (
-                  addCreature name strength location ["creature", "token", "summoned"]
-                ) board
-  put board'
-
 gainLife player amount =
   modifying
     (life . at player . non 0)
@@ -473,17 +437,19 @@ returnToPlay cn =
 -- These are a type of effect that create cards. They can be used for initial
 -- board setup, but also to create cards as needed (such as tokens).
 
--- TODO: This naming scheme sucks
-addCardFull name strength loc attrs = do
+addCardRaw name strength loc attrs = do
   let c = set cardStrength strength $ set cardAttributes (S.fromList attrs) $ mkCard name loc
 
   modifying cards (M.insert name c)
 
 addCard name loc attrs = do
-  addCardFull name (0, 0) loc attrs
+  addCardRaw name (0, 0) loc attrs
 
 addCreature name strength loc attrs =
-  addCardFull name strength loc ("creature":attrs)
+  addCardRaw name strength loc ("creature":attrs)
+
+addToken name strength loc attrs =
+  addCreature name strength loc ("token":attrs)
 
 addCards 0 name loc attrs = return ()
 addCards n name loc attrs = do
