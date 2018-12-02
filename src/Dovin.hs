@@ -17,6 +17,7 @@ import           Control.Monad.State hiding (state)
 import Control.Arrow ((&&&))
 import Data.List
 import Data.Function
+import System.Exit
 
 -- CORE TYPES
 --
@@ -537,6 +538,7 @@ printBoard board = do
 
 with x f = f x
 
+runVerbose :: GameMonad () -> IO ()
 runVerbose solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
@@ -549,5 +551,9 @@ runVerbose solution = do
     putStrLn ""
 
   case e of
-    Left x -> fail x
+    Left x -> do
+      putStrLn "ERROR:"
+      putStrLn x
+      putStrLn ""
+      System.Exit.exitFailure
     Right _ -> return ()
