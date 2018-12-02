@@ -21,8 +21,6 @@ import Data.Function
 -- CORE TYPES
 --
 
-
-
 type CardName = String
 type CardAttribute = String
 type CardLocation = (Player, Location)
@@ -99,7 +97,6 @@ requireCard name f = do
 -- Matchers are used for both filtering sets of cards, and also for verifying
 -- attributes of cards.
 --
--- TODO: Rename to match*?
 -- A wrapping type is used since I intend to add labels/introspection
 -- capabilities at some point.
 
@@ -112,25 +109,24 @@ instance Semigroup CardMatcher where
 instance Monoid CardMatcher where
   mempty = CardMatcher $ const True
 
-requireLocation :: CardLocation -> CardMatcher
-requireLocation loc = CardMatcher $ (==) loc . view location
+matchLocation :: CardLocation -> CardMatcher
+matchLocation loc = CardMatcher $ (==) loc . view location
 
--- TODO: Rename requireInPlay
-requireInPlay = CardMatcher $ \c -> case view location c of
+matchInPlay = CardMatcher $ \c -> case view location c of
                                (_, Play) -> True
                                _         -> False
 
-requireAttribute :: CardAttribute -> CardMatcher
-requireAttribute attr = CardMatcher $ S.member attr . view cardAttributes
+matchAttribute :: CardAttribute -> CardMatcher
+matchAttribute attr = CardMatcher $ S.member attr . view cardAttributes
 
-requireName :: CardName -> CardMatcher
-requireName n = CardMatcher $ (==) n . view cardName
+matchName :: CardName -> CardMatcher
+matchName n = CardMatcher $ (==) n . view cardName
 
-requireOther = invert . requireName
+matchOther = invert . matchName
 
-requireController player = CardMatcher $ (==) player . view (location . _1)
+matchController player = CardMatcher $ (==) player . view (location . _1)
 
-missingAttribute = invert . requireAttribute
+missingAttribute = invert . matchAttribute
 
 invert :: CardMatcher -> CardMatcher
 invert (CardMatcher f) = CardMatcher $ not . f
@@ -186,7 +182,7 @@ tap name = do
   let tapA = "tapped"
 
   card <- requireCard name
-    (requireLocation (Active, Play) <> missingAttribute tapA)
+    (matchLocation (Active, Play) <> missingAttribute tapA)
 
   modifying
     (cards . at name . _Just . cardAttributes)
@@ -195,7 +191,7 @@ tap name = do
 cast name = castFromLocation name (Active, Hand)
 
 castFromLocation name loc = do
-  card <- requireCard name (requireLocation loc)
+  card <- requireCard name (matchLocation loc)
 
   assign
     (cards . at name . _Just . location)
@@ -247,19 +243,19 @@ resolve expectedName = do
             (set location (Active, Play))
 
 target targetName = do
-  card <- requireCard targetName (requireInPlay <> missingAttribute "hexproof")
+  card <- requireCard targetName (matchInPlay <> missingAttribute "hexproof")
 
   return ()
 
 targetInLocation targetName zone = do
-  card <- requireCard targetName (requireLocation zone)
+  card <- requireCard targetName (matchLocation zone)
 
   return ()
 
 trigger targetName = do
   -- TODO: Technically some cards can trigger from other zones, figure out best
   -- way to represent.
-  card <- requireCard targetName requireInPlay
+  card <- requireCard targetName matchInPlay
 
   return ()
 
@@ -274,7 +270,7 @@ validate targetName reqs = do
   return ()
 
 destroy targetName = do
-  card <- requireCard targetName (requireInPlay <> missingAttribute "indestructible")
+  card <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
 
   case S.member "token" (view cardAttributes card) of
     True -> modifying cards (M.delete targetName)
@@ -286,7 +282,7 @@ destroy targetName = do
   return ()
 
 sacrifice targetName = do
-  card <- requireCard targetName requireInPlay
+  card <- requireCard targetName matchInPlay
 
   case S.member "token" (view cardAttributes card) of
     True -> modifying cards (M.delete targetName)
@@ -316,7 +312,7 @@ storm action = do
 
 resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do
-  c <- requireCard cn (requireAttribute "creature")
+  c <- requireCard cn (matchAttribute "creature")
 
   let c' = set cardStrength desired c
 
@@ -335,7 +331,7 @@ moveToGraveyard cn = do
 
 modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
 modifyStrength cn (x, y) = do
-  c <- requireCard cn (requireInPlay <> requireAttribute "creature")
+  c <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
   let c' = over cardStrength (\(a, b) -> (a + x, b + y)) c
 
@@ -354,8 +350,8 @@ attackWith :: [CardName] -> GameMonad ()
 attackWith cs = do
   forM_ cs $ \cn -> do
     c <- requireCard cn
-           (requireLocation (Active, Play)
-             <> requireAttribute "creature"
+           (matchLocation (Active, Play)
+             <> matchAttribute "creature"
              <> missingAttribute "summoned")
     tap cn
     modifying
@@ -365,8 +361,8 @@ attackWith cs = do
 numbered n name = name <> " " <> show n
 fight :: CardName -> CardName -> GameMonad ()
 fight x y = do
-  _ <- requireCard x requireInPlay
-  _ <- requireCard y requireInPlay
+  _ <- requireCard x matchInPlay
+  _ <- requireCard y matchInPlay
 
   target x
   target y
@@ -376,8 +372,8 @@ fight x y = do
 
   where
     fight' x y = do
-      cx <- requireCard x (requireAttribute "creature")
-      cy <- requireCard y (requireAttribute "creature")
+      cx <- requireCard x (matchAttribute "creature")
+      cy <- requireCard y (matchAttribute "creature")
 
       let xdmg = max 0 $ view (cardStrength . _1) cx
       let cy' = over cardDamage (+ xdmg) cy

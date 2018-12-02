@@ -34,27 +34,27 @@ solution = do
     do
       addCreature cn (3, 4) (Opponent, Play) ["angel", "flying"]
       addEffect cn
-        (requireOther cn
-          <> requireLocation (Opponent, Play)
-          <> requireAttribute "creature")
+        (matchOther cn
+          <> matchLocation (Opponent, Play)
+          <> matchAttribute "creature")
         (attributeEffect "hexproof")
 
   let cn = "Lyra Dawnbringer" in
     do
       addCreature cn (5, 5) (Opponent, Play) ["angel", "flying", "lifelink"]
       addEffect cn
-        (requireOther cn
-          <> requireLocation (Opponent, Play)
-          <> requireAttribute "angel")
+        (matchOther cn
+          <> matchLocation (Opponent, Play)
+          <> matchAttribute "angel")
         (attributeEffect "lifelink" <> strengthEffect (1, 1))
 
   let cn = numbered 1 "Merfolk Mistbinder" in
     do
       addCreature cn (2, 2) (Opponent, Play) ["merfolk"]
       addEffect cn
-        (requireOther cn
-          <> requireLocation (Opponent, Play)
-          <> requireAttribute "merfolk")
+        (matchOther cn
+          <> matchLocation (Opponent, Play)
+          <> matchAttribute "merfolk")
         (strengthEffect (1, 1))
 
   let cn = numbered 2 "Merfolk Mistbinder" in
@@ -62,9 +62,9 @@ solution = do
       -- Has a +1/+1 counter
       addCreature cn (3, 3) (Opponent, Play) ["merfolk"]
       addEffect cn
-        (requireOther cn
-          <> requireLocation (Opponent, Play)
-          <> requireAttribute "merfolk")
+        (matchOther cn
+          <> matchLocation (Opponent, Play)
+          <> matchAttribute "merfolk")
         (strengthEffect (1, 1))
   applyEffect "Shalai, Voice of Plenty"
   applyEffect "Lyra Dawnbringer"
@@ -88,12 +88,12 @@ solution = do
     withTriggers cast "Undercity Uprising"
     resolve "Undercity Uprising"
     forCards
-      (requireAttribute "creature" <> requireLocation (Active, Play))
+      (matchAttribute "creature" <> matchLocation (Active, Play))
       (setAttribute "deathtouch")
 
     with "Shalai, Voice of Plenty" $ \enemy -> do
       fight "Adeliz, the Cinder Wind" enemy
-      validate enemy $ requireLocation (Opponent, Graveyard)
+      validate enemy $ matchLocation (Opponent, Graveyard)
       removeEffect enemy
 
   step "Cast Doublecast" $ do
@@ -116,7 +116,7 @@ solution = do
     with "Lyra Dawnbringer" $ \enemy -> do
       target enemy
       destroy enemy
-      validate enemy $ requireLocation (Opponent, Graveyard)
+      validate enemy $ matchLocation (Opponent, Graveyard)
       removeEffect enemy
 
     forM_ [1..3] $ \n -> do
@@ -140,7 +140,7 @@ solution = do
         addToken tokenName (1, 4) (Active, Play) ["summoned"]
         fight tokenName enemy
 
-      validate enemy $ requireLocation (Opponent, Graveyard)
+      validate enemy $ matchLocation (Opponent, Graveyard)
       removeEffect enemy
 
   step "Jump-start Quasiduplicate again (w/ Waterknot), destroy merfolk" $ do
@@ -155,7 +155,7 @@ solution = do
         addToken tokenName (1, 4) (Active, Play) ["summoned"]
         fight tokenName enemy
 
-      validate enemy $ requireLocation (Opponent, Graveyard)
+      validate enemy $ matchLocation (Opponent, Graveyard)
       removeEffect enemy
 
     with "Kopala, Warden of Waves" $ \enemy -> do
@@ -165,7 +165,7 @@ solution = do
         addToken tokenName (1, 4) (Active, Play) ["summoned"]
         fight tokenName enemy
 
-      validate enemy $ requireLocation (Opponent, Graveyard)
+      validate enemy $ matchLocation (Opponent, Graveyard)
 
     forM_ [5] $ \n -> do
       let tokenName = numbered n "Afzocan Archer"

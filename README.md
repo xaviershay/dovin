@@ -32,7 +32,7 @@ them as you would in a real game of paper magic.
         resolve "Plummet"
         with "Angel" $ \enemy -> do
           target enemy
-          validate enemy $ requireAttribute "flying"
+          validate enemy $ matchAttribute "flying"
           destroy enemy
 
 See `src/Solutions` for more extensive usage (spoiler alert: these are
