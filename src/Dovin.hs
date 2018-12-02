@@ -191,11 +191,9 @@ tap name = do
 cast name = castFromLocation name (Active, Hand)
 
 castFromLocation name loc = do
-  card <- requireCard name (matchLocation loc)
+  move name loc (Active, Playing)
 
-  assign
-    (cards . at name . _Just . location)
-    (Active, Playing)
+  card <- requireCard name mempty
 
   when
     (hasAttribute "sorcery" card || hasAttribute "instant" card) $
@@ -205,12 +203,21 @@ castFromLocation name loc = do
 
   modifying
     stack
-    (\s -> (name, Cast) : s)
+    ((:) (name, Cast))
 
-jumpstart discard name = do
-  -- TODO: Discard
-  castFromLocation name (Active, Graveyard)
+jumpstart discardName castName = do
+  discard discardName
+  castFromLocation castName (Active, Graveyard)
   -- TODO: Exile when resolved
+
+discard name = move name (Active, Hand) (Active, Graveyard)
+
+move name from to = do
+  c <- requireCard name $ matchLocation from
+
+  assign
+    (cards . at name . _Just . location)
+    to
 
 resolve :: CardName -> GameMonad ()
 resolve expectedName = do
@@ -234,13 +241,9 @@ resolve expectedName = do
 
         if (hasAttribute "sorcery" c || hasAttribute "instant" c) then
           when (spellType == Cast) $
-            assign
-              (cards . at name . _Just . location)
-              (Active, Graveyard)
+            move name (Active, Playing) (Active, Graveyard)
         else
-          modifying
-            (cards . at name . _Just)
-            (set location (Active, Play))
+          move name (Active, Playing) (Active, Play)
 
 target targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute "hexproof")
@@ -415,18 +418,10 @@ loseLife player amount =
     (life . at player . non 0)
     (\x -> x - amount)
 
-setLife p n =
-  assign (life . at p) (Just n)
+setLife p n = assign (life . at p) (Just n)
 
-returnToHand cn =
-  assign
-    (cards . at cn . _Just . location)
-    (Active, Hand)
-
-returnToPlay cn =
-  assign
-    (cards . at cn . _Just . location)
-    (Active, Play)
+returnToHand cn = move cn (Active, Graveyard) (Active, Hand)
+returnToPlay cn = move cn (Active, Graveyard) (Active, Play)
 
 -- CARD HELPERS
 --

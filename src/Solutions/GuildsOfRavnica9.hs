@@ -14,6 +14,7 @@ solution = do
   addCard "Plummet" (Active, Hand) ["instant"]
   addCard "Quasiduplicate" (Active, Hand) ["sorcery"]
   addCreature "Torgaar, Famine Incarnate" (7, 6) (Active, Hand) ["creature"]
+  addCard "Waterknot" (Active, Hand) ["aura"]
 
   -- Play
   addCard "Thousand-Year Storm" (Active, Play) ["enchantment"]
