@@ -24,11 +24,9 @@ import Data.Function
 type CardName = String
 type CardAttribute = String
 type CardLocation = (Player, Location)
-data SpellType = Cast | Copy deriving (Show, Eq)
-type Spell = (CardName, SpellType)
 
 data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
-data Location = Hand | Graveyard | Play | Playing | Exile
+data Location = Hand | Graveyard | Play | Stack | Exile
   deriving (Show, Eq, Ord)
 
 data Card = Card
@@ -42,8 +40,14 @@ instance Hashable Player
 
 data Board = Board
   { _cards :: M.HashMap CardName Card
-  , _stack :: [Spell]
+  -- The stack is currently the only location where we care about order, so
+  -- store that information alongside the main _cards map. This won't scale -
+  -- deck and graveyard need to be ordered also - but works for now. Need to
+  -- think more about "hiding" this data structure.
+  , _stack :: [CardName]
   , _counters :: M.HashMap String Int
+  -- In theory, life could be just another counter. Need to think more about
+  -- making that happen.
   , _life :: M.HashMap Player Int
   , _effects :: M.HashMap String (CardMatcher, Effect)
   }
@@ -191,7 +195,7 @@ tap name = do
 cast name = castFromLocation name (Active, Hand)
 
 castFromLocation name loc = do
-  move name loc (Active, Playing)
+  move name loc (Active, Stack)
 
   card <- requireCard name mempty
 
@@ -203,7 +207,7 @@ castFromLocation name loc = do
 
   modifying
     stack
-    ((:) (name, Cast))
+    ((:) name)
 
 jumpstart discardName castName = do
   discard discardName
@@ -227,10 +231,10 @@ resolve expectedName = do
 
   case s of
     [] -> throwError $ "No spell on stack to resolve for: " <> expectedName
-    ((name, spellType):ss) ->
+    (name:ss) ->
 
       if name /= expectedName then
-        throwError $ "Top spell on stack does not match: " <> name
+        throwError $ "Top spell on stack does not match: expected " <> name <> ", got " <> expectedName
       else do
         c <- requireCard name mempty
 
@@ -242,17 +246,18 @@ resolve expectedName = do
             (setAttribute "summoned")
 
         if (hasAttribute "sorcery" c || hasAttribute "instant" c) then
-          when (spellType == Cast) $
-            if hasAttribute "exile-when-leave-stack" c then
-              do
-                modifying
-                  (cards . at name . _Just)
-                  (removeAttribute "exile-when-leave-stack")
-                move name (Active, Playing) (Active, Exile)
-            else
-              move name (Active, Playing) (Active, Graveyard)
+          if hasAttribute "copy" c then
+            remove name
+          else if hasAttribute "exile-when-leave-stack" c then
+            do
+              modifying
+                (cards . at name . _Just)
+                (removeAttribute "exile-when-leave-stack")
+              move name (Active, Stack) (Active, Exile)
+          else
+            move name (Active, Stack) (Active, Graveyard)
         else
-          move name (Active, Playing) (Active, Play)
+          move name (Active, Stack) (Active, Play)
 
 target targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute "hexproof")
@@ -281,11 +286,13 @@ validate targetName reqs = do
   _ <- requireCard targetName reqs
   return ()
 
+remove = modifying cards . M.delete
+
 destroy targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
 
   case S.member "token" (view cardAttributes card) of
-    True -> modifying cards (M.delete targetName)
+    True -> remove targetName
     False ->
           modifying
             (cards . at targetName . _Just . location)
@@ -297,7 +304,7 @@ sacrifice targetName = do
   card <- requireCard targetName matchInPlay
 
   case S.member "token" (view cardAttributes card) of
-    True -> modifying cards (M.delete targetName)
+    True -> remove targetName
     False ->
           modifying
             (cards . at targetName . _Just . location)
@@ -305,12 +312,18 @@ sacrifice targetName = do
 
   return ()
 
-copy targetName = do
+copySpell targetName newName = do
   card <- requireCard targetName mempty
+
+  let newCard = setAttribute "copy" $ card { _cardName = newName }
+
+  modifying
+    cards
+    (M.insert newName newCard)
 
   modifying
     stack
-    (\s -> (targetName, Copy) : s)
+    ((:) newName)
 
 storm :: (Int -> GameMonad ()) -> GameMonad ()
 storm action = do
@@ -497,8 +510,8 @@ printBoard board = do
 
   when (not . null $ view stack board) $ do
     putStrLn "Stack"
-    forM_ (view stack board) $ \(cn, spellType) -> do
-      putStrLn $ "  " <> cn <> (if spellType == Cast then "" else " (copy)")
+    forM_ (view stack board) $ \cn -> do
+      putStrLn $ "  " <> cn -- TODO: <> (if spellType == Cast then "" else " (copy)")
 
   where
     -- https://stackoverflow.com/questions/15412027/haskell-equivalent-to-scalas-groupby
