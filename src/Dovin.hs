@@ -54,7 +54,7 @@ data Board = Board
 
 type GameMonad a = (ExceptT String (StateT Board (WriterT [(String, Board)] Identity))) a
 
-data CardMatcher = CardMatcher (Card -> Bool)
+data CardMatcher = CardMatcher String (Card -> Bool)
 data Effect = Effect (Card -> Card) (Card -> Card)
 
 makeLenses ''Board
@@ -92,10 +92,11 @@ requireCard name f = do
 
   case view (cards . at name) board of
     Nothing -> throwError $ "Card does not exist: " <> name
-    Just card -> if applyMatcher f card then
-                   return card
-                 else
-                   throwError $ "Card does not match requirements: " <> name
+    Just card -> case applyMatcherWithDesc f card of
+                   Right () -> return card
+                   Left msg ->
+                     throwError $ name <> " does not match requirements: " <> msg
+
 -- CARD MATCHERS
 --
 -- Matchers are used for both filtering sets of cards, and also for verifying
@@ -108,35 +109,42 @@ instance Show CardMatcher where
   show _ = "<matcher>"
 
 instance Semigroup CardMatcher where
-  (CardMatcher f) <> (CardMatcher g) = CardMatcher $ \c -> f c && g c
+  (CardMatcher d1 f) <> (CardMatcher d2 g) = CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
 
 instance Monoid CardMatcher where
-  mempty = CardMatcher $ const True
+  mempty = CardMatcher "" $ const True
 
 matchLocation :: CardLocation -> CardMatcher
-matchLocation loc = CardMatcher $ (==) loc . view location
+matchLocation loc = CardMatcher ("in location " <> show loc) $ (==) loc . view location
 
-matchInPlay = CardMatcher $ \c -> case view location c of
-                               (_, Play) -> True
-                               _         -> False
+matchInPlay = CardMatcher "in play" $ \c -> case view location c of
+                                              (_, Play) -> True
+                                              _         -> False
 
 matchAttribute :: CardAttribute -> CardMatcher
-matchAttribute attr = CardMatcher $ S.member attr . view cardAttributes
+matchAttribute attr = CardMatcher ("has attribute " <> attr) $ S.member attr . view cardAttributes
 
 matchName :: CardName -> CardMatcher
-matchName n = CardMatcher $ (==) n . view cardName
+matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
 
 matchOther = invert . matchName
 
-matchController player = CardMatcher $ (==) player . view (location . _1)
+matchController player = CardMatcher ("has controller " <> show player) $ (==) player . view (location . _1)
 
 missingAttribute = invert . matchAttribute
 
 invert :: CardMatcher -> CardMatcher
-invert (CardMatcher f) = CardMatcher $ not . f
+invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f
 
 applyMatcher :: CardMatcher -> Card -> Bool
-applyMatcher (CardMatcher f) c = f c
+applyMatcher (CardMatcher _ f) c = f c
+
+applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
+applyMatcherWithDesc (CardMatcher d f) c =
+  if f c then
+    Right ()
+  else
+    Left d
 
 -- EFFECTS
 --
