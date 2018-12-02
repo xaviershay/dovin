@@ -114,27 +114,29 @@ instance Show CardMatcher where
   show _ = "<matcher>"
 
 instance Semigroup CardMatcher where
-  (CardMatcher d1 f) <> (CardMatcher d2 g) = CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
+  (CardMatcher d1 f) <> (CardMatcher d2 g) =
+    CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
 
 instance Monoid CardMatcher where
   mempty = CardMatcher "" $ const True
 
 matchLocation :: CardLocation -> CardMatcher
-matchLocation loc = CardMatcher ("in location " <> show loc) $ (==) loc . view location
+matchLocation loc = CardMatcher ("in location " <> show loc) $
+  (==) loc . view location
 
-matchInPlay = CardMatcher "in play" $ \c -> case view location c of
-                                              (_, Play) -> True
-                                              _         -> False
+matchInPlay = CardMatcher "in play" $ \c -> snd (view location c) == Play
 
 matchAttribute :: CardAttribute -> CardMatcher
-matchAttribute attr = CardMatcher ("has attribute " <> attr) $ S.member attr . view cardAttributes
+matchAttribute attr = CardMatcher ("has attribute " <> attr) $
+  S.member attr . view cardAttributes
 
 matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
 
 matchOther = invert . matchName
 
-matchController player = CardMatcher ("has controller " <> show player) $ (==) player . view (location . _1)
+matchController player = CardMatcher ("has controller " <> show player) $
+  (==) player . view (location . _1)
 
 missingAttribute = invert . matchAttribute
 
@@ -250,7 +252,10 @@ resolve expectedName = do
     (name:ss) ->
 
       if name /= expectedName then
-        throwError $ "Top spell on stack does not match: expected " <> name <> ", got " <> expectedName
+        throwError $ "Top spell on stack does not match: expected "
+                       <> name
+                       <> ", got "
+                       <> expectedName
       else do
         c <- requireCard name mempty
 
@@ -378,10 +383,12 @@ modifyStrength cn (x, y) = do
     (cards . at cn . _Just)
     c'
 
-  -- TODO: Handle tokens
   when (view cardToughness c' <= 0) $
-    let loc = view location c' in
-      move cn loc (first id >>> second (const Graveyard) $ loc)
+    if hasAttribute "token" c' then
+      remove cn
+    else
+      let loc = view location c' in
+        move cn loc $ second (const Graveyard) loc
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs =
@@ -503,7 +510,7 @@ printBoard board = do
   putStrLn ""
   let sections = groupByWithKey (view location) (M.elems $ view cards board)
 
-  forM_ sections $ \(loc, cs) -> do
+  forM_ sections $ \(loc, cs) ->
     unless (snd loc == Stack) $ do
       print loc
       forM_ (sortBy (compare `on` view cardName) cs) $ \c ->
