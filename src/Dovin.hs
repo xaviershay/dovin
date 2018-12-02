@@ -310,31 +310,25 @@ validate targetName reqs = do
 remove = modifying cards . M.delete
 
 destroy targetName = do
-  card <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
+  _ <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
 
-  if S.member "token" (view cardAttributes card) then
-    remove targetName
+  removeFromPlay targetName
+
+sacrifice targetName = removeFromPlay targetName
+
+removeFromPlay cardName = do
+  card <- requireCard cardName matchInPlay
+
+  if hasAttribute "token" card then
+    remove cardName
   else
-    modifying
-      (cards . at targetName . _Just . location)
-      (\(x, _) -> (x, Graveyard))
-
-sacrifice targetName = do
-  card <- requireCard targetName matchInPlay
-
-  if S.member "token" (view cardAttributes card) then
-    remove targetName
-  else
-    modifying
-      (cards . at targetName . _Just . location)
-      (\(x, _) -> (x, Graveyard))
-
-  return ()
+    let loc = view location card in
+      move cardName loc $ second (const Graveyard) loc
 
 copySpell targetName newName = do
   card <- requireCard targetName mempty
 
-  let newCard = setAttribute "copy" $ card { _cardName = newName }
+  let newCard = setAttribute "copy" . set cardName newName $ card
 
   modifying
     cards
@@ -375,20 +369,16 @@ moveToGraveyard cn = do
 
 modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
 modifyStrength cn (x, y) = do
-  c <- requireCard cn (matchInPlay <> matchAttribute "creature")
+  _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
-  let c' = over cardStrength (first (+ x) >>> second (+ y)) c
+  modifying
+    (cards . at cn . _Just . cardStrength)
+    (first (+ x) >>> second (+ y))
 
-  assign
-    (cards . at cn . _Just)
-    c'
+  -- Fetch card again to get new strength
+  c <- requireCard cn mempty
 
-  when (view cardToughness c' <= 0) $
-    if hasAttribute "token" c' then
-      remove cn
-    else
-      let loc = view location c' in
-        move cn loc $ second (const Graveyard) loc
+  when (view cardToughness c <= 0) $ removeFromPlay cn
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs =
