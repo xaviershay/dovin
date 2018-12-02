@@ -14,7 +14,7 @@ import GHC.Generics hiding (to)
 import           Control.Monad.Except
 import           Control.Monad.Writer
 import           Control.Monad.State hiding (state)
-import Control.Arrow ((&&&))
+import Control.Arrow ((&&&), (>>>), first, second)
 import Data.List
 import Data.Function
 import System.Exit
@@ -189,8 +189,8 @@ removeEffect effectName = do
 
 attributeEffect attr = Effect (setAttribute attr) (removeAttribute attr)
 strengthEffect (x, y) = Effect
-  (over cardStrength (\(a, b) -> (a + x, b + y)))
-  (over cardStrength (\(a, b) -> (a - x, b - y)))
+  (over cardStrength (first (+ x) >>> second (+ y)))
+  (over cardStrength (first (subtract x) >>> second (subtract y)))
 
 -- ACTIONS
 --
@@ -372,18 +372,16 @@ modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
 modifyStrength cn (x, y) = do
   c <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
-  let c' = over cardStrength (\(a, b) -> (a + x, b + y)) c
-
-  -- TODO: Handle tokens
-  let c'' =
-        if view cardToughness c' <= 0 then
-          over location (\(player, _) -> (player, Graveyard)) c'
-        else
-          c'
+  let c' = over cardStrength (first (+ x) >>> second (+ y)) c
 
   assign
     (cards . at cn . _Just)
-    c''
+    c'
+
+  -- TODO: Handle tokens
+  when (view cardToughness c' <= 0) $
+    let loc = view location c' in
+      move cn loc (first id >>> second (const Graveyard) $ loc)
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs =
