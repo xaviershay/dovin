@@ -519,7 +519,11 @@ printBoard board = do
   unless (null $ view stack board) $ do
     putStrLn "Stack"
     forM_ (view stack board) $ \cn ->
-      putStrLn $ "  " <> cn -- TODO: <> (if spellType == Cast then "" else " (copy)")
+      case view (cards . at cn) board of
+        Just card -> putStrLn $ "  "
+                       <> cn
+                       <> (if hasAttribute "copy" card then "copy" else "")
+        Nothing -> fail $ cn <> " was on stack but doesn't exist"
 
   where
     -- https://stackoverflow.com/questions/15412027/haskell-equivalent-to-scalas-groupby
