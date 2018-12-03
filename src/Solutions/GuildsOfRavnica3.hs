@@ -15,7 +15,7 @@ solution = do
             <> matchController Active
             <> matchAttribute "creature"
           sacrifice name
-          gainAttribute "Undercity Necrolisk" "menace"
+          gainAttribute "menace" "Undercity Necrolisk"
           modifyStrength "Undercity Necrolisk" (1, 1)
           whenMatch "Pitiless Plunderer" matchInPlay $ do
             trigger "Pitiless Plunderer"
@@ -103,11 +103,11 @@ solution = do
 
   fork $
     [ step "Roc is blocked" $ do
-        gainAttribute "Roc Charger" "blocked"
+        gainAttribute "blocked" "Roc Charger"
         damagePlayer "Undercity Necrolisk"
         validateLife Opponent 0
     , step "Roc is blocked" $ do
-        gainAttribute "Undercity Necrolisk" "blocked"
+        gainAttribute "blocked" "Undercity Necrolisk"
         damagePlayer "Roc Charger"
         validateLife Opponent 0
     ]

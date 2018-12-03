@@ -33,7 +33,7 @@ solution = do
     activate "" "Torch Courier"
     sacrifice "Torch Courier"
 
-    gainAttribute "Ochran Assassin" "haste"
+    gainAttribute "haste" "Ochran Assassin"
 
   step "Sac Whisper to get Torch Courier back" $ do
     tap "Whisper, Blood Liturgist"
@@ -50,18 +50,18 @@ solution = do
     cast "2BG" "Rhizome Lurcher"
     resolve "Rhizome Lurcher"
 
-    forCardsM
+    forCards
       (matchLocation (Active, Graveyard) <> matchAttribute "creature")
       (const $ modifyStrength "Rhizome Lurcher" (1, 1))
 
     activate "" "Torch Courier"
     sacrifice "Torch Courier"
 
-    gainAttribute "Rhizome Lurcher" "haste"
+    gainAttribute "haste" "Rhizome Lurcher"
 
   step "Attack with Lurcher and Assasin" $ do
     attackWith ["Rhizome Lurcher", "Ochran Assassin"]
-    gainAttribute "Ochran Assassin" "blocked"
+    gainAttribute "blocked" "Ochran Assassin"
 
     damagePlayer "Rhizome Lurcher"
 

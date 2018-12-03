@@ -31,7 +31,7 @@ solution = do
   step "Angrath gain control, targeting Aurelia" $ do
     activatePlaneswalker "Angrath, the Flame-Chained" (-3)
     target "Aurelia, Exemplar of Justice"
-    gainAttribute "Aurelia, Exemplar of Justice" "haste"
+    gainAttribute "haste" "Aurelia, Exemplar of Justice"
 
   step "Activate Goblin Banneret" $ do
     forM_ [1..2] $ \n -> tapForMana (numbered n "Dragonskull Summit") "R"

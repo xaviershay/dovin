@@ -206,14 +206,20 @@ requireEffect effectName = do
     Just x -> return x
 
 applyEffect effectName = do
-  (matcher, Effect forward _) <- requireEffect effectName
+  (matcher, Effect f _) <- requireEffect effectName
 
-  forCards matcher forward
+  forCards matcher $ \name -> do
+    modifying
+      (cards . at name . _Just)
+      f
 
 removeEffect effectName = do
-  (matcher, Effect _ undo) <- requireEffect effectName
+  (matcher, Effect _ f) <- requireEffect effectName
 
-  forCards matcher undo
+  forCards matcher $ \name -> do
+    modifying
+      (cards . at name . _Just)
+      f
 
 attributeEffect attr = Effect (setAttribute attr) (removeAttribute attr)
 strengthEffect (x, y) = Effect
@@ -482,7 +488,7 @@ attackWith cs = do
                   missingAttribute "summoned"
                 ))
     tap cn
-    gainAttribute cn "attacking"
+    gainAttribute "attacking" cn
 
 damagePlayer cn = do
   c <- requireCard cn matchInPlay
@@ -530,24 +536,13 @@ fight x y = do
       when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
         destroy y
 
-forCards :: CardMatcher -> (Card -> Card) -> GameMonad ()
+forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
 forCards matcher f = do
   cs <- use cards
 
   let matchingCs = filter (applyMatcher matcher) (M.elems cs)
 
-  forM_ matchingCs $ \c ->
-    assign
-      (cards . at (view cardName c) . _Just)
-      (f c)
-
-forCardsM :: CardMatcher -> (Card -> GameMonad ()) -> GameMonad ()
-forCardsM matcher f = do
-  cs <- use cards
-
-  let matchingCs = filter (applyMatcher matcher) (M.elems cs)
-
-  forM_ matchingCs f
+  forM_ (map (view cardName) matchingCs) f
 
 gainLife player amount =
   modifying
@@ -571,7 +566,7 @@ activatePlaneswalker cn loyalty = do
       (cards . at cn . _Just . cardLoyalty)
       (+ loyalty)
 
-gainAttribute cn attr = do
+gainAttribute attr cn = do
   c <- requireCard cn mempty
 
   modifying

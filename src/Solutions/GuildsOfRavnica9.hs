@@ -96,7 +96,7 @@ solution = do
     resolve "Undercity Uprising"
     forCards
       (matchAttribute "creature" <> matchLocation (Active, Play))
-      (setAttribute "deathtouch")
+      (gainAttribute "deathtouch")
 
     with "Shalai, Voice of Plenty" $ \enemy -> do
       fight "Adeliz, the Cinder Wind" enemy
