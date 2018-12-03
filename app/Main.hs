@@ -10,6 +10,6 @@ import qualified Solutions.GuildsOfRavnica9
 main :: IO ()
 main = do
   runVerbose Solutions.Example.solution
+  runVerbose Solutions.GuildsOfRavnica1.solution
   runVerbose Solutions.GuildsOfRavnica8.solution
   runVerbose Solutions.GuildsOfRavnica9.solution
-  runVerbose Solutions.GuildsOfRavnica1.solution

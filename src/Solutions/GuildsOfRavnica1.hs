@@ -25,8 +25,7 @@ solution = do
     tapForMana "Sacred Foundry 2" "W"
     tapForMana "Sacred Foundry 3" "W"
     tapForMana "Sacred Foundry 4" "W"
-    spendMana "RW2"
-    cast "Aurelia, Exemplar of Justice"
+    cast "2RW" "Aurelia, Exemplar of Justice"
     resolve "Aurelia, Exemplar of Justice"
 
   step "Angrath gain control, targeting Aurelia" $ do
@@ -36,8 +35,7 @@ solution = do
 
   step "Activate Goblin Banneret" $ do
     forM_ [1..2] $ \n -> tapForMana (numbered n "Dragonskull Summit") "R"
-    spendMana "R1"
-    activate "Goblin Banneret"
+    activate "Goblin Banneret" "R1"
     modifyStrength "Goblin Banneret" (2, 0)
 
   step "Begin combat, put Aurelia's trigger on Banneret" $ do

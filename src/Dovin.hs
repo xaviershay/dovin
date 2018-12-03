@@ -250,14 +250,20 @@ spendMana amount = do
                          | otherwise = b : deleteFirst f bc
 
 parseMana :: String -> ManaPool
-parseMana pool = concatMap (\char -> if isDigit char then replicate (read [char]) 'X' else [char]) pool
+-- sort puts the Xs at the back
+parseMana pool = sort $ concatMap (\char -> if isDigit char then replicate (read [char]) 'X' else [char]) pool
 
-cast name = castFromLocation name (Active, Hand)
+cast name = castFromLocation (Active, Hand) "" name
 
-castFromLocation name loc = do
+cast mana name = do
+  castFromLocation (Active, Hand) mana name
+
+castFromLocation loc mana name = do
   move name loc (Active, Stack)
 
   card <- requireCard name mempty
+
+  spendMana mana
 
   when
     (hasAttribute "sorcery" card || hasAttribute "instant" card) $
@@ -269,9 +275,10 @@ castFromLocation name loc = do
     stack
     ((:) name)
 
-jumpstart discardName castName = do
+jumpstart mana discardName castName = do
+  spendMana mana
   discard discardName
-  castFromLocation castName (Active, Graveyard)
+  castFromLocation (Active, Graveyard) "" castName
   modifying
     (cards . at castName . _Just)
     (setAttribute "exile-when-leave-stack")
@@ -339,8 +346,10 @@ trigger targetName = do
 
   return ()
 
-activate targetName = do
+activate targetName mana = do
   card <- requireCard targetName mempty
+
+  spendMana mana
 
   return ()
 

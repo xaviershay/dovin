@@ -25,7 +25,7 @@ solution = do
 
   -- Helper function to keep track of which permanent types have been cast
   -- using Muldrotha's ability.
-  let castWithMuldrotha = \ptype cn -> do
+  let castWithMuldrotha = \ptype mana cn -> do
         let ptypes = S.fromList ["artifact", "creature", "land", "enchantment"]
         let counterName = "muldrotha-" <> ptype
 
@@ -38,7 +38,7 @@ solution = do
           throwError $ "Already cast card of type with Muldrotha: " <> ptype
         else
           do
-            castFromLocation cn (Active, Graveyard)
+            castFromLocation (Active, Graveyard) mana cn
             resolve cn
             assign (counters . at counterName) (Just 1)
 
@@ -63,26 +63,26 @@ solution = do
     addCreature "Sailor of Means" (1, 4) (Active, Graveyard) []
 
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
-    castWithMuldrotha "land" "Detection Tower"
-    castWithMuldrotha "artifact" "Mox Amber"
+    castWithMuldrotha "land" "" "Detection Tower"
+    castWithMuldrotha "artifact" "" "Mox Amber"
     tap "Detection Tower"
     tap "Mox Amber"
-    castWithMuldrotha "creature" "Diamond Mare"
+    castWithMuldrotha "creature" "2" "Diamond Mare"
 
   step "March of the Drowned on Vicious Conquistador" $ do
-    tap "Memorial to Folly 1"
-    withTriggers cast "March of the Drowned"
+    tapForMana "Memorial to Folly 1" "B"
+    withTriggers (cast "B") "March of the Drowned"
     resolve "March of the Drowned"
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
-    tap "Memorial to Folly 2"
-    withTriggers cast "Vicious Conquistador"
+    tapForMana "Memorial to Folly 2" "B"
+    withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"
 
   step "Dead Weight on Vicious Conquistador" $ do
-    tap "Memorial to Folly 3"
-    withTriggers cast "Dead Weight"
+    tapForMana "Memorial to Folly 3" "B"
+    withTriggers (cast "B") "Dead Weight"
     target "Vicious Conquistador"
     resolve "Dead Weight"
     modifyStrength "Vicious Conquistador" (-2, -2)
@@ -90,12 +90,12 @@ solution = do
     moveToGraveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
-    tap "Watery Grave 1"
-    tap "Watery Grave 2"
-    tap "Watery Grave 3"
-    tap "Watery Grave 4"
-    tap "Overgrown Tomb 1"
-    withTriggers cast "Gruesome Menagerie"
+    tapForMana "Watery Grave 1" "B"
+    tapForMana "Watery Grave 2" "B"
+    tapForMana "Watery Grave 3" "B"
+    tapForMana "Watery Grave 4" "B"
+    tapForMana "Overgrown Tomb 1" "B"
+    withTriggers (cast "3BB") "Gruesome Menagerie"
     resolve "Gruesome Menagerie"
     targetInLocation "Vicious Conquistador" (Active, Graveyard)
     targetInLocation "Sailor of Means" (Active, Graveyard)
@@ -104,24 +104,25 @@ solution = do
     addCard "Treasure" (Active, Play) ["artifact"]
 
   step "Dead Weight on Vicious Conquistador" $ do
-    tap "Overgrown Tomb 2"
-    withTriggers (castWithMuldrotha "enchantment") "Dead Weight"
+    tapForMana "Overgrown Tomb 2" "B"
+    withTriggers (castWithMuldrotha "enchantment" "B") "Dead Weight"
     target "Vicious Conquistador"
     modifyStrength "Vicious Conquistador" (-2, -2)
     resetStrength "Vicious Conquistador" (1, 2)
     moveToGraveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do
-    tap "Overgrown Tomb 3"
-    tap "Overgrown Tomb 4"
-    withTriggers cast "Find"
+    tapForMana "Overgrown Tomb 3" "B"
+    tapForMana "Overgrown Tomb 4" "B"
+    withTriggers (cast "BB") "Find"
     resolve "Find"
     targetInLocation "Vicious Conquistador" (Active, Graveyard)
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
-    tap "Treasure"
-    withTriggers cast "Vicious Conquistador"
+    tapForMana "Treasure" "B"
+    sacrifice "Treasure"
+    withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"
 
     validateLife Opponent 0

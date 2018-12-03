@@ -88,11 +88,11 @@ solution = do
     applyEffect "Merfolk Mistbinder 2"
 
   step "Use Undercity Uprising on Adeliz to destroy Shalai" $ do
-    tap $ numbered 1 "Timber Gorge"
-    tap $ numbered 1 "Submerged Boneyard"
-    tap $ numbered 2 "Submerged Boneyard"
+    tapForMana (numbered 1 "Timber Gorge") "G"
+    tapForMana (numbered 1 "Submerged Boneyard") "B"
+    tapForMana (numbered 2 "Submerged Boneyard") "B"
 
-    withTriggers cast "Undercity Uprising"
+    withTriggers (cast "1GB") "Undercity Uprising"
     resolve "Undercity Uprising"
     forCards
       (matchAttribute "creature" <> matchLocation (Active, Play))
@@ -104,16 +104,16 @@ solution = do
       removeEffect enemy
 
   step "Cast Doublecast" $ do
-    tap $ numbered 2 "Timber Gorge"
-    tap $ numbered 3 "Timber Gorge"
-    withTriggers cast "Doublecast 1"
+    tapForMana (numbered 2 "Timber Gorge") "R"
+    tapForMana (numbered 3 "Timber Gorge") "R"
+    withTriggers (cast "RR") "Doublecast 1"
 
     resolve "Doublecast 2"
     resolve "Doublecast 1"
 
   step "Cast Plummet to destroy all fliers" $ do
-    tap "Timber Gorge 4"
-    withTriggers cast "Plummet 1"
+    tapForMana "Timber Gorge 4" "G"
+    withTriggers (cast "G") "Plummet 1"
 
     -- From double doublecast earlier
     copySpell "Plummet 1" "Plummet 4"
@@ -138,9 +138,9 @@ solution = do
     resolve "Plummet 1" -- No target
 
   step "Quasiduplicate on archer, destroy one of the Mistbinders" $ do
-    tap $ numbered 1 "Highland Lake"
-    tap $ numbered 2 "Highland Lake"
-    withTriggers cast "Quasiduplicate 1"
+    tapForMana (numbered 1 "Highland Lake") "U"
+    tapForMana (numbered 2 "Highland Lake") "U"
+    withTriggers (cast "UU") "Quasiduplicate 1"
 
     with (numbered 2 "Merfolk Mistbinder") $ \enemy -> do
       forM_ [1..4] $ \n -> do
@@ -153,9 +153,9 @@ solution = do
       removeEffect enemy
 
   step "Jump-start Quasiduplicate again (w/ Waterknot), destroy merfolk" $ do
-    tap $ numbered 3 "Highland Lake"
-    tap $ numbered 4 "Highland Lake"
-    withTriggers (jumpstart "Waterknot") "Quasiduplicate 1"
+    tapForMana (numbered 3 "Highland Lake") "U"
+    tapForMana (numbered 4 "Highland Lake") "U"
+    withTriggers (jumpstart "UU" "Waterknot") "Quasiduplicate 1"
 
     with (numbered 1 "Merfolk Mistbinder") $ \enemy -> do
       forM_ [1..2] $ \n -> do
@@ -182,12 +182,12 @@ solution = do
       addToken tokenName (1, 4) (Active, Play) ["summoned"]
 
   step "Torgaar, sacrificing archers to reduce cost" $ do
-    tap $ numbered 3 "Submerged Boneyard"
-    tap $ numbered 4 "Submerged Boneyard"
+    tapForMana (numbered 3 "Submerged Boneyard") "B"
+    tapForMana (numbered 4 "Submerged Boneyard") "B"
     sacrifice $ numbered 1 "Afzocan Archer"
     sacrifice $ numbered 2 "Afzocan Archer"
     sacrifice $ numbered 3 "Afzocan Archer"
-    cast "Torgaar, Famine Incarnate"
+    cast "BB" "Torgaar, Famine Incarnate"
     resolve "Torgaar, Famine Incarnate"
     setLife Opponent 10
 
