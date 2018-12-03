@@ -21,7 +21,11 @@ solution = do
     addCards 4 "Dragonskull Summit" (Active, Play) ["land"]
 
   step "Cast Aurelia" $ do
-    forM_ [1..4] $ \n -> tap $ numbered n "Sacred Foundry"
+    tapForMana "Sacred Foundry 1" "R"
+    tapForMana "Sacred Foundry 2" "W"
+    tapForMana "Sacred Foundry 3" "W"
+    tapForMana "Sacred Foundry 4" "W"
+    spendMana "RW2"
     cast "Aurelia, Exemplar of Justice"
     resolve "Aurelia, Exemplar of Justice"
 
@@ -31,14 +35,15 @@ solution = do
     gainAttribute "Aurelia, Exemplar of Justice" "haste"
 
   step "Activate Goblin Banneret" $ do
-    forM_ [1..2] $ \n -> tap $ numbered n "Dragonskull Summit"
+    forM_ [1..2] $ \n -> tapForMana (numbered n "Dragonskull Summit") "R"
+    spendMana "R1"
     activate "Goblin Banneret"
     modifyStrength "Goblin Banneret" (2, 0)
 
   step "Begin combat, put Aurelia's trigger on Banneret" $ do
     trigger "Aurelia, Exemplar of Justice"
     modifyStrength "Goblin Banneret" (2, 0)
-   
+
   step "Attack with everything, stacking Mentor triggers on to Aurelia" $ do
     attackWith ["Aurelia, Exemplar of Justice", "Blade Instructor", "Goblin Banneret", "Barging Sergeant"]
     mentor "Blade Instructor" "Aurelia, Exemplar of Justice"

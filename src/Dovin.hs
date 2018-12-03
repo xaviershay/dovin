@@ -4,6 +4,7 @@
 
 module Dovin where
 
+import Data.Char (isDigit)
 import Data.Maybe (fromJust)
 import Control.Lens
 import Data.Monoid
@@ -25,6 +26,9 @@ import System.Exit
 type CardName = String
 type CardAttribute = String
 type CardLocation = (Player, Location)
+
+-- This is pretty dodgy - one char per mana - but works for now.
+type ManaPool = String
 
 data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
 -- TODO: Stack shouldn't be in here because there is only one of them
@@ -53,6 +57,7 @@ data Board = Board
   -- making that happen.
   , _life :: M.HashMap Player Int
   , _effects :: M.HashMap String (CardMatcher, Effect)
+  , _manaPool :: ManaPool
   }
 
 type GameMonad a = (ExceptT String (StateT Board (WriterT [(String, Board)] Identity))) a
@@ -72,6 +77,7 @@ emptyBoard = Board
                , _stack = mempty
                , _life = mempty
                , _effects = mempty
+               , _manaPool = mempty
                }
 
 
@@ -217,6 +223,34 @@ tap name = do
   modifying
     (cards . at name . _Just . cardAttributes)
     (S.insert tapA)
+
+tapForMana name amount = do
+  tap name
+  addMana amount
+
+addMana amount =
+  modifying
+    manaPool
+    (parseMana amount <>)
+
+spendMana amount = do
+  pool <- use manaPool
+  forM_ (parseMana amount) $ \mana ->
+    if mana == 'X' || mana `elem` pool then
+      modifying
+        manaPool
+        (deleteFirst (if mana == 'X' then (const True) else (==) mana))
+    else
+      throwError $ "Mana pool (" <> pool <> ") does not contain " <> [mana]
+  where
+
+    -- https://stackoverflow.com/questions/14688716/removing-the-first-instance-of-x-from-a-list
+    deleteFirst _ [] = []
+    deleteFirst f (b:bc) | f b    = bc
+                         | otherwise = b : deleteFirst f bc
+
+parseMana :: String -> ManaPool
+parseMana pool = concatMap (\char -> if isDigit char then replicate (read [char]) 'X' else [char]) pool
 
 cast name = castFromLocation name (Active, Hand)
 
@@ -561,6 +595,8 @@ runMonad state m =
 printBoard board = do
   putStr "Opponent Life: "
   print $ view (life . at Opponent . non 0) board
+  unless (null $ view manaPool board) $
+    putStrLn $ "Mana Pool: " <> view manaPool board
   putStrLn ""
   let sections = groupByWithKey (view location) (M.elems $ view cards board)
 
