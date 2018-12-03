@@ -37,6 +37,7 @@ data Card = Card
   , _cardAttributes :: S.Set CardAttribute
   , _cardStrength :: (Int, Int)
   , _cardDamage :: Int
+  , _cardLoyalty :: Int
   } deriving (Show)
 instance Hashable Player
 
@@ -89,6 +90,7 @@ mkCard name location =
     , _cardAttributes = mempty
     , _cardStrength = (0, 0)
     , _cardDamage = 0
+    , _cardLoyalty = 0
     }
 
 requireCard :: CardName -> CardMatcher -> GameMonad Card
@@ -138,7 +140,13 @@ matchOther = invert . matchName
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view (location . _1)
 
+matchLesserPower n = CardMatcher ("power < " <> show n) $
+  (< n) . view cardPower
+
 missingAttribute = invert . matchAttribute
+
+(CardMatcher d1 f) `matchOr` (CardMatcher d2 g) =
+    CardMatcher (d1 <> " or " <> d2) $ \c -> f c || g c
 
 invert :: CardMatcher -> CardMatcher
 invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f
@@ -297,6 +305,11 @@ trigger targetName = do
 
   return ()
 
+activate targetName = do
+  card <- requireCard targetName mempty
+
+  return ()
+
 validateRemoved targetName = do
   board <- get
   case view (cards . at targetName) board of
@@ -306,6 +319,16 @@ validateRemoved targetName = do
 validate targetName reqs = do
   _ <- requireCard targetName reqs
   return ()
+
+validateLife player n = do
+  current <- use (life . at player . non 0)
+
+  when (current /= n) $
+    throwError $ show player
+      <> " life was "
+      <> show current
+      <> ", expected "
+      <> show n
 
 destroy targetName = do
   _ <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
@@ -388,11 +411,27 @@ attackWith cs =
     c <- requireCard cn
            (matchLocation (Active, Play)
              <> matchAttribute "creature"
-             <> missingAttribute "summoned")
+             <> (
+                  matchAttribute "haste"
+                  `matchOr`
+                  missingAttribute "summoned"
+                ))
     tap cn
-    modifying
-      (life . at Opponent . non 0)
-      (\x -> x - view cardPower c)
+    gainAttribute cn "attacking"
+
+damagePlayer cn = do
+  c <- requireCard cn matchInPlay
+  modifying
+    (life . at Opponent . non 0)
+    (\x -> x - view cardPower c)
+
+mentor sourceName targetName = do
+  source <- requireCard sourceName $ matchAttribute "attacking"
+  _      <- requireCard targetName $
+                 matchAttribute "attacking"
+              <> matchLesserPower (view cardPower source)
+
+  modifyStrength targetName (1, 1)
 
 numbered n name = name <> " " <> show n
 fight :: CardName -> CardName -> GameMonad ()
@@ -449,6 +488,24 @@ setLife p n = assign (life . at p) (Just n)
 returnToHand cn = move cn (Active, Graveyard) (Active, Hand)
 returnToPlay cn = move cn (Active, Graveyard) (Active, Play)
 
+activatePlaneswalker cn loyalty = do
+  c <- requireCard cn matchInPlay
+
+  if view cardLoyalty c - loyalty < 0 then
+    throwError $ cn <> " does not have enough loyalty"
+  else
+    modifying
+      (cards . at cn . _Just . cardLoyalty)
+      (+ loyalty)
+
+gainAttribute cn attr = do
+  c <- requireCard cn mempty
+
+  modifying
+    (cards . at cn . _Just)
+    (setAttribute attr)
+
+
 -- CARD HELPERS
 --
 -- These are a type of effect that create cards. They can be used for initial
@@ -464,6 +521,11 @@ addCard name =
 
 addCreature name strength loc attrs =
   addCardRaw name strength loc ("creature":attrs)
+
+addPlaneswalker name loyalty loc = do
+  let c = set cardLoyalty loyalty $ set cardAttributes (S.fromList ["planeswalker"]) $ mkCard name loc
+
+  modifying cards (M.insert name c)
 
 addToken name strength loc attrs =
   addCreature name strength loc ("token":attrs)
@@ -526,6 +588,10 @@ printBoard board = do
              <> show (view cardToughness c)
              <> ", "
              <> show (view cardDamage c)
+             <> ")"
+         else if hasAttribute "planeswalker" c then
+           " ("
+             <> show (view cardLoyalty c)
              <> ")"
          else
           ""

@@ -123,3 +123,5 @@ solution = do
     tap "Treasure"
     withTriggers cast "Vicious Conquistador"
     resolve "Vicious Conquistador"
+
+    validateLife Opponent 0

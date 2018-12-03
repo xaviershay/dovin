@@ -3,6 +3,7 @@ module Main where
 import Dovin
 
 import qualified Solutions.Example
+import qualified Solutions.GuildsOfRavnica1
 import qualified Solutions.GuildsOfRavnica8
 import qualified Solutions.GuildsOfRavnica9
 
@@ -11,3 +12,4 @@ main = do
   runVerbose Solutions.Example.solution
   runVerbose Solutions.GuildsOfRavnica8.solution
   runVerbose Solutions.GuildsOfRavnica9.solution
+  runVerbose Solutions.GuildsOfRavnica1.solution
