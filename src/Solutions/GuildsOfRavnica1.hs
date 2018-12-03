@@ -35,7 +35,7 @@ solution = do
 
   step "Activate Goblin Banneret" $ do
     forM_ [1..2] $ \n -> tapForMana (numbered n "Dragonskull Summit") "R"
-    activate "Goblin Banneret" "R1"
+    activate "R1" "Goblin Banneret"
     modifyStrength "Goblin Banneret" (2, 0)
 
   step "Begin combat, put Aurelia's trigger on Banneret" $ do

@@ -110,6 +110,14 @@ requireCard name f = do
                    Left msg ->
                      throwError $ name <> " does not match requirements: " <> msg
 
+whenMatch name f action = do
+  board <- get
+
+  case view (cards . at name) board of
+    Nothing -> return ()
+    Just card -> case applyMatcherWithDesc f card of
+                   Right () -> action
+                   Left msg -> return ()
 -- CARD MATCHERS
 --
 -- Matchers are used for both filtering sets of cards, and also for verifying
@@ -236,7 +244,7 @@ addMana amount =
 spendMana amount = do
   pool <- use manaPool
   forM_ (parseMana amount) $ \mana ->
-    if mana == 'X' || mana `elem` pool then
+    if mana == 'X' && (not . null $ pool) || mana `elem` pool then
       modifying
         manaPool
         (deleteFirst (if mana == 'X' then (const True) else (==) mana))
@@ -344,7 +352,7 @@ trigger targetName = do
 
   return ()
 
-activate targetName mana = do
+activate mana targetName = do
   card <- requireCard targetName mempty
 
   spendMana mana
@@ -484,7 +492,7 @@ fight x y = do
   target y
 
   fight' x y
-  fight' y x
+  unless (x == y) $ fight' y x
 
   where
     fight' x y = do
@@ -545,7 +553,7 @@ gainAttribute cn attr = do
   modifying
     (cards . at cn . _Just)
     (setAttribute attr)
-
+  
 
 -- CARD HELPERS
 --
@@ -555,6 +563,7 @@ gainAttribute cn attr = do
 addCardRaw name strength loc attrs = do
   let c = set cardStrength strength $ set cardAttributes (S.fromList attrs) $ mkCard name loc
 
+  validateRemoved name
   modifying cards (M.insert name c)
 
 addCard name =
@@ -566,6 +575,7 @@ addCreature name strength loc attrs =
 addPlaneswalker name loyalty loc = do
   let c = set cardLoyalty loyalty $ set cardAttributes (S.fromList ["planeswalker"]) $ mkCard name loc
 
+  validateRemoved name
   modifying cards (M.insert name c)
 
 addToken name strength loc attrs =
@@ -591,6 +601,14 @@ step desc m = do
   case e of
     Left x -> throwError x
     Right _ -> return ()
+
+fork :: [GameMonad ()] -> GameMonad ()
+fork options = do
+  b <- get
+
+  forM_ options $ \m -> do
+    m
+    put b
 
 runMonad :: Board -> GameMonad () -> (Either String (), Board, [(String, Board)])
 runMonad state m =
