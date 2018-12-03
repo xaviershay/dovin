@@ -541,6 +541,14 @@ forCards matcher f = do
       (cards . at (view cardName c) . _Just)
       (f c)
 
+forCardsM :: CardMatcher -> (Card -> GameMonad ()) -> GameMonad ()
+forCardsM matcher f = do
+  cs <- use cards
+
+  let matchingCs = filter (applyMatcher matcher) (M.elems cs)
+
+  forM_ matchingCs f
+
 gainLife player amount =
   modifying
     (life . at player . non 0)
