@@ -253,8 +253,6 @@ parseMana :: String -> ManaPool
 -- sort puts the Xs at the back
 parseMana pool = sort $ concatMap (\char -> if isDigit char then replicate (read [char]) 'X' else [char]) pool
 
-cast name = castFromLocation (Active, Hand) "" name
-
 cast mana name = do
   castFromLocation (Active, Hand) mana name
 
