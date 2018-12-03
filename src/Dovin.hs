@@ -35,6 +35,8 @@ data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
 data Location = Hand | Graveyard | Play | Stack | Exile
   deriving (Show, Eq, Ord)
 
+data Phase = FirstMain | Combat deriving (Show, Eq)
+
 data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
@@ -58,6 +60,7 @@ data Board = Board
   , _life :: M.HashMap Player Int
   , _effects :: M.HashMap String (CardMatcher, Effect)
   , _manaPool :: ManaPool
+  , _phase :: Phase
   }
 
 type GameMonad a = (ExceptT String (StateT Board (WriterT [(String, Board)] Identity))) a
@@ -78,6 +81,7 @@ emptyBoard = Board
                , _life = mempty
                , _effects = mempty
                , _manaPool = mempty
+               , _phase = FirstMain
                }
 
 
@@ -379,6 +383,15 @@ validateLife player n = do
       <> ", expected "
       <> show n
 
+validatePhase expected = do
+  actual <- use phase
+
+  when (actual /= expected) $
+    throwError $ "phase was "
+      <> show actual
+      <> ", expected "
+      <> show expected
+
 destroy targetName = do
   _ <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
 
@@ -455,7 +468,10 @@ modifyStrength cn (x, y) = do
   when (view cardToughness c <= 0) $ removeFromPlay cn
 
 attackWith :: [CardName] -> GameMonad ()
-attackWith cs =
+attackWith cs = do
+  validatePhase FirstMain
+  assign phase Combat
+
   forM_ cs $ \cn -> do
     c <- requireCard cn
            (matchLocation (Active, Play)

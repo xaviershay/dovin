@@ -8,6 +8,7 @@ solution :: GameMonad ()
 solution = do
   let sacrificeToNecrolisk =
         \name -> do
+          validatePhase FirstMain
           activate "1" "Undercity Necrolisk"
           validate name $
                matchInPlay
@@ -77,9 +78,22 @@ solution = do
     sacrifice "Treasure"
     sacrificeToNecrolisk "Bat"
 
+  step "Repeat vampire/bat cycle" $ do
+    tapForMana "Gateway Plaza 3" "B"
     tapForMana "Treasure" "1"
     sacrifice "Treasure"
-    sacrificeToNecrolisk "Pitiless Plunderer"
+    castFromLocation (Active, Graveyard) "1B" "Oathsworn Vampire"
+    resolve "Oathsworn Vampire"
+
+    trigger "Desecrated Tomb"
+    addToken "Bat" (1, 1) (Active, Play) ["flying"]
+
+    tapForMana "Gateway Plaza 4" "B"
+    sacrificeToNecrolisk "Oathsworn Vampire"
+
+    tapForMana "Treasure" "1"
+    sacrifice "Treasure"
+    sacrificeToNecrolisk "Bat"
 
   step "Attack with Roc and Necrolisk" $ do
     validate "Roc Charger" $ matchAttribute "menace"
@@ -90,17 +104,10 @@ solution = do
   fork $
     [ step "Roc is blocked" $ do
         gainAttribute "Roc Charger" "blocked"
-
-        tapForMana "Gateway Plaza 3" "B"
-        sacrificeToNecrolisk "Roc Charger"
-
         damagePlayer "Undercity Necrolisk"
-
         validateLife Opponent 0
     , step "Roc is blocked" $ do
         gainAttribute "Undercity Necrolisk" "blocked"
-
         damagePlayer "Roc Charger"
-
         validateLife Opponent 0
     ]
