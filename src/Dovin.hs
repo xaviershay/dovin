@@ -1,13 +1,15 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGAUGE FlexibleContexts #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE FlexibleContexts #-}
 
-module Dovin where
+module Dovin
+  ( module Dovin
+  , module Dovin.Actions
+  , module Dovin.Types
+  , module Dovin.Helpers
+  ) where
 
 import Data.Char (isDigit)
-import Data.Maybe (fromJust)
 import Control.Lens
-import Data.Monoid
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Hashable
@@ -20,60 +22,12 @@ import Data.List
 import Data.Function
 import System.Exit
 
+import Dovin.Actions
+import Dovin.Types
+import Dovin.Helpers
+
 -- CORE TYPES
 --
-
-type CardName = String
-type CardAttribute = String
-type CardLocation = (Player, Location)
-
--- This is pretty dodgy - one char per mana - but works for now.
-type ManaPool = String
-
-data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
--- TODO: Stack shouldn't be in here because there is only one of them
-data Location = Hand | Graveyard | Play | Stack | Exile
-  deriving (Show, Eq, Ord)
-
-data Phase = FirstMain | Combat deriving (Show, Eq)
-
-data Card = Card
-  { _cardName :: CardName
-  , _location :: (Player, Location)
-  , _cardAttributes :: S.Set CardAttribute
-  , _cardStrength :: (Int, Int)
-  , _cardDamage :: Int
-  , _cardLoyalty :: Int
-  } deriving (Show)
-instance Hashable Player
-
-data Board = Board
-  { _cards :: M.HashMap CardName Card
-  -- The stack is currently the only location where we care about order, so
-  -- store that information alongside the main _cards map. This won't scale -
-  -- deck and graveyard need to be ordered also - but works for now. Need to
-  -- think more about "hiding" this data structure.
-  , _stack :: [CardName]
-  , _counters :: M.HashMap String Int
-  -- In theory, life could be just another counter. Need to think more about
-  -- making that happen.
-  , _life :: M.HashMap Player Int
-  , _effects :: M.HashMap String (CardMatcher, Effect)
-  , _manaPool :: ManaPool
-  , _phase :: Phase
-  }
-
-type GameMonad a = (ExceptT String (StateT Board (WriterT [(String, Board)] Identity))) a
-
-data CardMatcher = CardMatcher String (Card -> Bool)
-data Effect = Effect (Card -> Card) (Card -> Card)
-
-makeLenses ''Board
-makeLenses ''Card
-
-cardPower = cardStrength . _1
-cardToughness = cardStrength . _2
-
 emptyBoard = Board
                { _cards = mempty
                , _counters = mempty
@@ -91,7 +45,6 @@ setAttribute attr = over cardAttributes (S.insert attr)
 removeAttribute :: CardAttribute -> Card -> Card
 removeAttribute attr = over cardAttributes (S.delete attr)
 
-hasAttribute attr = S.member attr . view cardAttributes
 
 mkCard name location =
   Card
@@ -103,17 +56,8 @@ mkCard name location =
     , _cardLoyalty = 0
     }
 
-requireCard :: CardName -> CardMatcher -> GameMonad Card
-requireCard name f = do
-  board <- get
 
-  case view (cards . at name) board of
-    Nothing -> throwError $ "Card does not exist: " <> name
-    Just card -> case applyMatcherWithDesc f card of
-                   Right () -> return card
-                   Left msg ->
-                     throwError $ name <> " does not match requirements: " <> msg
-
+whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
   board <- get
 
@@ -122,66 +66,6 @@ whenMatch name f action = do
     Just card -> case applyMatcherWithDesc f card of
                    Right () -> action
                    Left msg -> return ()
--- CARD MATCHERS
---
--- Matchers are used for both filtering sets of cards, and also for verifying
--- attributes of cards.
---
--- A wrapping type is used since I intend to add labels/introspection
--- capabilities at some point.
-
-instance Show CardMatcher where
-  show _ = "<matcher>"
-
-instance Semigroup CardMatcher where
-  (CardMatcher d1 f) <> (CardMatcher d2 g) =
-    CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
-
-instance Monoid CardMatcher where
-  mempty = CardMatcher "" $ const True
-
-matchLocation :: CardLocation -> CardMatcher
-matchLocation loc = CardMatcher ("in location " <> show loc) $
-  (==) loc . view location
-
-matchInPlay = CardMatcher "in play" $ \c -> snd (view location c) == Play
-
-matchAttribute :: CardAttribute -> CardMatcher
-matchAttribute attr = CardMatcher ("has attribute " <> attr) $
-  S.member attr . view cardAttributes
-
-matchName :: CardName -> CardMatcher
-matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
-
-matchOther = invert . matchName
-
-matchController player = CardMatcher ("has controller " <> show player) $
-  (==) player . view (location . _1)
-
-matchLesserPower n = CardMatcher ("power < " <> show n) $
-  (< n) . view cardPower
-
-missingAttribute = invert . matchAttribute
-
-(CardMatcher d1 f) `matchOr` (CardMatcher d2 g) =
-    CardMatcher (d1 <> " or " <> d2) $ \c -> f c || g c
-
-invert :: CardMatcher -> CardMatcher
-invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f
-
-applyMatcher :: CardMatcher -> Card -> Bool
-applyMatcher matcher c =
-  case applyMatcherWithDesc matcher c of
-    Left _ -> False
-    Right _ -> True
-
-applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
-applyMatcherWithDesc (CardMatcher d f) c =
-  if f c then
-    Right ()
-  else
-    Left d
-
 -- EFFECTS
 --
 -- An effect is a reversible function that can be applied to a card. They can
@@ -196,9 +80,11 @@ instance Semigroup Effect where
 instance Monoid Effect where
   mempty = Effect id id
 
+addEffect :: EffectName -> CardMatcher -> Effect -> GameMonad ()
 addEffect cn f effect =
   modifying effects (M.insert cn (f, effect))
 
+requireEffect :: EffectName -> GameMonad (CardMatcher, Effect)
 requireEffect effectName = do
   board <- get
   case view (effects . at effectName) board of
@@ -246,50 +132,11 @@ tapForMana name amount = do
   tap name
   addMana amount
 
+addMana :: ManaString -> GameMonad ()
 addMana amount =
   modifying
     manaPool
     (parseMana amount <>)
-
-spendMana amount = do
-  pool <- use manaPool
-  forM_ (parseMana amount) $ \mana ->
-    if mana == 'X' && (not . null $ pool) || mana `elem` pool then
-      modifying
-        manaPool
-        (deleteFirst (if mana == 'X' then (const True) else (==) mana))
-    else
-      throwError $ "Mana pool (" <> pool <> ") does not contain " <> [mana]
-  where
-
-    -- https://stackoverflow.com/questions/14688716/removing-the-first-instance-of-x-from-a-list
-    deleteFirst _ [] = []
-    deleteFirst f (b:bc) | f b    = bc
-                         | otherwise = b : deleteFirst f bc
-
-parseMana :: String -> ManaPool
--- sort puts the Xs at the back
-parseMana pool = sort $ concatMap (\char -> if isDigit char then replicate (read [char]) 'X' else [char]) pool
-
-cast mana name = do
-  castFromLocation (Active, Hand) mana name
-
-castFromLocation loc mana name = do
-  move name loc (Active, Stack)
-
-  card <- requireCard name mempty
-
-  spendMana mana
-
-  when
-    (hasAttribute "sorcery" card || hasAttribute "instant" card) $
-    modifying
-      (counters . at "storm" . non 0)
-      (+ 1)
-
-  modifying
-    stack
-    ((:) name)
 
 jumpstart mana discardName castName = do
   spendMana mana
@@ -299,14 +146,7 @@ jumpstart mana discardName castName = do
     (cards . at castName . _Just)
     (setAttribute "exile-when-leave-stack")
 
-discard name = move name (Active, Hand) (Active, Graveyard)
-
-move name from to = do
-  c <- requireCard name $ matchLocation from
-
-  assign
-    (cards . at name . _Just . location)
-    to
+discard = move (Active, Hand) (Active, Graveyard)
 
 resolve :: CardName -> GameMonad ()
 resolve expectedName = do
@@ -339,11 +179,11 @@ resolve expectedName = do
               modifying
                 (cards . at name . _Just)
                 (removeAttribute "exile-when-leave-stack")
-              move name (Active, Stack) (Active, Exile)
+              move (Active, Stack) (Active, Exile) name
           else
-            move name (Active, Stack) (Active, Graveyard)
+            move (Active, Stack) (Active, Graveyard) name
         else
-          move name (Active, Stack) (Active, Play)
+          move (Active, Stack) (Active, Play) name
 
 target targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute "hexproof")
@@ -369,16 +209,19 @@ activate mana targetName = do
 
   return ()
 
+validateRemoved :: CardName -> GameMonad ()
 validateRemoved targetName = do
   board <- get
   case view (cards . at targetName) board of
     Nothing -> return ()
     Just _ -> throwError $ "Card should be removed: " <> targetName
 
+validate :: CardName -> CardMatcher -> GameMonad ()
 validate targetName reqs = do
   _ <- requireCard targetName reqs
   return ()
 
+validateLife :: Player -> Int -> GameMonad ()
 validateLife player n = do
   current <- use (life . at player . non 0)
 
@@ -389,6 +232,7 @@ validateLife player n = do
       <> ", expected "
       <> show n
 
+validatePhase :: Phase -> GameMonad ()
 validatePhase expected = do
   actual <- use phase
 
@@ -405,6 +249,7 @@ destroy targetName = do
 
 sacrifice targetName = removeFromPlay targetName
 
+remove :: CardName -> GameMonad ()
 remove cn = do
   modifying cards (M.delete cn)
   modifying stack (filter (/= cn))
@@ -416,7 +261,7 @@ removeFromPlay cardName = do
     remove cardName
   else
     let loc = view location card in
-      move cardName loc $ second (const Graveyard) loc
+      move loc (second (const Graveyard) loc) cardName
 
 copySpell targetName newName = do
   card <- requireCard targetName mempty
@@ -544,17 +389,20 @@ forCards matcher f = do
 
   forM_ (map (view cardName) matchingCs) f
 
+gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
   modifying
     (life . at player . non 0)
     (+ amount)
 
+loseLife :: Player -> Int -> GameMonad ()
 loseLife player amount = gainLife player (-amount)
 
+setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
 
-returnToHand cn = move cn (Active, Graveyard) (Active, Hand)
-returnToPlay cn = move cn (Active, Graveyard) (Active, Play)
+returnToHand = move (Active, Graveyard) (Active, Hand)
+returnToPlay = move (Active, Graveyard) (Active, Play)
 
 activatePlaneswalker cn loyalty = do
   c <- requireCard cn matchInPlay
@@ -572,13 +420,14 @@ gainAttribute attr cn = do
   modifying
     (cards . at cn . _Just)
     (setAttribute attr)
-  
+
 
 -- CARD HELPERS
 --
 -- These are a type of effect that create cards. They can be used for initial
 -- board setup, but also to create cards as needed (such as tokens).
 
+addCardRaw :: CardName -> (Int, Int) -> CardLocation -> [CardAttribute] -> GameMonad ()
 addCardRaw name strength loc attrs = do
   let c = set cardStrength strength $ set cardAttributes (S.fromList attrs) $ mkCard name loc
 
@@ -591,6 +440,7 @@ addCard name =
 addCreature name strength loc attrs =
   addCardRaw name strength loc ("creature":attrs)
 
+addPlaneswalker :: CardName -> Int -> CardLocation -> GameMonad ()
 addPlaneswalker name loyalty loc = do
   let c = set cardLoyalty loyalty $ set cardAttributes (S.fromList ["planeswalker"]) $ mkCard name loc
 
@@ -610,6 +460,7 @@ addCards n name loc attrs = do
 -- A proof consists on multiple steps. Each step is a human-readable
 -- description, then a definition of that step using actions. If a step fails,
 -- no subsequent steps will be run.
+step :: String -> GameMonad () -> GameMonad ()
 step desc m = do
   b <- get
   let (e, b', _) = runMonad b m

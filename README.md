@@ -20,7 +20,7 @@ them as you would in a real game of paper magic.
 
 I've only added actions "as needed" to solve problems, so the built-in
 functions are rather incomplete right now. It is straightforward to add more
-though. See `src/Dovin.hs` for implemented actions.
+though. See `src/Dovin.hs` and `src/Dovin/Actions.hs` for available actions.
 
 ## Example
 
@@ -82,3 +82,9 @@ solutions for published Possibility Storm puzzles!)
 
     stack build
     stack exec dovin # Runs all solutions
+
+`src/Dovin.hs` is currently a dumping ground for prototype code. Actions are in
+the process of being moved to `Dovin.Actions`. To be moved they must:
+
+  * Be unit tested.
+  * Be documented.
