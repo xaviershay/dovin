@@ -54,7 +54,7 @@ mkCard name location =
     { _cardName = name
     , _location = location
     , _cardAttributes = mempty
-    , _cardStrength = (0, 0)
+    , _cardStrength = mempty
     , _cardDamage = 0
     , _cardLoyalty = 0
     }
@@ -112,8 +112,8 @@ removeEffect effectName = do
 
 attributeEffect attr = Effect (setAttribute attr) (removeAttribute attr)
 strengthEffect (x, y) = Effect
-  (over cardStrength (first (+ x) >>> second (+ y)))
-  (over cardStrength (first (subtract x) >>> second (subtract y)))
+  (over cardStrength (overStrength $ first (+ x) >>> second (+ y)))
+  (over cardStrength (overStrength $ first (subtract x) >>> second (subtract y)))
 
 -- ACTIONS
 --
@@ -293,7 +293,7 @@ resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do
   c <- requireCard cn (matchAttribute "creature")
 
-  let c' = set cardStrength desired c
+  let c' = set cardStrength (CardStrength desired) c
 
   assign
     (cards . at cn . _Just)
@@ -314,7 +314,7 @@ modifyStrength cn (x, y) = do
 
   modifying
     (cards . at cn . _Just . cardStrength)
-    (first (+ x) >>> second (+ y))
+    (overStrength $ first (+ x) >>> second (+ y))
 
   -- Fetch card again to get new strength
   c <- requireCard cn mempty
@@ -433,7 +433,7 @@ emptyCard = mkCard "" (Active, Hand)
 
 addCardRaw :: CardName -> (Int, Int) -> CardLocation -> [CardAttribute] -> GameMonad ()
 addCardRaw name strength loc attrs = do
-  let c = set cardStrength strength $ set cardAttributes (S.fromList attrs) $ mkCard name loc
+  let c = set cardStrength (CardStrength strength) $ set cardAttributes (S.fromList attrs) $ mkCard name loc
 
   validateRemoved name
   modifying cards (M.insert name c)

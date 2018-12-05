@@ -9,7 +9,8 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
 import Data.Hashable (Hashable)
-import Control.Lens (makeLenses, view, _1, _2, Lens')
+import Control.Arrow (first, second)
+import Control.Lens (makeLenses, view, _1, _2, Lens', over)
 import Control.Monad.Identity (Identity)
 import           Control.Monad.Except (ExceptT)
 import           Control.Monad.Writer (WriterT)
@@ -27,6 +28,7 @@ data Location = Hand | Graveyard | Play | Stack | Exile
 
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
+newtype CardStrength = CardStrength (Int, Int) deriving (Show, Eq)
 
 data Phase = FirstMain | Combat deriving (Show, Eq)
 
@@ -34,7 +36,7 @@ data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
   , _cardAttributes :: CardAttributes
-  , _cardStrength :: (Int, Int)
+  , _cardStrength :: CardStrength
   , _cardDamage :: Int
   , _cardLoyalty :: Int
   } deriving (Show, Eq)
@@ -67,9 +69,17 @@ makeLenses ''Board
 makeLenses ''Card
 
 cardPower :: Control.Lens.Lens' Card Int
-cardPower = cardStrength . _1
+cardPower f parent =
+  fmap (\x -> over cardStrength (CardStrength . first (const x) . unwrap) parent) (f $ fst $ unwrap $ view cardStrength parent)
+  where
+    unwrap (CardStrength x) = x
 cardToughness :: Control.Lens.Lens' Card Int
-cardToughness = cardStrength . _2
+cardToughness f parent =
+  fmap (\x -> over cardStrength (CardStrength . second (const x) . unwrap) parent) (f $ snd $ unwrap $ view cardStrength parent)
+  where
+    unwrap (CardStrength x) = x
+
+overStrength f (CardStrength x) = CardStrength $ f x
 
 instance Show CardMatcher where
   show _ = "<matcher>"
@@ -81,3 +91,9 @@ instance Semigroup CardMatcher where
 instance Monoid CardMatcher where
   mempty = CardMatcher "" $ const True
 
+instance Semigroup CardStrength where
+  CardStrength (p1, t1) <> CardStrength (p2, t2) =
+   CardStrength (p1 + p2, t1 + t2)
+
+instance Monoid CardStrength where
+  mempty = CardStrength (0, 0)
