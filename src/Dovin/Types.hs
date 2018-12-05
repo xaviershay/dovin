@@ -68,18 +68,21 @@ type Formatter = Board -> String
 makeLenses ''Board
 makeLenses ''Card
 
+-- TODO: How to define these lenses using built-in Lens primitives
+-- (Control.Lens.Wrapped?)
 cardPower :: Control.Lens.Lens' Card Int
-cardPower f parent =
-  fmap (\x -> over cardStrength (CardStrength . first (const x) . unwrap) parent) (f $ fst $ unwrap $ view cardStrength parent)
-  where
-    unwrap (CardStrength x) = x
-cardToughness :: Control.Lens.Lens' Card Int
-cardToughness f parent =
-  fmap (\x -> over cardStrength (CardStrength . second (const x) . unwrap) parent) (f $ snd $ unwrap $ view cardStrength parent)
+cardPower f parent = fmap
+  (\x -> over cardStrength (CardStrength . first (const x) . unwrap) parent)
+  (f . fst . unwrap . view cardStrength $ parent)
   where
     unwrap (CardStrength x) = x
 
-overStrength f (CardStrength x) = CardStrength $ f x
+cardToughness :: Control.Lens.Lens' Card Int
+cardToughness f parent = fmap
+  (\x -> over cardStrength (CardStrength . second (const x) . unwrap) parent)
+  (f . snd . unwrap . view cardStrength $ parent)
+  where
+    unwrap (CardStrength x) = x
 
 instance Show CardMatcher where
   show _ = "<matcher>"

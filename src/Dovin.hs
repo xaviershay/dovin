@@ -18,7 +18,7 @@ import GHC.Generics hiding (to)
 import           Control.Monad.Except
 import           Control.Monad.Writer
 import           Control.Monad.State hiding (state)
-import Control.Arrow ((&&&), (>>>), first, second)
+import Control.Arrow ((&&&), second)
 import Data.List
 import Data.Function
 import System.Exit
@@ -112,8 +112,8 @@ removeEffect effectName = do
 
 attributeEffect attr = Effect (setAttribute attr) (removeAttribute attr)
 strengthEffect (x, y) = Effect
-  (over cardStrength (overStrength $ first (+ x) >>> second (+ y)))
-  (over cardStrength (overStrength $ first (subtract x) >>> second (subtract y)))
+  (over cardStrength (CardStrength (x, y) <>))
+  (over cardStrength (CardStrength (-x, -y) <>))
 
 -- ACTIONS
 --
@@ -314,7 +314,7 @@ modifyStrength cn (x, y) = do
 
   modifying
     (cards . at cn . _Just . cardStrength)
-    (overStrength $ first (+ x) >>> second (+ y))
+    (CardStrength (x, y) <>)
 
   -- Fetch card again to get new strength
   c <- requireCard cn mempty
