@@ -106,7 +106,7 @@ solution = do
         gainAttribute "blocked" "Roc Charger"
         damagePlayer "Undercity Necrolisk"
         validateLife Opponent 0
-    , step "Roc is blocked" $ do
+    , step "Undercity Necrolisk is blocked" $ do
         gainAttribute "blocked" "Undercity Necrolisk"
         damagePlayer "Roc Charger"
         validateLife Opponent 0
