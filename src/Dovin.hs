@@ -389,6 +389,12 @@ forCards matcher f = do
 
   forM_ (map (view cardName) matchingCs) f
 
+countCards :: CardMatcher -> GameMonad Int
+countCards matcher = do
+  cs <- use cards
+
+  return . length . filter (applyMatcher matcher) $ (M.elems cs)
+
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
   modifying
@@ -426,6 +432,7 @@ gainAttribute attr cn = do
 --
 -- These are a type of effect that create cards. They can be used for initial
 -- board setup, but also to create cards as needed (such as tokens).
+emptyCard = mkCard "" (Active, Hand)
 
 addCardRaw :: CardName -> (Int, Int) -> CardLocation -> [CardAttribute] -> GameMonad ()
 addCardRaw name strength loc attrs = do
@@ -487,6 +494,12 @@ runMonad state m =
 
   (e, b, log)
 
+execMonad :: Board -> GameMonad a -> Either String a
+execMonad state m =
+  let result = fst $ runIdentity (runWriterT (evalStateT (runExceptT m) state)) in
+
+  result
+
 printBoard board = do
   putStr "Opponent Life: "
   print $ view (life . at Opponent . non 0) board
@@ -535,6 +548,25 @@ printBoard board = do
 
 with x f = f x
 
+formatStrength (p, t) = show p <> "/" <> show t
+
+run :: (Board -> String) -> GameMonad () -> IO ()
+run formatter solution = do
+  let (e, _, log) = runMonad emptyBoard solution
+
+  forM_ (zip log [1..]) $ \((step, board), n) -> do
+    putStr $ show n <> ". "
+    putStr step
+    putStrLn (formatter board)
+
+  case e of
+    Left x -> do
+      putStrLn "ERROR:"
+      putStrLn x
+      putStrLn ""
+      System.Exit.exitFailure
+    Right _ -> return ()
+
 runVerbose :: GameMonad () -> IO ()
 runVerbose solution = do
   let (e, _, log) = runMonad emptyBoard solution
@@ -554,3 +586,14 @@ runVerbose solution = do
       putStrLn ""
       System.Exit.exitFailure
     Right _ -> return ()
+
+attributeFormatter :: [(String, GameMonad String)] -> Formatter
+attributeFormatter attrs board = do
+  "\n      " <> (intercalate ", " . map (\(x, y) -> x <> ": " <> y) $
+    map formatAttribute attrs)
+
+  where
+    formatAttribute :: (String, GameMonad String) -> (String, String)
+    formatAttribute (label, m) =
+      let Right value = execMonad board m in
+      (label, value)

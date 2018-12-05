@@ -16,4 +16,4 @@ main = do
   runVerbose Solutions.GuildsOfRavnica1.solution
   runVerbose Solutions.GuildsOfRavnica3.solution
   runVerbose Solutions.GuildsOfRavnica8.solution
-  runVerbose Solutions.GuildsOfRavnica9.solution
+  run Solutions.GuildsOfRavnica9.formatter Solutions.GuildsOfRavnica9.solution

@@ -1,5 +1,6 @@
 module Solutions.GuildsOfRavnica9 where
 
+import Control.Lens
 import Control.Monad
 
 import Dovin
@@ -197,3 +198,21 @@ solution = do
     damagePlayer "Afzocan Archer"
 
     validateLife Opponent 0
+
+formatter :: Formatter
+formatter = attributeFormatter
+  [ (,) "mana"    $ show <$>
+                      countCards (
+                           matchAttribute "land"
+                        <> missingAttribute "tapped"
+                      )
+  , (,) "storm"   $ show <$> use (counters . at "storm" . non 0)
+  , (,) "adeliz"  $ formatStrength <$>
+                      use (cards
+                             . at "Adeliz, the Cinder Wind"
+                             . non emptyCard
+                             . cardStrength)
+  , (,) "enemies" $ show <$>
+                      countCards (matchLocation (Opponent, Play))
+  ]
+

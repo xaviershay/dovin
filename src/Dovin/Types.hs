@@ -37,7 +37,7 @@ data Card = Card
   , _cardStrength :: (Int, Int)
   , _cardDamage :: Int
   , _cardLoyalty :: Int
-  } deriving (Show)
+  } deriving (Show, Eq)
 instance Hashable Player
 
 data CardMatcher = CardMatcher String (Card -> Bool)
@@ -61,6 +61,7 @@ data Board = Board
   }
 
 type GameMonad a = (ExceptT String (StateT Board (WriterT [(String, Board)] Identity))) a
+type Formatter = Board -> String
 
 makeLenses ''Board
 makeLenses ''Card
