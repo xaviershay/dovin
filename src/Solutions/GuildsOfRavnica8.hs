@@ -128,11 +128,6 @@ solution = do
     validateLife Opponent 0
 
 formatter :: Formatter
-formatter = attributeFormatter
-  [ (,) "mana"    $ show <$>
-                      countCards (
-                           matchAttribute "land"
-                        <> missingAttribute "tapped"
-                      )
-  , (,) "life"   $ show <$> use (life . at Opponent . non 0)
-  ]
+formatter = attributeFormatter $ do
+  attribute "mana" $ countCards (matchAttribute "land" <> missingAttribute "tapped")
+  attribute "life" $ countLife Opponent

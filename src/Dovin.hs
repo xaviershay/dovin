@@ -392,12 +392,6 @@ forCards matcher f = do
 
   forM_ (map (view cardName) matchingCs) f
 
-countCards :: CardMatcher -> GameMonad Int
-countCards matcher = do
-  cs <- use cards
-
-  return . length . filter (applyMatcher matcher) $ (M.elems cs)
-
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
   modifying

@@ -200,19 +200,12 @@ solution = do
     validateLife Opponent 0
 
 formatter :: Formatter
-formatter = attributeFormatter
-  [ (,) "mana"    $ show <$>
-                      countCards (
-                           matchAttribute "land"
-                        <> missingAttribute "tapped"
-                      )
-  , (,) "storm"   $ show <$> use (counters . at "storm" . non 0)
-  , (,) "adeliz"  $ formatStrength <$>
-                      use (cards
+formatter = attributeFormatter $ do
+  attribute "mana"   $ countCards (matchAttribute "land" <> missingAttribute "tapped")
+  attribute "storm"  $ countValue "storm"
+  attribute "adeliz" $ use (cards
                              . at "Adeliz, the Cinder Wind"
                              . non emptyCard
                              . cardStrength)
-  , (,) "enemies" $ show <$>
-                      countCards (matchLocation (Opponent, Play))
-  ]
+  attribute "enemies" $ countCards (matchLocation (Opponent, Play))
 
