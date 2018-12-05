@@ -3,18 +3,15 @@
 
 module Dovin.Types where
 
-import GHC.Generics
-
-import qualified Data.HashMap.Strict as M
-import qualified Data.Set as S
-
-import Data.Hashable (Hashable)
-import Control.Arrow (first, second)
-import Control.Lens (makeLenses, view, _1, _2, Lens', over)
+import Control.Lens (Lens', makeLenses, over, view)
+import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
-import           Control.Monad.Except (ExceptT)
-import           Control.Monad.Writer (WriterT)
-import           Control.Monad.State (StateT)
+import Control.Monad.State (StateT)
+import Control.Monad.Writer (WriterT)
+import qualified Data.HashMap.Strict as M
+import Data.Hashable (Hashable)
+import qualified Data.Set as S
+import GHC.Generics
 
 type CardName = String
 type CardAttribute = String
@@ -28,9 +25,9 @@ data Location = Hand | Graveyard | Play | Stack | Exile
 
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
-newtype CardStrength = CardStrength (Int, Int) deriving (Eq)
+data CardStrength = CardStrength Int Int deriving (Eq)
 instance Show CardStrength where
-  show (CardStrength (p, t)) = show p <> "/" <> show t
+  show (CardStrength p t) = show p <> "/" <> show t
 
 data Phase = FirstMain | Combat deriving (Show, Eq)
 
@@ -74,17 +71,19 @@ makeLenses ''Card
 -- (Control.Lens.Wrapped?)
 cardPower :: Control.Lens.Lens' Card Int
 cardPower f parent = fmap
-  (\x -> over cardStrength (CardStrength . first (const x) . unwrap) parent)
-  (f . fst . unwrap . view cardStrength $ parent)
+  (\x -> over cardStrength (setPower x) parent)
+  (f . power . view cardStrength $ parent)
   where
-    unwrap (CardStrength x) = x
+    setPower p (CardStrength _ t) = CardStrength p t
+    power (CardStrength p _) = p
 
 cardToughness :: Control.Lens.Lens' Card Int
 cardToughness f parent = fmap
-  (\x -> over cardStrength (CardStrength . second (const x) . unwrap) parent)
-  (f . snd . unwrap . view cardStrength $ parent)
+  (\x -> over cardStrength (setToughness x) parent)
+  (f . toughness . view cardStrength $ parent)
   where
-    unwrap (CardStrength x) = x
+    setToughness t (CardStrength p _) = CardStrength p t
+    toughness (CardStrength _ t) = t
 
 instance Show CardMatcher where
   show _ = "<matcher>"
@@ -97,9 +96,10 @@ instance Monoid CardMatcher where
   mempty = CardMatcher "" $ const True
 
 instance Semigroup CardStrength where
-  CardStrength (p1, t1) <> CardStrength (p2, t2) =
-   CardStrength (p1 + p2, t1 + t2)
+  CardStrength p1 t1 <> CardStrength p2 t2 =
+   CardStrength (p1 + p2) (t1 + t2)
 
 instance Monoid CardStrength where
-  mempty = CardStrength (0, 0)
+  mempty = CardStrength 0 0
 
+mkStrength (p, t) = CardStrength p t
