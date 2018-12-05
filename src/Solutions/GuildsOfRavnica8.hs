@@ -126,3 +126,13 @@ solution = do
     resolve "Vicious Conquistador"
 
     validateLife Opponent 0
+
+formatter :: Formatter
+formatter = attributeFormatter
+  [ (,) "mana"    $ show <$>
+                      countCards (
+                           matchAttribute "land"
+                        <> missingAttribute "tapped"
+                      )
+  , (,) "life"   $ show <$> use (life . at Opponent . non 0)
+  ]

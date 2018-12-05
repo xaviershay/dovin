@@ -6,6 +6,7 @@ module Dovin
   , module Dovin.Actions
   , module Dovin.Types
   , module Dovin.Helpers
+  , module Dovin.Formatting
   ) where
 
 import Data.Char (isDigit)
@@ -25,6 +26,8 @@ import System.Exit
 import Dovin.Actions
 import Dovin.Types
 import Dovin.Helpers
+import Dovin.Formatting
+import Dovin.Monad
 
 -- CORE TYPES
 --
@@ -487,18 +490,6 @@ fork options = do
     m
     put b
 
-runMonad :: Board -> GameMonad () -> (Either String (), Board, [(String, Board)])
-runMonad state m =
-  let ((e, b), log) = runIdentity $
-                        runWriterT (runStateT (runExceptT m) state) in
-
-  (e, b, log)
-
-execMonad :: Board -> GameMonad a -> Either String a
-execMonad state m =
-  let result = fst $ runIdentity (runWriterT (evalStateT (runExceptT m) state)) in
-
-  result
 
 printBoard board = do
   putStr "Opponent Life: "
@@ -548,8 +539,6 @@ printBoard board = do
 
 with x f = f x
 
-formatStrength (p, t) = show p <> "/" <> show t
-
 run :: (Board -> String) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution
@@ -559,6 +548,7 @@ run formatter solution = do
     putStr step
     putStrLn (formatter board)
 
+  putStrLn ""
   case e of
     Left x -> do
       putStrLn "ERROR:"
@@ -586,14 +576,3 @@ runVerbose solution = do
       putStrLn ""
       System.Exit.exitFailure
     Right _ -> return ()
-
-attributeFormatter :: [(String, GameMonad String)] -> Formatter
-attributeFormatter attrs board = do
-  "\n      " <> (intercalate ", " . map (\(x, y) -> x <> ": " <> y) $
-    map formatAttribute attrs)
-
-  where
-    formatAttribute :: (String, GameMonad String) -> (String, String)
-    formatAttribute (label, m) =
-      let Right value = execMonad board m in
-      (label, value)
