@@ -28,7 +28,9 @@ data Location = Hand | Graveyard | Play | Stack | Exile
 
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
-newtype CardStrength = CardStrength (Int, Int) deriving (Show, Eq)
+newtype CardStrength = CardStrength (Int, Int) deriving (Eq)
+instance Show CardStrength where
+  show (CardStrength (p, t)) = show p <> "/" <> show t
 
 data Phase = FirstMain | Combat deriving (Show, Eq)
 
@@ -100,3 +102,4 @@ instance Semigroup CardStrength where
 
 instance Monoid CardStrength where
   mempty = CardStrength (0, 0)
+
