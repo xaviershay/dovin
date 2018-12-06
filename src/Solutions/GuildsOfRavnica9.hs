@@ -21,68 +21,76 @@ solution = do
         trigger "Adeliz, the Cinder Wind"
         modifyStrength "Adeliz, the Cinder Wind" (1, 1)
 
+  -- We'll be making a lot of archers...
+  let addArcherCopy name = do
+        withLocation (Active, Play) $
+          withAttributes [token, summoned] $ addCreature2 (1, 4) name
+
   step "Initial state" $ do
     setLife Opponent 12
 
-    -- Hand
-    addCard "Undercity Uprising" (Active, Hand) ["sorcery"]
-    addCard "Doublecast 1" (Active, Hand) ["sorcery"]
-    addCard "Plummet 1" (Active, Hand) ["instant"]
-    addCard "Quasiduplicate 1" (Active, Hand) ["sorcery"]
-    addCreature "Torgaar, Famine Incarnate" (7, 6) (Active, Hand) ["creature"]
-    addCard "Waterknot" (Active, Hand) ["aura"]
+    withLocation (Active, Hand) $ do
+      addSorcery "Undercity Uprising"
+      addSorcery "Doublecast 1"
+      addInstant "Plummet 1"
+      addSorcery "Quasiduplicate 1"
+      withAttribute flying $ addCreature2 (7, 6) "Torgaar, Famine Incarnate"
+      addAura "Waterknot"
 
-    -- Play
-    addCard "Thousand-Year Storm" (Active, Play) ["enchantment"]
-    -- Has +2/+2 from Maniacal Rage aura
-    addCreature "Adeliz, the Cinder Wind" (4, 4) (Active, Play) ["flying"]
-    addCreature "Afzocan Archer" (1, 4) (Active, Play) []
-    addCards 4 "Timber Gorge" (Active, Play) ["land"]
-    addCards 4 "Submerged Boneyard" (Active, Play) ["land"]
-    addCards 4 "Highland Lake" (Active, Play) ["land"]
+    withLocation (Active, Play) $ do
+      addEnchantment "Thousand-Year Storm"
+      -- Has +2/+2 from Maniacal Rage aura
+      withAttribute flying $ addCreature2 (4, 4) "Adeliz, the Cinder Wind"
+      addCreature2 (1, 4) "Afzocan Archer"
 
-    -- Opponent
-    addCreature "Kopala, Warden of Waves" (2, 2) (Opponent, Play) ["merfolk"]
-    addCreature "Angel 1" (4, 4) (Opponent, Play) ["angel", "flying", "token"]
-    addCreature "Angel 2" (4, 4) (Opponent, Play) ["angel", "flying", "token"]
-    addCreature "Angel 3" (4, 4) (Opponent, Play) ["angel", "flying", "token"]
+      forM_ [1..4] $ \n -> do
+        addLand (numbered n "Timber Gorge")
+        addLand (numbered n "Submerged Boneyard")
+        addLand (numbered n "Highland Lake")
 
-    let cn = "Shalai, Voice of Plenty" in
-      do
-        addCreature cn (3, 4) (Opponent, Play) ["angel", "flying"]
-        addEffect cn
-          (matchOther cn
-            <> matchLocation (Opponent, Play)
-            <> matchAttribute "creature")
-          (attributeEffect "hexproof")
+    withLocation (Opponent, Play) $ do
+      withAttribute "merfolk" $ addCreature2 (2, 2) "Kopala, Warden of Waves"
+      withAttributes [flying, token] $ addCreature2 (4, 4) "Angel 1"
+      withAttributes [flying, token] $ addCreature2 (4, 4) "Angel 2"
+      withAttributes [flying, token] $ addCreature2 (4, 4) "Angel 3"
 
-    let cn = "Lyra Dawnbringer" in
-      do
-        addCreature cn (5, 5) (Opponent, Play) ["angel", "flying", "lifelink"]
-        addEffect cn
-          (matchOther cn
-            <> matchLocation (Opponent, Play)
-            <> matchAttribute "angel")
-          (attributeEffect "lifelink" <> strengthEffect (1, 1))
+      let cn = "Shalai, Voice of Plenty" in
+        do
+          withAttributes [flying, "angel"] $ addCreature2 (3, 4) cn
+          addEffect cn
+            (matchOther cn
+              <> matchLocation (Opponent, Play)
+              <> matchAttribute creature)
+            (attributeEffect "hexproof")
 
-    let cn = numbered 1 "Merfolk Mistbinder" in
-      do
-        addCreature cn (2, 2) (Opponent, Play) ["merfolk"]
-        addEffect cn
-          (matchOther cn
-            <> matchLocation (Opponent, Play)
-            <> matchAttribute "merfolk")
-          (strengthEffect (1, 1))
+      let cn = "Lyra Dawnbringer" in
+        do
+          withAttributes [flying, lifelink, "angel"] $ addCreature2 (4, 4) cn
+          addEffect cn
+            (matchOther cn
+              <> matchLocation (Opponent, Play)
+              <> matchAttribute "angel")
+            (attributeEffect lifelink <> strengthEffect (1, 1))
 
-    let cn = numbered 2 "Merfolk Mistbinder" in
-      do
-        -- Has a +1/+1 counter
-        addCreature cn (3, 3) (Opponent, Play) ["merfolk"]
-        addEffect cn
-          (matchOther cn
-            <> matchLocation (Opponent, Play)
-            <> matchAttribute "merfolk")
-          (strengthEffect (1, 1))
+      let cn = numbered 1 "Merfolk Mistbinder" in
+        do
+          withAttribute "merfolk" $ addCreature2 (2, 2) cn
+          addEffect cn
+            (matchOther cn
+              <> matchLocation (Opponent, Play)
+              <> matchAttribute "merfolk")
+            (strengthEffect (1, 1))
+
+      let cn = numbered 2 "Merfolk Mistbinder" in
+        do
+          -- Has a +1/+1 counter
+          withAttribute "merfolk" $ addCreature2 (3, 3) cn
+          addEffect cn
+            (matchOther cn
+              <> matchLocation (Opponent, Play)
+              <> matchAttribute "merfolk")
+            (strengthEffect (1, 1))
+
     applyEffect "Shalai, Voice of Plenty"
     applyEffect "Lyra Dawnbringer"
     applyEffect "Merfolk Mistbinder 1"
@@ -96,8 +104,8 @@ solution = do
     withTriggers (cast "1GB") "Undercity Uprising"
     resolve "Undercity Uprising"
     forCards
-      (matchAttribute "creature" <> matchLocation (Active, Play))
-      (gainAttribute "deathtouch")
+      (matchAttribute creature <> matchLocation (Active, Play))
+      (gainAttribute deathtouch)
 
     with "Shalai, Voice of Plenty" $ \enemy -> do
       fight "Adeliz, the Cinder Wind" enemy
@@ -123,7 +131,7 @@ solution = do
     resolve "Plummet 5"
     with "Lyra Dawnbringer" $ \enemy -> do
       target enemy
-      validate enemy $ matchAttribute "flying"
+      validate enemy $ matchAttribute flying
       destroy enemy
       validate enemy $ matchLocation (Opponent, Graveyard)
       removeEffect enemy
@@ -132,7 +140,7 @@ solution = do
       resolve (numbered (5 - n) "Plummet")
       with (numbered n "Angel") $ \enemy -> do
         target enemy
-        validate enemy $ matchAttribute "flying"
+        validate enemy $ matchAttribute flying
         destroy enemy
         validateRemoved enemy
 
@@ -147,7 +155,7 @@ solution = do
       forM_ [1..4] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve $ numbered (5 - n) "Quasiduplicate"
-        addToken tokenName (1, 4) (Active, Play) ["summoned"]
+        addArcherCopy tokenName
         fight tokenName enemy
 
       validate enemy $ matchLocation (Opponent, Graveyard)
@@ -162,7 +170,7 @@ solution = do
       forM_ [1..2] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve $ numbered (6 - n) "Quasiduplicate"
-        addToken tokenName (1, 4) (Active, Play) ["summoned"]
+        addArcherCopy tokenName
         fight tokenName enemy
 
       validate enemy $ matchLocation (Opponent, Graveyard)
@@ -172,7 +180,7 @@ solution = do
       forM_ [3..4] $ \n -> do
         let tokenName = numbered n "Afzocan Archer"
         resolve $ numbered (6 - n) "Quasiduplicate"
-        addToken tokenName (1, 4) (Active, Play) ["summoned"]
+        addArcherCopy tokenName
         fight tokenName enemy
 
       validate enemy $ matchLocation (Opponent, Graveyard)
@@ -180,7 +188,7 @@ solution = do
     forM_ [5] $ \n -> do
       let tokenName = numbered n "Afzocan Archer"
       resolve $ numbered (6 - n) "Quasiduplicate"
-      addToken tokenName (1, 4) (Active, Play) ["summoned"]
+      addArcherCopy tokenName
 
   step "Torgaar, sacrificing archers to reduce cost" $ do
     tapForMana (numbered 3 "Submerged Boneyard") "B"

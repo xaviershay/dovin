@@ -4,9 +4,11 @@
 module Dovin
   ( module Dovin
   , module Dovin.Actions
-  , module Dovin.Types
-  , module Dovin.Helpers
+  , module Dovin.Attributes
+  , module Dovin.Builder
   , module Dovin.Formatting
+  , module Dovin.Helpers
+  , module Dovin.Types
   ) where
 
 import Data.Char (isDigit)
@@ -24,10 +26,12 @@ import Data.Function
 import System.Exit
 
 import Dovin.Actions
-import Dovin.Types
-import Dovin.Helpers
+import Dovin.Attributes
+import Dovin.Builder
 import Dovin.Formatting
+import Dovin.Helpers
 import Dovin.Monad
+import Dovin.Types
 
 -- CORE TYPES
 --
@@ -47,18 +51,6 @@ setAttribute attr = over cardAttributes (S.insert attr)
 
 removeAttribute :: CardAttribute -> Card -> Card
 removeAttribute attr = over cardAttributes (S.delete attr)
-
-
-mkCard name location =
-  Card
-    { _cardName = name
-    , _location = location
-    , _cardAttributes = mempty
-    , _cardStrength = mempty
-    , _cardDamage = 0
-    , _cardLoyalty = 0
-    }
-
 
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
@@ -352,7 +344,7 @@ mentor sourceName targetName = do
 
   modifyStrength targetName (1, 1)
 
-numbered n name = name <> " " <> show n
+
 fight :: CardName -> CardName -> GameMonad ()
 fight x y = do
   _ <- requireCard x matchInPlay
@@ -429,7 +421,6 @@ gainAttribute attr cn = do
 --
 -- These are a type of effect that create cards. They can be used for initial
 -- board setup, but also to create cards as needed (such as tokens).
-emptyCard = mkCard "" (Active, Hand)
 
 addCardRaw :: CardName -> (Int, Int) -> CardLocation -> [CardAttribute] -> GameMonad ()
 addCardRaw name strength loc attrs = do
