@@ -190,6 +190,11 @@ targetInLocation targetName zone = do
 
   return ()
 
+targetInLocation2 zone targetName = do
+  card <- requireCard targetName (matchLocation zone)
+
+  return ()
+
 trigger targetName = do
   -- TODO: Technically some cards can trigger from other zones, figure out best
   -- way to represent.
@@ -238,7 +243,7 @@ validatePhase expected = do
       <> show expected
 
 destroy targetName = do
-  _ <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
+  _ <- requireCard targetName (matchInPlay <> missingAttribute indestructible)
 
   removeFromPlay targetName
 
@@ -300,8 +305,8 @@ moveToGraveyard cn = do
     (cards . at cn . _Just)
     c'
 
-modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
-modifyStrength cn (x, y) = do
+modifyStrength2 :: (Int, Int) -> CardName -> GameMonad ()
+modifyStrength2 (x, y) cn = do
   _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
   modifying
@@ -312,6 +317,9 @@ modifyStrength cn (x, y) = do
   c <- requireCard cn mempty
 
   when (view cardToughness c <= 0) $ removeFromPlay cn
+
+modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
+modifyStrength cn (x, y) = modifyStrength2 (x, y) cn
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs = do
@@ -375,6 +383,29 @@ fight x y = do
 
       when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
         destroy y
+
+damageCard :: CardName -> CardName -> GameMonad ()
+damageCard sourceName destName = do
+  source <- requireCard sourceName (matchAttribute creature)
+  dest   <- requireCard destName   (matchAttribute creature)
+
+  let dmg = max 0 $ view cardPower source
+
+  modifying
+    (cards . at destName . _Just . cardDamage)
+    (+ dmg)
+
+  when (hasAttribute lifelink source) $
+    do
+      let owner = fst . view location $ source
+      modifying (life . at owner . non 0) (+ dmg)
+
+  dest <- requireCard destName (matchAttribute creature)
+  return ()
+  -- TODO: Why isn't indestructible check working?
+  -- TODO: Move this in to a state-based check?
+  --when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
+    --destroy sourceName
 
 forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
 forCards matcher f = do

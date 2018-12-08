@@ -10,25 +10,37 @@ import Dovin.Types
 numbered :: Int -> CardName -> CardName
 numbered n name = name <> " " <> show n
 
-aura :: CardAttribute
 aura = "aura"
+aura :: CardAttribute
 creature :: CardAttribute
 creature = "creature"
 deathtouch :: CardAttribute
 deathtouch = "deathtouch"
+doublestrike :: CardAttribute
+doublestrike = "doublestrike"
 enchantment :: CardAttribute
 enchantment = "enchantment"
+firststrike :: CardAttribute
+firststrike = "firststrike"
 flying :: CardAttribute
 flying = "flying"
+haste :: CardAttribute
+haste = "haste"
+indestructible :: CardAttribute
+indestructible = "indestructible"
 instant :: CardAttribute
 instant = "instant"
 land :: CardAttribute
 land = "land"
 lifelink :: CardAttribute
 lifelink = "lifelink"
-summoned :: CardAttribute
-summoned = "summonded"
 sorcery :: CardAttribute
 sorcery = "sorcery"
+summoned :: CardAttribute
+summoned = "summonded"
 token :: CardAttribute
 token = "token"
+trample :: CardAttribute
+trample = "trample"
+vigilance :: CardAttribute
+vigilance = "vigilance"
