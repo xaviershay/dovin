@@ -9,8 +9,15 @@ solution = do
   let goblin = "goblin"
   let pirate = "pirate"
   let lazav = "Lazav, the Multifarious"
+  let shapeshift x = do
+        activate "" lazav
+        targetInLocation2 (Active, Graveyard) "Adanto Vanguard"
 
-  step "Initial state" $ do
+  let goblinToken = withLocation (Active, Play)
+        . withAttributes [token, goblin]
+        . addCreature2 (1, 1)
+
+  step "Relevant initial state" $ do
     withLocation (Active, Hand) $ do
       withAttribute goblin $ addCreature2 (2, 2) "Legion Warboss"
       withAttribute doublestrike $ addCreature2 (2, 2) "Kwende, Pride of Femeref"
@@ -24,15 +31,11 @@ solution = do
 
     withLocation (Active, Graveyard) $ do
       addCreature2 (1, 1) "Adanto Vanguard"
-      addCreature2 (6, 4) "Vigorspore Wurm"
       addCreature2 (1, 3) "Lazav, the Multifarious 2"
       withAttribute deathtouch $ addCreature2 (3, 3) "Isareth the Awakener"
       addCreature2 (4, 3) "Truefire Captain"
-      addCreature2 (2, 2) "Whisper, Blood Liturgist"
-      addCreature2 (2, 2) "Siege-Gang Commander"
+      withAttribute goblin $ addCreature2 (2, 2) "Siege-Gang Commander"
       withAttribute deathtouch $ addCreature2 (1, 1) "Ochran Assassin"
-      withAttributes [doublestrike, vigilance, trample] $
-        addCreature2 (1, 1) "Swiftblade Vindicator"
 
     withLocation (Opponent, Play) $ do
       withAttributes [indestructible, doublestrike] $
@@ -49,12 +52,13 @@ solution = do
 
   step "Buccaneer's Bravado on Angrath's, giving first strike and +1/+1" $ do
     with "Angrath's Marauders" $ \x -> do
-    cast "" "Buccaneer's Bravado"
-    target x
-    resolve "Buccaneer's Bravado"
+      cast "" "Buccaneer's Bravado"
+      target x
+      validate x $ matchAttribute pirate
+      resolve "Buccaneer's Bravado"
 
-    modifyStrength2 (1, 1) x
-    gainAttribute firststrike x
+      modifyStrength2 (1, 1) x
+      gainAttribute firststrike x
 
   step "Switcheroo Kwende and Garna, creatures get haste and doublestrike appropriately" $ do
     cast "" "Switcheroo"
@@ -76,19 +80,17 @@ solution = do
       (matchLocation (Opponent, Play) <> matchAttribute firststrike)
       (gainAttribute doublestrike)
 
-  step "Shapeshift Lazav to Adanto Vanguard and make indestructible" $ do
-    activate "" lazav
-    targetInLocation2 (Active, Graveyard) "Adanto Vanguard"
+  step "Shapeshift to Adanto Vanguard and make indestructible" $ do
+    shapeshift "Adanto Vanguard"
     activate "" lazav
     gainAttribute indestructible lazav
 
   step "Shapeshift Lazav to Isareth" $ do
-    activate "" lazav
-    targetInLocation2 (Active, Graveyard) "Isareth the Awakener"
+    shapeshift "Isareth the Awakener"
 
   step "Begin combat, create a new goblin token from Warboss" $ do
     trigger "Legion Warboss"
-    withLocation (Active, Play) $ withAttributes [token, haste, goblin] $ addCreature2 (1, 1) "Goblin 3"
+    withAttribute haste $ goblinToken "Goblin 3"
 
   step "Attack with lazav and all goblins (haste from Garna), with mentor from Warboss" $ do
     attackWith [lazav, "Legion Warboss", "Goblin 1", "Goblin 2", "Goblin 3"]
@@ -100,13 +102,12 @@ solution = do
     targetInLocation2 (Active, Graveyard) "Siege-Gang Commander"
     move (Active, Graveyard) (Active, Play) "Siege-Gang Commander"
 
-    forM_ [4..6] $ \n -> do
-      withLocation (Active, Play) $ withAttributes [token, haste, goblin] $ addCreature2 (1, 1) (numbered n "Goblin")
+    -- haste from Garna, even though not relevant
+    forM_ [4..6] $ \n -> withAttribute haste $ goblinToken (numbered n "Goblin")
 
-  step "after declare attacker, shapeshift to Ochran Assassin, luring all enemies to block" $ do
-    trigger lazav
-    targetInLocation2 (Active, Graveyard) "Ochran Assassin"
-    --removeAttribute deathtouch lazav -- From Isareth
+  step "After declare attacker, shapeshift to Ochran Assassin, luring all enemies to block" $ do
+    shapeshift "Ochran Assassin"
+    loseAttribute deathtouch lazav -- From Isareth
     gainAttribute deathtouch lazav -- From Assassin
 
     forCards
@@ -114,20 +115,23 @@ solution = do
       (gainAttribute "blocking")
     gainAttribute "blocked" lazav
 
-  step "after declare blockers, shapeshift to Truefire Captain" $ do
-    trigger lazav
-    targetInLocation2 (Active, Graveyard) "Truefire Captain"
-    --removeAttribute deathtouch lazav -- From Assassin
+  step "After declare blockers, shapeshift to Truefire Captain" $ do
+    shapeshift "Truefire Captain"
+    loseAttribute deathtouch lazav -- From Assassin
 
   step "First strike damage from enemies to lazav, doubled from Angrath's, bounced to opponent from Truefire" $ do
-    forCards (matchLocation (Opponent, Play) <> matchAttribute "blocking" <> (matchAttribute firststrike `matchOr` matchAttribute doublestrike))
+    forCards
+      (    matchLocation (Opponent, Play)
+        <> matchAttribute "blocking"
+        <> (matchAttribute firststrike `matchOr` matchAttribute doublestrike)
+      )
       $ \cn -> do
         -- Just damage/fight twice rather than double damage. Not technically
         -- correct, but works for this set of triggers.
         damagePlayer cn
         damagePlayer cn
-        damageCard lazav cn
-        damageCard lazav cn
+        damageCard cn lazav
+        damageCard cn lazav
 
   step "Regular damage from enemies to lazav, doubled from Angrath's, bounced to opponent from Truefire" $ do
     forCards (matchLocation (Opponent, Play) <> matchAttribute "blocking")
@@ -137,16 +141,17 @@ solution = do
         damagePlayer cn
         damagePlayer cn
         damageCard lazav cn
-        damageCard lazav cn
+        damageCard cn lazav
         damageCard cn lazav
 
   step "Regular damage from attackers to player" $ do
     forCards
-      (matchLocation (Active, Play) <> matchAttribute "attacking")
+      (matchLocation (Active, Play) <> matchAttribute "attacking" <> missingAttribute "blocked")
       damagePlayer
 
   let sacrificeToSiegeGang = \name -> do
         activate "" "Siege-Gang Commander"
+        validate name $ matchAttribute goblin
         sacrifice name
         -- Should be damage not lose life, but works for now
         loseLife Opponent 2
@@ -157,12 +162,36 @@ solution = do
       sacrificeToSiegeGang
 
   step "Shapeshift to Warboss, sacrifice lazav and self to Siege-Gang" $ do
-    activate "" lazav
-    targetInLocation2 (Active, Graveyard) "Legion Warboss"
+    shapeshift "Legion Warboss"
+    gainAttribute "goblin" lazav
 
     sacrificeToSiegeGang lazav
     sacrificeToSiegeGang "Siege-Gang Commander"
 
-formatter :: Formatter
-formatter = attributeFormatter $ do
-  attribute "damage" $ (* (-1)) <$> countLife Opponent
+damageFormatter = attributeFormatter $ do
+  attribute "cumulative damage" $ (* (-1)) <$> countLife Opponent
+
+formatter :: Int -> Formatter
+formatter 1 =
+     cardFormatter "hand" (matchLocation (Active, Hand))
+  <> cardFormatter "our creatures" (matchLocation (Active, Play))
+  <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
+  <> cardFormatter "graveyard" (matchLocation (Active, Graveyard))
+formatter 2 = cardFormatter "our creatures" (matchLocation (Active, Play))
+formatter 8 = cardFormatter "attacking creatures" (matchAttribute "attacking")
+formatter 9 = cardFormatter "our creatures" (matchLocation (Active, Play))
+formatter 12 = damageFormatter <>
+  cardFormatter
+   "blocking creatures with doublestrike"
+   (matchAttribute "blocking" <> matchAttribute doublestrike)
+formatter 13 = damageFormatter <>
+  cardFormatter "blocking creatures" (matchAttribute "blocking")
+formatter 14 = damageFormatter <>
+  cardFormatter
+    "unblocked creatures"
+    (matchAttribute "attacking" <> missingAttribute "blocked")
+formatter 15 = damageFormatter <>
+  cardFormatter "remaining creatures" (matchLocation (Active, Play))
+formatter 16 = damageFormatter
+
+formatter _ = blankFormatter

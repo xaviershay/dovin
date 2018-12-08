@@ -447,6 +447,13 @@ gainAttribute attr cn = do
     (cards . at cn . _Just)
     (setAttribute attr)
 
+loseAttribute attr cn = do
+  c <- requireCard cn mempty
+
+  modifying
+    (cards . at cn . _Just)
+    (removeAttribute attr)
+
 
 -- CARD HELPERS
 --
@@ -555,14 +562,14 @@ printBoard board = do
 
 with x f = f x
 
-run :: (Board -> String) -> GameMonad () -> IO ()
+run :: (Int -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
   forM_ (zip log [1..]) $ \((step, board), n) -> do
     putStr $ show n <> ". "
     putStr step
-    putStrLn (formatter board)
+    putStrLn (formatter n board)
 
   putStrLn ""
   case e of
