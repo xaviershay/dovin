@@ -68,3 +68,7 @@ countValue name = use (counters . at name . non 0)
 countCards :: CardMatcher -> GameMonad Int
 countCards matcher =
   length . filter (applyMatcher matcher) . M.elems <$> use cards
+
+countManaPool :: GameMonad Int
+countManaPool =
+  length <$> use manaPool

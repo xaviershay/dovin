@@ -127,6 +127,10 @@ tapForMana name amount = do
   tap name
   addMana amount
 
+tapForMana2 amount name = do
+  tap name
+  addMana amount
+
 addMana :: ManaString -> GameMonad ()
 addMana amount =
   modifying
@@ -262,6 +266,15 @@ removeFromPlay cardName = do
   else
     let loc = view location card in
       move loc (second (const Graveyard) loc) cardName
+
+exile cardName = do
+  card <- requireCard cardName mempty
+
+  if hasAttribute "token" card then
+    remove cardName
+  else
+    let loc = view location card in
+      move loc (second (const Exile) loc) cardName
 
 copySpell targetName newName = do
   card <- requireCard targetName mempty
@@ -430,7 +443,8 @@ setLife p n = assign (life . at p) (Just n)
 returnToHand = move (Active, Graveyard) (Active, Hand)
 returnToPlay = move (Active, Graveyard) (Active, Play)
 
-activatePlaneswalker cn loyalty = do
+activatePlaneswalker :: Int -> CardName -> GameMonad ()
+activatePlaneswalker loyalty cn = do
   c <- requireCard cn matchInPlay
 
   if view cardLoyalty c - loyalty < 0 then

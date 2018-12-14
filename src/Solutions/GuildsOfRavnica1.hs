@@ -29,7 +29,7 @@ solution = do
     resolve "Aurelia, Exemplar of Justice"
 
   step "Angrath gain control, targeting Aurelia" $ do
-    activatePlaneswalker "Angrath, the Flame-Chained" (-3)
+    activatePlaneswalker (-3) "Angrath, the Flame-Chained"
     target "Aurelia, Exemplar of Justice"
     gainAttribute "haste" "Aurelia, Exemplar of Justice"
 

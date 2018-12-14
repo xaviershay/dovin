@@ -10,10 +10,12 @@ module Dovin.Builder (
   -- specified type to the board.
     addCard2
   , addAura
+  , addArtifact
   , addCreature2
   , addEnchantment
   , addInstant
   , addLand
+  , addPlaneswalker2
   , addSorcery
   -- * Fluid interface
   -- | These methods can be chained together to specify different properties of
@@ -41,9 +43,17 @@ addCard2 name = do
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name
 
+addArtifact :: CardName -> GameMonad ()
+addArtifact name = withAttribute artifact $ addEnchantment name
+
 addCreature2 :: (Int, Int) -> CardName -> GameMonad ()
 addCreature2 strength name = local (set cardStrength $ mkStrength strength)
   $ withAttribute creature
+  $ addCard2 name
+
+addPlaneswalker2 :: Int -> CardName -> GameMonad ()
+addPlaneswalker2 loyalty name = local (set cardLoyalty loyalty)
+  $ withAttribute planeswalker
   $ addCard2 name
 
 addEnchantment :: CardName -> GameMonad ()
