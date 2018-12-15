@@ -38,23 +38,23 @@ solution = do
     addCards 4 "Gateway Plaza" (Active, Play) ["land"]
 
   step "Cast Hunted Witness and sac it" $ do
-    tapForMana "Boros Guildgate 1" "W"
+    tapForMana "W" "Boros Guildgate 1"
     cast "W" "Hunted Witness"
     resolve "Hunted Witness"
 
-    tapForMana "Boros Guildgate 2" "W"
+    tapForMana "W" "Boros Guildgate 2"
     sacrificeToNecrolisk "Hunted Witness"
     addToken "Soldier" (1, 1) (Active, Play) ["lifelink"]
 
   step "Sac Oathsworn Vampire" $ do
-    tapForMana "Treasure" "1"
+    tapForMana "1" "Treasure"
     sacrifice "Treasure"
     sacrificeToNecrolisk "Oathsworn Vampire"
 
   step "Justice Strike soldier to trigger life gain" $ do
-    tapForMana "Treasure" "W"
+    tapForMana "W" "Treasure"
     sacrifice "Treasure"
-    tapForMana "Boros Guildgate 3" "R"
+    tapForMana "R" "Boros Guildgate 3"
 
     cast "RW" "Justice Strike"
     resolve "Justice Strike"
@@ -62,8 +62,8 @@ solution = do
     fight "Soldier" "Soldier"
 
   step "Cast Oathsworn Vampire from Graveyard, triggering Desecrated Tomb" $ do
-    tapForMana "Boros Guildgate 4" "R"
-    tapForMana "Gateway Plaza 1" "B"
+    tapForMana "R" "Boros Guildgate 4"
+    tapForMana "B" "Gateway Plaza 1"
     castFromLocation (Active, Graveyard) "1B" "Oathsworn Vampire"
     resolve "Oathsworn Vampire"
 
@@ -71,16 +71,16 @@ solution = do
     addToken "Bat" (1, 1) (Active, Play) ["flying"]
 
   step "Sac vampire, bat, and plunderer" $ do
-    tapForMana "Gateway Plaza 2" "B"
+    tapForMana "B" "Gateway Plaza 2"
     sacrificeToNecrolisk "Oathsworn Vampire"
 
-    tapForMana "Treasure" "1"
+    tapForMana "1" "Treasure"
     sacrifice "Treasure"
     sacrificeToNecrolisk "Bat"
 
   step "Repeat vampire/bat cycle" $ do
-    tapForMana "Gateway Plaza 3" "B"
-    tapForMana "Treasure" "1"
+    tapForMana "B" "Gateway Plaza 3"
+    tapForMana "1" "Treasure"
     sacrifice "Treasure"
     castFromLocation (Active, Graveyard) "1B" "Oathsworn Vampire"
     resolve "Oathsworn Vampire"
@@ -88,10 +88,10 @@ solution = do
     trigger "Desecrated Tomb"
     addToken "Bat" (1, 1) (Active, Play) ["flying"]
 
-    tapForMana "Gateway Plaza 4" "B"
+    tapForMana "B" "Gateway Plaza 4"
     sacrificeToNecrolisk "Oathsworn Vampire"
 
-    tapForMana "Treasure" "1"
+    tapForMana "1" "Treasure"
     sacrifice "Treasure"
     sacrificeToNecrolisk "Bat"
 

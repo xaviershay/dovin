@@ -14,7 +14,7 @@ solution = do
     addToken "Angel" (4, 4) (Opponent, Play) ["angel", "flying"]
 
   step "Plummet to destroy angel" $ do
-    forM_ [1..2] $ \n -> tapForMana (numbered n "Forest") "G"
+    forM_ [1..2] $ \n -> tapForMana "G" (numbered n "Forest")
     cast "1G" "Plummet"
     resolve "Plummet"
     with "Angel" $ \enemy -> do

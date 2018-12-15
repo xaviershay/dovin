@@ -113,30 +113,6 @@ strengthEffect (x, y) = Effect
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
 
-tap name = do
-  let tapA = "tapped"
-
-  card <- requireCard name
-    (matchLocation (Active, Play) <> missingAttribute tapA)
-
-  modifying
-    (cards . at name . _Just . cardAttributes)
-    (S.insert tapA)
-
-tapForMana name amount = do
-  tap name
-  addMana amount
-
-tapForMana2 amount name = do
-  tap name
-  addMana amount
-
-addMana :: ManaString -> GameMonad ()
-addMana amount =
-  modifying
-    manaPool
-    (parseMana amount <>)
-
 jumpstart mana discardName castName = do
   spendMana mana
   discard discardName

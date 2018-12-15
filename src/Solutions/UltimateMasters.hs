@@ -50,7 +50,7 @@ solution = do
     discard "Stingerfling Spider"
 
   step "Reanimate Stingerfling, targeting Reya" $ do
-    tapForMana2 "B" "Swamp 1"
+    tapForMana "B" "Swamp 1"
     cast "B" "Reanimate"
     resolve "Reanimate"
     targetInLocation2 (Active, Graveyard) "Stingerfling Spider"
@@ -92,8 +92,8 @@ solution = do
     destroy "Sigarda, Host of Herons"
 
   step "Through the Breach Emarkul" $ do
-    forM_ [3..6] $ \n -> tapForMana2 "B" (numbered n "Swamp")
-    tapForMana2 "R" "Raging Ravine 1"
+    forM_ [3..6] $ \n -> tapForMana "B" (numbered n "Swamp")
+    tapForMana "R" "Raging Ravine 1"
     cast "4R" "Through the Breach"
     resolve "Through the Breach"
     move (Active, Hand) (Active, Play) "Emrakul, the Aeons Torn"
@@ -102,10 +102,10 @@ solution = do
     gainAttribute haste "Emrakul, the Aeons Torn"
 
   step "Activate a raging ravine" $ do
-    tapForMana2 "B" "Swamp 7"
-    tapForMana2 "B" "Swamp 8"
-    tapForMana2 "R" "Raging Ravine 2"
-    tapForMana2 "G" "Raging Ravine 3"
+    tapForMana "B" "Swamp 7"
+    tapForMana "B" "Swamp 8"
+    tapForMana "R" "Raging Ravine 2"
+    tapForMana "G" "Raging Ravine 3"
     activate "2RG" "Raging Ravine 4"
     gainAttribute creature "Raging Ravine 4"
     resetStrength "Raging Ravine 4" (4, 4)
@@ -169,7 +169,7 @@ solution = do
     addMana "U"
 
   step "Cast Vengeful Rebirth on Mikaeus, targeting opponent" $ do
-    tapForMana2 "B" "Swamp 2"
+    tapForMana "B" "Swamp 2"
     cast "4GR" "Vengeful Rebirth"
     resolve "Vengeful Rebirth"
 

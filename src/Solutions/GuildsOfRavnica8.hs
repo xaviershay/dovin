@@ -65,23 +65,23 @@ solution = do
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
     castWithMuldrotha "land" "" "Detection Tower"
     castWithMuldrotha "artifact" "" "Mox Amber"
-    tapForMana "Detection Tower" "X"
-    tapForMana "Mox Amber" "X"
+    tapForMana "X" "Detection Tower"
+    tapForMana "X" "Mox Amber"
     castWithMuldrotha "creature" "2" "Diamond Mare"
 
   step "March of the Drowned on Vicious Conquistador" $ do
-    tapForMana "Memorial to Folly 1" "B"
+    tapForMana "B" "Memorial to Folly 1"
     withTriggers (cast "B") "March of the Drowned"
     resolve "March of the Drowned"
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
-    tapForMana "Memorial to Folly 2" "B"
+    tapForMana "B" "Memorial to Folly 2"
     withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"
 
   step "Dead Weight on Vicious Conquistador" $ do
-    tapForMana "Memorial to Folly 3" "B"
+    tapForMana "B" "Memorial to Folly 3"
     withTriggers (cast "B") "Dead Weight"
     target "Vicious Conquistador"
     resolve "Dead Weight"
@@ -90,11 +90,11 @@ solution = do
     moveToGraveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
-    tapForMana "Watery Grave 1" "B"
-    tapForMana "Watery Grave 2" "B"
-    tapForMana "Watery Grave 3" "B"
-    tapForMana "Watery Grave 4" "B"
-    tapForMana "Overgrown Tomb 1" "B"
+    tapForMana "B" "Watery Grave 1"
+    tapForMana "B" "Watery Grave 2"
+    tapForMana "B" "Watery Grave 3"
+    tapForMana "B" "Watery Grave 4"
+    tapForMana "B" "Overgrown Tomb 1"
     withTriggers (cast "3BB") "Gruesome Menagerie"
     resolve "Gruesome Menagerie"
     targetInLocation "Vicious Conquistador" (Active, Graveyard)
@@ -104,7 +104,7 @@ solution = do
     addCard "Treasure" (Active, Play) ["artifact"]
 
   step "Dead Weight on Vicious Conquistador" $ do
-    tapForMana "Overgrown Tomb 2" "B"
+    tapForMana "B" "Overgrown Tomb 2"
     withTriggers (castWithMuldrotha "enchantment" "B") "Dead Weight"
     target "Vicious Conquistador"
     modifyStrength "Vicious Conquistador" (-2, -2)
@@ -112,15 +112,15 @@ solution = do
     moveToGraveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do
-    tapForMana "Overgrown Tomb 3" "B"
-    tapForMana "Overgrown Tomb 4" "B"
+    tapForMana "B" "Overgrown Tomb 3"
+    tapForMana "B" "Overgrown Tomb 4"
     withTriggers (cast "BB") "Find"
     resolve "Find"
     targetInLocation "Vicious Conquistador" (Active, Graveyard)
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
-    tapForMana "Treasure" "B"
+    tapForMana "B" "Treasure"
     sacrifice "Treasure"
     withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"

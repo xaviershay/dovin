@@ -97,9 +97,9 @@ solution = do
     applyEffect "Merfolk Mistbinder 2"
 
   step "Use Undercity Uprising on Adeliz to destroy Shalai" $ do
-    tapForMana (numbered 1 "Timber Gorge") "G"
-    tapForMana (numbered 1 "Submerged Boneyard") "B"
-    tapForMana (numbered 2 "Submerged Boneyard") "B"
+    tapForMana "G" (numbered 1 "Timber Gorge")
+    tapForMana "B" (numbered 1 "Submerged Boneyard")
+    tapForMana "B" (numbered 2 "Submerged Boneyard")
 
     withTriggers (cast "1GB") "Undercity Uprising"
     resolve "Undercity Uprising"
@@ -113,15 +113,15 @@ solution = do
       removeEffect enemy
 
   step "Cast Doublecast" $ do
-    tapForMana (numbered 2 "Timber Gorge") "R"
-    tapForMana (numbered 3 "Timber Gorge") "R"
+    tapForMana "R" (numbered 2 "Timber Gorge")
+    tapForMana "R" (numbered 3 "Timber Gorge")
     withTriggers (cast "RR") "Doublecast 1"
 
     resolve "Doublecast 2"
     resolve "Doublecast 1"
 
   step "Cast Plummet to destroy all fliers" $ do
-    tapForMana "Timber Gorge 4" "G"
+    tapForMana "G" "Timber Gorge 4"
     withTriggers (cast "G") "Plummet 1"
 
     -- From double doublecast earlier
@@ -147,8 +147,8 @@ solution = do
     resolve "Plummet 1" -- No target
 
   step "Quasiduplicate on archer, destroy one of the Mistbinders" $ do
-    tapForMana (numbered 1 "Highland Lake") "U"
-    tapForMana (numbered 2 "Highland Lake") "U"
+    tapForMana "U" (numbered 1 "Highland Lake")
+    tapForMana "U" (numbered 2 "Highland Lake")
     withTriggers (cast "UU") "Quasiduplicate 1"
 
     with (numbered 2 "Merfolk Mistbinder") $ \enemy -> do
@@ -162,8 +162,8 @@ solution = do
       removeEffect enemy
 
   step "Jump-start Quasiduplicate again (w/ Waterknot), destroy merfolk" $ do
-    tapForMana (numbered 3 "Highland Lake") "U"
-    tapForMana (numbered 4 "Highland Lake") "U"
+    tapForMana "U" (numbered 3 "Highland Lake")
+    tapForMana "U" (numbered 4 "Highland Lake")
     withTriggers (jumpstart "UU" "Waterknot") "Quasiduplicate 1"
 
     with (numbered 1 "Merfolk Mistbinder") $ \enemy -> do
@@ -191,8 +191,8 @@ solution = do
       addArcherCopy tokenName
 
   step "Torgaar, sacrificing archers to reduce cost" $ do
-    tapForMana (numbered 3 "Submerged Boneyard") "B"
-    tapForMana (numbered 4 "Submerged Boneyard") "B"
+    tapForMana "B" (numbered 3 "Submerged Boneyard")
+    tapForMana "B" (numbered 4 "Submerged Boneyard")
     sacrifice $ numbered 1 "Afzocan Archer"
     sacrifice $ numbered 2 "Afzocan Archer"
     sacrifice $ numbered 3 "Afzocan Archer"

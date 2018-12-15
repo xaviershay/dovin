@@ -1,4 +1,3 @@
-{-# LANGAUGE FlexibleContexts #-}
 {-|
 Actions correspond to things you can do in Magic. They progress the state
 machine while verifying applicable properties. The all run inside a
@@ -13,21 +12,42 @@ module Dovin.Actions (
   -- * Casting
     cast
   , castFromLocation
+  , tapForMana
   --, resolve
   -- * Low-level
-  -- | These actions provide low-level control over the game, and will rarely
-  -- be used directly. Instead, try to use the more descriptive higher-level
-  -- actions.
+  -- | These actions provide low-level control over the game. Where possible,
+  -- try to use the more descriptive higher-level actions.
+  , addMana
   , move
   , spendMana
+  , tap
   ) where
 
+import           Dovin.Attributes
 import           Dovin.Helpers
 import           Dovin.Types
 
 import           Control.Lens         (assign, at, modifying, non, use, _Just)
 import           Control.Monad        (forM_, when)
 import           Control.Monad.Except (throwError)
+import qualified Data.Set as S
+
+-- | Add mana to your mana pool.
+--
+-- > addMana "2RG"
+--
+-- [Validates]:
+--
+--   * Mana specification is valid.
+--
+-- [Effects]:
+--
+--   * Mana pool is increased.
+addMana :: ManaString -> GameMonad ()
+addMana amount =
+  modifying
+    manaPool
+    (parseMana amount <>)
 
 -- | Casts a card from hand. See 'castFromLocation' for specification.
 cast mana name = do
@@ -49,7 +69,8 @@ cast mana name = do
 --
 --     * Card moved to top of stack.
 --     * Mana removed from pool.
---     * Counter @storm@ incremented if card has @instant@ or @sorcery@ attribute.
+--     * Counter @storm@ incremented if card has @instant@ or @sorcery@
+--       attribute.
 castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
 castFromLocation loc mana name = do
   move loc (Active, Stack) name
@@ -67,6 +88,12 @@ castFromLocation loc mana name = do
   modifying
     stack
     ((:) name)
+
+-- | Combination of 'tap' and 'addMana', see them for specification.
+tapForMana :: ManaString -> CardName -> GameMonad ()
+tapForMana amount name = do
+  tap name
+  addMana amount
 
 -- | Move a card from one location to another.
 --
@@ -99,7 +126,7 @@ move from to name = do
 --
 -- [Effects]:
 --
---     * Mana pool is reduced by the specified amount.
+--     * Mana pool is reduced.
 spendMana :: ManaString -> GameMonad ()
 spendMana amount = do
   forM_ (parseMana amount) $ \mana -> do
@@ -117,3 +144,23 @@ spendMana amount = do
     deleteFirst f (b:bc) | f b    = bc
                          | otherwise = b : deleteFirst f bc
 
+
+-- | Taps a card.
+--
+-- [Validates]:
+--
+--   * Card is in play.
+--   * Card is not tapped.
+--
+-- [Effects]:
+--
+--   * Card gains tapped attribute.
+tap :: CardName -> GameMonad ()
+tap name = do
+  card <- requireCard name
+    ((matchLocation (Opponent, Play) `matchOr` matchLocation (Active, Play))
+    <> missingAttribute tapped)
+
+  modifying
+    (cards . at name . _Just . cardAttributes)
+    (S.insert tapped)

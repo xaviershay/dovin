@@ -24,9 +24,9 @@ solution = do
     addCreature "Bone Dragon" (5, 4) (Active, Graveyard) []
 
   step "Play Ochran Assassin, haste with Torch Courier" $ do
-    tapForMana "Woodland Cemetery 1" "G"
-    tapForMana "Woodland Cemetery 2" "B"
-    tapForMana "Dragonskull Summit 1" "R"
+    tapForMana "G" "Woodland Cemetery 1"
+    tapForMana "B" "Woodland Cemetery 2"
+    tapForMana "R" "Dragonskull Summit 1"
     cast "1BG" "Ochran Assassin"
     resolve "Ochran Assassin"
 
@@ -43,10 +43,10 @@ solution = do
     returnToPlay "Torch Courier"
 
   step "Play Rhizome Lurcher, haste with Torch Courier" $ do
-    tapForMana "Woodland Cemetery 3" "G"
-    tapForMana "Woodland Cemetery 4" "B"
-    tapForMana "Dragonskull Summit 2" "R"
-    tapForMana "Dragonskull Summit 3" "R"
+    tapForMana "G" "Woodland Cemetery 3"
+    tapForMana "B" "Woodland Cemetery 4"
+    tapForMana "R" "Dragonskull Summit 2"
+    tapForMana "R" "Dragonskull Summit 3"
     cast "2BG" "Rhizome Lurcher"
     resolve "Rhizome Lurcher"
 

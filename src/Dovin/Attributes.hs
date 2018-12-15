@@ -46,6 +46,8 @@ summoned :: CardAttribute
 summoned = "summonded"
 undying :: CardAttribute
 undying = "undying"
+tapped :: CardAttribute
+tapped = "tapped"
 token :: CardAttribute
 token = "token"
 trample :: CardAttribute
