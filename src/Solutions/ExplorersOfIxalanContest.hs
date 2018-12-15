@@ -11,7 +11,7 @@ solution = do
   let lazav = "Lazav, the Multifarious"
   let shapeshift x = do
         activate "" lazav
-        targetInLocation2 (Active, Graveyard) "Adanto Vanguard"
+        targetInLocation (Active, Graveyard) "Adanto Vanguard"
 
   let goblinToken = withLocation (Active, Play)
         . withAttributes [token, goblin]
@@ -99,7 +99,7 @@ solution = do
 
   step "Trigger lazav-as-isareth, reanimating Seige-Gang Commander" $ do
     trigger lazav
-    targetInLocation2 (Active, Graveyard) "Siege-Gang Commander"
+    targetInLocation (Active, Graveyard) "Siege-Gang Commander"
     move (Active, Graveyard) (Active, Play) "Siege-Gang Commander"
 
     -- haste from Garna, even though not relevant

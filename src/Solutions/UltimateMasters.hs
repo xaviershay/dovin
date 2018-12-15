@@ -53,7 +53,7 @@ solution = do
     tapForMana "B" "Swamp 1"
     cast "B" "Reanimate"
     resolve "Reanimate"
-    targetInLocation2 (Active, Graveyard) "Stingerfling Spider"
+    targetInLocation (Active, Graveyard) "Stingerfling Spider"
     returnToPlay "Stingerfling Spider"
 
     validate "Stingerfling Spider" $ (invert $ matchAttribute "human")
@@ -173,7 +173,7 @@ solution = do
     cast "4GR" "Vengeful Rebirth"
     resolve "Vengeful Rebirth"
 
-    targetInLocation2 (Active, Graveyard) "Mikaeus, the Unhallowed"
+    targetInLocation (Active, Graveyard) "Mikaeus, the Unhallowed"
     returnToHand "Mikaeus, the Unhallowed"
     -- TODO: Should be damage
     loseLife Opponent 6

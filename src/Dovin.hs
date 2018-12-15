@@ -165,12 +165,7 @@ target targetName = do
 
   return ()
 
-targetInLocation targetName zone = do
-  card <- requireCard targetName (matchLocation zone)
-
-  return ()
-
-targetInLocation2 zone targetName = do
+targetInLocation zone targetName = do
   card <- requireCard targetName (matchLocation zone)
 
   return ()

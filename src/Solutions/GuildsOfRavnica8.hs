@@ -103,8 +103,8 @@ solution = do
     tapForMana "B" "Overgrown Tomb 1"
     withTriggers (cast "3BB") "Gruesome Menagerie"
     resolve "Gruesome Menagerie"
-    targetInLocation "Vicious Conquistador" (Active, Graveyard)
-    targetInLocation "Sailor of Means" (Active, Graveyard)
+    targetInLocation (Active, Graveyard) "Vicious Conquistador"
+    targetInLocation (Active, Graveyard) "Sailor of Means"
     returnToPlay "Vicious Conquistador"
     returnToPlay "Sailor of Means"
     withLocation (Active, Play)
@@ -124,7 +124,7 @@ solution = do
     tapForMana "B" "Overgrown Tomb 4"
     withTriggers (cast "BB") "Find"
     resolve "Find"
-    targetInLocation "Vicious Conquistador" (Active, Graveyard)
+    targetInLocation (Active, Graveyard) "Vicious Conquistador"
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
