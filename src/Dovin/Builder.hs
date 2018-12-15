@@ -88,6 +88,7 @@ withAttributes :: [String] -> GameMonad () -> GameMonad ()
 withAttributes attrs m = do
   local (over cardAttributes (S.union . S.fromList $ attrs)) m
 
+-- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   local (set location loc) m
