@@ -50,7 +50,7 @@ solution = do
     tapForMana "W" "Boros Guildgate 2"
     sacrificeToNecrolisk "Hunted Witness"
     withLocation (Active, Play)
-      $ withAttribute lifelink
+      $ withAttributes [lifelink, token]
       $ addCreature (1, 1) "Soldier"
 
   step "Sac Oathsworn Vampire" $ do
@@ -76,7 +76,7 @@ solution = do
 
     trigger "Desecrated Tomb"
     withLocation (Active, Play)
-      $ withAttribute flying
+      $ withAttributes [flying, token]
       $ addCreature (1, 1) "Bat"
 
   step "Sac vampire, bat, and plunderer" $ do
@@ -96,7 +96,7 @@ solution = do
 
     trigger "Desecrated Tomb"
     withLocation (Active, Play)
-      $ withAttribute flying
+      $ withAttributes [flying, token]
       $ addCreature (1, 1) "Bat"
 
     tapForMana "B" "Gateway Plaza 4"

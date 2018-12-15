@@ -189,13 +189,6 @@ activate mana targetName = do
 
   return ()
 
-validateRemoved :: CardName -> GameMonad ()
-validateRemoved targetName = do
-  board <- get
-  case view (cards . at targetName) board of
-    Nothing -> return ()
-    Just _ -> throwError $ "Card should be removed: " <> targetName
-
 validate :: CardName -> CardMatcher -> GameMonad ()
 validate targetName reqs = do
   _ <- requireCard targetName reqs

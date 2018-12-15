@@ -32,14 +32,15 @@ import Control.Monad.Reader (ask, local)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
-import Dovin.Types
 import Dovin.Attributes
+import Dovin.Helpers
+import Dovin.Types
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
   template <- ask
   -- TODO: Add this back in
-  --validateRemoved name
+  validateRemoved name
   modifying cards (M.insert name (set cardName name template))
 
 addAura :: CardName -> GameMonad ()
