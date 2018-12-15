@@ -3,6 +3,7 @@ module Main where
 import Dovin
 
 import qualified Solutions.Example
+import qualified Solutions.ExampleEffects
 import qualified Solutions.GuildsOfRavnicaPre2
 import qualified Solutions.GuildsOfRavnica1
 import qualified Solutions.GuildsOfRavnica3
@@ -13,6 +14,9 @@ import qualified Solutions.UltimateMasters
 
 main :: IO ()
 main = do
+  runVerbose Solutions.ExampleEffects.solution
+ 
+main2 = do
   runVerbose Solutions.Example.solution
   runVerbose Solutions.GuildsOfRavnicaPre2.solution
   runVerbose Solutions.GuildsOfRavnica1.solution

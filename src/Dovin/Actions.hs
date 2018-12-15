@@ -114,6 +114,8 @@ move from to name = do
     (cards . at name . _Just . location)
     to
 
+  checkEffects
+
 -- | Remove mana from the pool. Colored mana will be removed first, then extra
 -- mana of any type will be removed to match the colorless required.
 --
@@ -164,3 +166,5 @@ tap name = do
   modifying
     (cards . at name . _Just . cardAttributes)
     (S.insert tapped)
+
+  checkEffects

@@ -66,14 +66,36 @@ whenMatch name f action = do
 -- An effect is a reversible function that can be applied to a card. They can
 -- be used to simplify keeping track of effects as cards enter and leave play.
 
-instance Show Effect where
-  show _ = "<effect>"
-
 instance Semigroup Effect where
   (Effect f1 g1) <> (Effect f2 g2) = Effect (f1 . f2) (g1 . g2)
 
 instance Monoid Effect where
   mempty = Effect id id
+
+addEffect2 :: EffectName -> CardMatcher -> Effect -> CardName -> GameMonad ()
+addEffect2 name matcher effect cn = do
+  c <- requireCard cn mempty
+
+  let effects = view cardEffects c
+
+  -- Remove all effects
+  forM_ effects $ \(_, Effect _ f) -> do
+    modifying
+      (cards . at cn . _Just)
+      f
+
+  -- Add effect to list
+  modifying
+    (cards . at cn . _Just . cardEffects)
+    (M.insert name (matcher, effect))
+
+  -- Apply all effects again
+  c <- requireCard cn mempty
+  let effects = view cardEffects c
+  forM_ effects $ \(_, Effect f _) -> do
+    modifying
+      (cards . at cn . _Just)
+      f
 
 addEffect :: EffectName -> CardMatcher -> Effect -> GameMonad ()
 addEffect cn f effect =
@@ -221,6 +243,7 @@ remove :: CardName -> GameMonad ()
 remove cn = do
   modifying cards (M.delete cn)
   modifying stack (filter (/= cn))
+  checkEffects
 
 removeFromPlay cardName = do
   card <- requireCard cardName matchInPlay
@@ -381,14 +404,6 @@ damageCard sourceName destName = do
   -- TODO: Move this in to a state-based check?
   --when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
     --destroy sourceName
-
-forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
-forCards matcher f = do
-  cs <- use cards
-
-  let matchingCs = filter (applyMatcher matcher) (M.elems cs)
-
-  forM_ (map (view cardName) matchingCs) f
 
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =

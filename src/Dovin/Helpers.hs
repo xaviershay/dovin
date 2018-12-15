@@ -2,13 +2,16 @@ module Dovin.Helpers where
 
 import Dovin.Types
 
-import Data.List (sort)
+import Data.List (intercalate, sort)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
-import Control.Lens (at, view, use, _1, _2)
+import Control.Lens (at, view, use, _1, _2, _Just, modifying)
+import Control.Monad (forM_, when)
 import Control.Monad.Except (throwError)
 import Control.Monad.State (get)
+
+import Debug.Trace
 
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
 applyMatcherWithDesc (CardMatcher d f) c =
@@ -85,3 +88,44 @@ applyMatcher matcher c =
   case applyMatcherWithDesc matcher c of
     Left _ -> False
     Right _ -> True
+
+-- For each creature, for each effect, remove if no longer valid.
+checkEffects :: GameMonad ()
+checkEffects = do
+  forCards mempty $ \cn -> do
+    c <- requireCard cn mempty
+    cs <- M.elems <$> use cards
+
+    let effects = view cardEffects c
+    let toRemove = filter (\(name, (m, _)) -> null $ filter (applyMatcher m) cs) . M.toList $ effects
+
+    traceM . show $ "TO REMOVE: " <> intercalate ", " (map fst toRemove)
+
+    when (not . null $ toRemove) $ do
+      -- Remove all effects
+      forM_ effects $ \(_, Effect _ f) -> do
+        modifying
+          (cards . at cn . _Just)
+          f
+
+      -- Drop toRemove effects
+      forM_ toRemove $ \(name, _) -> do
+        modifying
+          (cards . at cn . _Just . cardEffects)
+          (M.delete name)
+
+      -- Apply remaining effects
+      c <- requireCard cn mempty
+      let effects = view cardEffects c
+      forM_ effects $ \(_, Effect f _) -> do
+        modifying
+          (cards . at cn . _Just)
+          f
+
+forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
+forCards matcher f = do
+  cs <- use cards
+
+  let matchingCs = filter (applyMatcher matcher) (M.elems cs)
+
+  forM_ (map (view cardName) matchingCs) f

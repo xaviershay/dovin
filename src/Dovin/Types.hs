@@ -32,6 +32,13 @@ instance Show CardStrength where
 
 data Phase = FirstMain | Combat deriving (Show, Eq)
 
+-- name: unique per card name of effect
+-- effect: add/remove strength or attribute
+-- matcher: as long as this matcher is true, the effect applies
+--
+-- on SBE, remove all effects whose matchers no longer return true. If any
+-- effects removed, remove _all_ effects and reapply (so that multiple sources
+-- of an attribute continue to apply)
 data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
@@ -39,11 +46,19 @@ data Card = Card
   , _cardStrength :: CardStrength
   , _cardDamage :: Int
   , _cardLoyalty :: Int
-  } deriving (Show, Eq)
+  , _cardEffects :: M.HashMap EffectName (CardMatcher, Effect)
+  } deriving (Show)
 instance Hashable Player
 
 data CardMatcher = CardMatcher String (Card -> Bool)
+
+instance Show CardMatcher where
+  show (CardMatcher x _) = x
+
 data Effect = Effect (Card -> Card) (Card -> Card)
+instance Show Effect where
+  show (Effect{}) = "<effect>"
+
 type EffectName = String
 
 data Board = Board
@@ -86,9 +101,6 @@ cardToughness f parent = fmap
     setToughness t (CardStrength p _) = CardStrength p t
     toughness (CardStrength _ t) = t
 
-instance Show CardMatcher where
-  show _ = "<matcher>"
-
 instance Semigroup CardMatcher where
   (CardMatcher d1 f) <> (CardMatcher d2 g) =
     CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
@@ -113,6 +125,8 @@ mkCard name location =
     , _cardStrength = mempty
     , _cardDamage = 0
     , _cardLoyalty = 0
+    , _cardEffects = mempty
     }
 
-
+instance Eq Card where
+  x == y = view cardName x == view cardName y

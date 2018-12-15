@@ -54,14 +54,27 @@ solution = do
       withAttributes [flying, token] $ addCreature (4, 4) "Angel 2"
       withAttributes [flying, token] $ addCreature (4, 4) "Angel 3"
 
-      let cn = "Shalai, Voice of Plenty" in
-        do
-          withAttributes [flying, "angel"] $ addCreature (3, 4) cn
-          addEffect cn
-            (matchOther cn
-              <> matchLocation (Opponent, Play)
-              <> matchAttribute creature)
-            (attributeEffect "hexproof")
+      --matchName "Shalai, Voice of Plenty" <> matchLocation (Opponent, Play)
+
+      with "Shalai, Voice of Plenty" $ \cn -> do
+        withAttributes [flying, "angel"] $ addCreature (3, 4) cn
+
+        -- TODO: Add effect to board, so that when new cards are created/moved
+        -- they have appropriate effect happen.
+        -- TODO: Add effects as needed in requireCard?
+        forCards
+          (matchOther cn
+            <> matchLocation (Opponent, Play)
+            <> matchAttribute creature)
+          $ addEffect2 cn
+              (matchName cn <> matchLocation (Opponent, Play))
+              (attributeEffect "hexproof")
+
+        addEffect cn
+          (matchOther cn
+            <> matchLocation (Opponent, Play)
+            <> matchAttribute creature)
+          (attributeEffect "hexproof")
 
       let cn = "Lyra Dawnbringer" in
         do
