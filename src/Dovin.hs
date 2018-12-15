@@ -287,8 +287,8 @@ moveToGraveyard cn = do
     (cards . at cn . _Just)
     c'
 
-modifyStrength2 :: (Int, Int) -> CardName -> GameMonad ()
-modifyStrength2 (x, y) cn = do
+modifyStrength :: (Int, Int) -> CardName -> GameMonad ()
+modifyStrength (x, y) cn = do
   _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
   modifying
@@ -299,9 +299,6 @@ modifyStrength2 (x, y) cn = do
   c <- requireCard cn mempty
 
   when (view cardToughness c <= 0) $ removeFromPlay cn
-
-modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
-modifyStrength cn (x, y) = modifyStrength2 (x, y) cn
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs = do
@@ -333,7 +330,7 @@ triggerMentor sourceName targetName = do
                  matchAttribute "attacking"
               <> matchLesserPower (view cardPower source)
 
-  modifyStrength targetName (1, 1)
+  modifyStrength (1, 1) targetName
 
 
 fight :: CardName -> CardName -> GameMonad ()

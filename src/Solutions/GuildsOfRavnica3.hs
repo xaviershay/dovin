@@ -17,7 +17,7 @@ solution = do
             <> matchAttribute "creature"
           sacrifice name
           gainAttribute menace "Undercity Necrolisk"
-          modifyStrength "Undercity Necrolisk" (1, 1)
+          modifyStrength (1, 1) "Undercity Necrolisk"
           whenMatch "Pitiless Plunderer" matchInPlay $ do
             trigger "Pitiless Plunderer"
             withLocation (Active, Play)

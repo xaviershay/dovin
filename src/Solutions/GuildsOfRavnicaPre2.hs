@@ -55,7 +55,7 @@ solution = do
 
     forCards
       (matchLocation (Active, Graveyard) <> matchAttribute "creature")
-      (const $ modifyStrength "Rhizome Lurcher" (1, 1))
+      (const $ modifyStrength (1, 1) "Rhizome Lurcher")
 
     activate "" "Torch Courier"
     sacrifice "Torch Courier"

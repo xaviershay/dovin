@@ -42,11 +42,11 @@ solution = do
   step "Activate Goblin Banneret" $ do
     forM_ [1..2] $ \n -> tapForMana "R" (numbered n "Dragonskull Summit")
     activate "R1" "Goblin Banneret"
-    modifyStrength "Goblin Banneret" (2, 0)
+    modifyStrength (2, 0) "Goblin Banneret"
 
   step "Begin combat, put Aurelia's trigger on Banneret" $ do
     trigger "Aurelia, Exemplar of Justice"
-    modifyStrength "Goblin Banneret" (2, 0)
+    modifyStrength (2, 0) "Goblin Banneret"
 
   step "Attack with everything, stacking Mentor triggers on to Aurelia" $ do
     attackWith ["Aurelia, Exemplar of Justice", "Blade Instructor", "Goblin Banneret", "Barging Sergeant"]

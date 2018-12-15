@@ -19,7 +19,7 @@ solution = do
                         (numbered (n + 1) (zipWith const name (drop 2 name)))
 
         trigger "Adeliz, the Cinder Wind"
-        modifyStrength "Adeliz, the Cinder Wind" (1, 1)
+        modifyStrength (1, 1) "Adeliz, the Cinder Wind"
 
   -- We'll be making a lot of archers...
   let addArcherCopy name = do

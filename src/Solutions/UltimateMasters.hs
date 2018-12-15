@@ -24,8 +24,8 @@ solution = do
       forM_ [1..4] $ \n -> addLand (numbered n "Raging Ravine")
 
       withAttribute haste $ addCreature (4, 3) "Vengevine"
-      modifyStrength2 (1, 1) "Vengevine" -- counter
-      modifyStrength2 (1, 1) "Vengevine" -- Mikaeus
+      modifyStrength (1, 1) "Vengevine" -- counter
+      modifyStrength (1, 1) "Vengevine" -- Mikaeus
 
       addCreature (5, 5) "Mikaeus, the Unhallowed"
 
@@ -72,7 +72,7 @@ solution = do
   step "Return Stingerfling with undying from Mikaeus, target Sublime Archangel" $ do
     validate "Stingerfling Spider" $ matchAttribute undying
     returnToPlay "Stingerfling Spider"
-    modifyStrength2 (1, 1) "Stingerfling Spider"
+    modifyStrength (1, 1) "Stingerfling Spider"
 
     validate "Sublime Archangel" $ matchAttribute flying
     -- TODO: Add spider to stack
@@ -97,7 +97,7 @@ solution = do
     cast "4R" "Through the Breach"
     resolve "Through the Breach"
     move (Active, Hand) (Active, Play) "Emrakul, the Aeons Torn"
-    modifyStrength2 (1, 1) "Emrakul, the Aeons Torn"
+    modifyStrength (1, 1) "Emrakul, the Aeons Torn"
     gainAttribute undying "Emrakul, the Aeons Torn"
     gainAttribute haste "Emrakul, the Aeons Torn"
 
@@ -109,7 +109,7 @@ solution = do
     activate "2RG" "Raging Ravine 4"
     gainAttribute creature "Raging Ravine 4"
     resetStrength "Raging Ravine 4" (4, 4)
-    modifyStrength2 (1, 1) "Raging Ravine 4"
+    modifyStrength (1, 1) "Raging Ravine 4"
 
   step "Attack with everything" $ do
     attackWith
@@ -119,7 +119,7 @@ solution = do
       , "Raging Ravine 4"
       ]
 
-    modifyStrength2 (1, 1) "Raging Ravine 4"
+    modifyStrength (1, 1) "Raging Ravine 4"
 
   step "Assume opponent activates Dark Depths to block Emrakul in response to Annihilator trigger" $ do
     -- TODO: Allow acting as opponent
@@ -138,7 +138,7 @@ solution = do
 
     validate "Emrakul, the Aeons Torn" $ matchAttribute undying
     returnToPlay "Emrakul, the Aeons Torn"
-    modifyStrength2 (1, 1) "Emrakul, the Aeons Torn"
+    modifyStrength (1, 1) "Emrakul, the Aeons Torn"
 
     activate "" "Phrexian Altar"
     sacrifice "Emrakul, the Aeons Torn"

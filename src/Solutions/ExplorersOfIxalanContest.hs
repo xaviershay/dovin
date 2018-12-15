@@ -57,7 +57,7 @@ solution = do
       validate x $ matchAttribute pirate
       resolve "Buccaneer's Bravado"
 
-      modifyStrength2 (1, 1) x
+      modifyStrength (1, 1) x
       gainAttribute firststrike x
 
   step "Switcheroo Kwende and Garna, creatures get haste and doublestrike appropriately" $ do
