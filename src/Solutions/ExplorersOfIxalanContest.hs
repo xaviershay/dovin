@@ -15,34 +15,34 @@ solution = do
 
   let goblinToken = withLocation (Active, Play)
         . withAttributes [token, goblin]
-        . addCreature2 (1, 1)
+        . addCreature (1, 1)
 
   step "Relevant initial state" $ do
     withLocation (Active, Hand) $ do
-      withAttribute goblin $ addCreature2 (2, 2) "Legion Warboss"
-      withAttribute doublestrike $ addCreature2 (2, 2) "Kwende, Pride of Femeref"
+      withAttribute goblin $ addCreature (2, 2) "Legion Warboss"
+      withAttribute doublestrike $ addCreature (2, 2) "Kwende, Pride of Femeref"
       addSorcery "Switcheroo"
       addInstant "Buccaneer's Bravado"
 
     withLocation (Active, Play) $ do
-      addCreature2 (1, 3) lazav
-      withAttributes [goblin, token] $ addCreature2 (1, 1) "Goblin 1"
-      withAttributes [goblin, token] $ addCreature2 (1, 1) "Goblin 2"
+      addCreature (1, 3) lazav
+      withAttributes [goblin, token] $ addCreature (1, 1) "Goblin 1"
+      withAttributes [goblin, token] $ addCreature (1, 1) "Goblin 2"
 
     withLocation (Active, Graveyard) $ do
-      addCreature2 (1, 1) "Adanto Vanguard"
-      addCreature2 (1, 3) "Lazav, the Multifarious 2"
-      withAttribute deathtouch $ addCreature2 (3, 3) "Isareth the Awakener"
-      addCreature2 (4, 3) "Truefire Captain"
-      withAttribute goblin $ addCreature2 (2, 2) "Siege-Gang Commander"
-      withAttribute deathtouch $ addCreature2 (1, 1) "Ochran Assassin"
+      addCreature (1, 1) "Adanto Vanguard"
+      addCreature (1, 3) "Lazav, the Multifarious 2"
+      withAttribute deathtouch $ addCreature (3, 3) "Isareth the Awakener"
+      addCreature (4, 3) "Truefire Captain"
+      withAttribute goblin $ addCreature (2, 2) "Siege-Gang Commander"
+      withAttribute deathtouch $ addCreature (1, 1) "Ochran Assassin"
 
     withLocation (Opponent, Play) $ do
       withAttributes [indestructible, doublestrike] $
-        addCreature2 (4, 8) "Zetalpa, Primal Dawn"
-      withAttribute pirate $ addCreature2 (4, 4) "Angrath's Marauders"
-      withAttribute firststrike $ addCreature2 (3, 3) "Goblin Chainwhirler"
-      addCreature2 (3, 3) "Garna, the Bloodflame"
+        addCreature (4, 8) "Zetalpa, Primal Dawn"
+      withAttribute pirate $ addCreature (4, 4) "Angrath's Marauders"
+      withAttribute firststrike $ addCreature (3, 3) "Goblin Chainwhirler"
+      addCreature (3, 3) "Garna, the Bloodflame"
 
   step "Cast Legion Warboss and Kwende from hand" $ do
     cast "" "Legion Warboss"
@@ -95,7 +95,7 @@ solution = do
   step "Attack with lazav and all goblins (haste from Garna), with mentor from Warboss" $ do
     attackWith [lazav, "Legion Warboss", "Goblin 1", "Goblin 2", "Goblin 3"]
 
-    mentor "Legion Warboss" "Goblin 1"
+    triggerMentor "Legion Warboss" "Goblin 1"
 
   step "Trigger lazav-as-isareth, reanimating Seige-Gang Commander" $ do
     trigger lazav

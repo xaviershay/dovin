@@ -13,21 +13,21 @@ solution = do
       addInstant "Through the Breach"
       addSorcery "Reanimate"
       addSorcery "Vengeful Rebirth"
-      addCreature2 (2, 5) "Stingerfling Spider"
-      addCreature2 (15, 15) "Emrakul, the Aeons Torn"
+      addCreature (2, 5) "Stingerfling Spider"
+      addCreature (15, 15) "Emrakul, the Aeons Torn"
 
     withLocation (Active, Play) $ do
-      addPlaneswalker2 3 "Liliana of the Veil"
+      addPlaneswalker 3 "Liliana of the Veil"
       addArtifact "Phrexian Altar"
       addArtifact "Engineered Explosives"
       forM_ [1..8] $ \n -> addLand (numbered n "Swamp")
       forM_ [1..4] $ \n -> addLand (numbered n "Raging Ravine")
 
-      withAttribute haste $ addCreature2 (4, 3) "Vengevine"
+      withAttribute haste $ addCreature (4, 3) "Vengevine"
       modifyStrength2 (1, 1) "Vengevine" -- counter
       modifyStrength2 (1, 1) "Vengevine" -- Mikaeus
 
-      addCreature2 (5, 5) "Mikaeus, the Unhallowed"
+      addCreature (5, 5) "Mikaeus, the Unhallowed"
 
     withLocation (Opponent, Play) $ do
       forM_ [1..7] $ \n -> addLand (numbered n "Plains")
@@ -36,10 +36,10 @@ solution = do
       addLand "Dark Depths"
 
       withAttribute flying $ do
-        addCreature2 (4, 6) "Reya Dawnbringer"
-        addCreature2 (4, 3) "Sublime Archangel"
+        addCreature (4, 6) "Reya Dawnbringer"
+        addCreature (4, 3) "Sublime Archangel"
         withAttribute legendary
-          $ addCreature2 (5, 5) "Sigarda, Host of Herons"
+          $ addCreature (5, 5) "Sigarda, Host of Herons"
 
     withLocation (Opponent, Graveyard) $ do
       addEnchantment "Bridge from Below"
@@ -127,7 +127,7 @@ solution = do
     -- forM_ [1..2] $ \n -> tap (numbered n "Forest")
     withLocation (Opponent, Play)
       $ withAttributes [indestructible, flying, token]
-      $ addCreature2 (20, 20) "Marit Large"
+      $ addCreature (20, 20) "Marit Large"
 
     gainAttribute "blocked" "Emrakul, the Aeons Torn"
 

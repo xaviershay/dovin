@@ -24,7 +24,7 @@ solution = do
   -- We'll be making a lot of archers...
   let addArcherCopy name = do
         withLocation (Active, Play) $
-          withAttributes [token, summoned] $ addCreature2 (1, 4) name
+          withAttributes [token, summoned] $ addCreature (1, 4) name
 
   step "Initial state" $ do
     setLife Opponent 12
@@ -34,14 +34,14 @@ solution = do
       addSorcery "Doublecast 1"
       addInstant "Plummet 1"
       addSorcery "Quasiduplicate 1"
-      withAttribute flying $ addCreature2 (7, 6) "Torgaar, Famine Incarnate"
+      withAttribute flying $ addCreature (7, 6) "Torgaar, Famine Incarnate"
       addAura "Waterknot"
 
     withLocation (Active, Play) $ do
       addEnchantment "Thousand-Year Storm"
       -- Has +2/+2 from Maniacal Rage aura
-      withAttribute flying $ addCreature2 (4, 4) "Adeliz, the Cinder Wind"
-      addCreature2 (1, 4) "Afzocan Archer"
+      withAttribute flying $ addCreature (4, 4) "Adeliz, the Cinder Wind"
+      addCreature (1, 4) "Afzocan Archer"
 
       forM_ [1..4] $ \n -> do
         addLand (numbered n "Timber Gorge")
@@ -49,14 +49,14 @@ solution = do
         addLand (numbered n "Highland Lake")
 
     withLocation (Opponent, Play) $ do
-      withAttribute "merfolk" $ addCreature2 (2, 2) "Kopala, Warden of Waves"
-      withAttributes [flying, token] $ addCreature2 (4, 4) "Angel 1"
-      withAttributes [flying, token] $ addCreature2 (4, 4) "Angel 2"
-      withAttributes [flying, token] $ addCreature2 (4, 4) "Angel 3"
+      withAttribute "merfolk" $ addCreature (2, 2) "Kopala, Warden of Waves"
+      withAttributes [flying, token] $ addCreature (4, 4) "Angel 1"
+      withAttributes [flying, token] $ addCreature (4, 4) "Angel 2"
+      withAttributes [flying, token] $ addCreature (4, 4) "Angel 3"
 
       let cn = "Shalai, Voice of Plenty" in
         do
-          withAttributes [flying, "angel"] $ addCreature2 (3, 4) cn
+          withAttributes [flying, "angel"] $ addCreature (3, 4) cn
           addEffect cn
             (matchOther cn
               <> matchLocation (Opponent, Play)
@@ -65,7 +65,7 @@ solution = do
 
       let cn = "Lyra Dawnbringer" in
         do
-          withAttributes [flying, lifelink, "angel"] $ addCreature2 (4, 4) cn
+          withAttributes [flying, lifelink, "angel"] $ addCreature (4, 4) cn
           addEffect cn
             (matchOther cn
               <> matchLocation (Opponent, Play)
@@ -74,7 +74,7 @@ solution = do
 
       let cn = numbered 1 "Merfolk Mistbinder" in
         do
-          withAttribute "merfolk" $ addCreature2 (2, 2) cn
+          withAttribute "merfolk" $ addCreature (2, 2) cn
           addEffect cn
             (matchOther cn
               <> matchLocation (Opponent, Play)
@@ -84,7 +84,7 @@ solution = do
       let cn = numbered 2 "Merfolk Mistbinder" in
         do
           -- Has a +1/+1 counter
-          withAttribute "merfolk" $ addCreature2 (3, 3) cn
+          withAttribute "merfolk" $ addCreature (3, 3) cn
           addEffect cn
             (matchOther cn
               <> matchLocation (Opponent, Play)

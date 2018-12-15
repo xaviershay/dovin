@@ -7,18 +7,24 @@ import Dovin
 -- http://www.possibilitystorm.com/083-guilds-of-ravnica-puzzle-1/
 solution :: GameMonad ()
 solution = do
+  let mentor = "mentor"
+
   step "Initial state" $ do
     setLife Opponent 5
 
-    addCreature "Aurelia, Exemplar of Justice" (2, 5) (Active, Hand) ["flying", "mentor"]
+    withLocation (Active, Hand)
+      $ withAttributes [flying, mentor]
+      $ addCreature (2, 5) "Aurelia, Exemplar of Justice"
 
-    addCreature "Blade Instructor" (3, 1) (Active, Play) ["mentor"]
-    addCreature "Goblin Banneret" (1, 1) (Active, Play) ["mentor"]
-    addCreature "Barging Sergeant" (4, 2) (Active, Play) ["mentor"]
-    addPlaneswalker "Angrath, the Flame-Chained" 5 (Active, Play)
+    withLocation (Active, Play) $ do
+      withAttribute mentor $ do
+        addCreature (3, 1) "Blade Instructor"
+        addCreature (1, 1) "Goblin Banneret"
+        addCreature (4, 2) "Barging Sergeant"
+      addPlaneswalker 5 "Angrath, the Flame-Chained"
 
-    addCards 4 "Sacred Foundry" (Active, Play) ["land"]
-    addCards 4 "Dragonskull Summit" (Active, Play) ["land"]
+      addLands 4 "Sacred Foundry"
+      addLands 4 "Dragonskull Summit"
 
   step "Cast Aurelia" $ do
     tapForMana "R" "Sacred Foundry 1"
@@ -44,9 +50,9 @@ solution = do
 
   step "Attack with everything, stacking Mentor triggers on to Aurelia" $ do
     attackWith ["Aurelia, Exemplar of Justice", "Blade Instructor", "Goblin Banneret", "Barging Sergeant"]
-    mentor "Blade Instructor" "Aurelia, Exemplar of Justice"
-    mentor "Barging Sergeant" "Aurelia, Exemplar of Justice"
-    mentor "Goblin Banneret" "Aurelia, Exemplar of Justice"
+    triggerMentor "Blade Instructor" "Aurelia, Exemplar of Justice"
+    triggerMentor "Barging Sergeant" "Aurelia, Exemplar of Justice"
+    triggerMentor "Goblin Banneret" "Aurelia, Exemplar of Justice"
 
     damagePlayer "Aurelia, Exemplar of Justice"
 

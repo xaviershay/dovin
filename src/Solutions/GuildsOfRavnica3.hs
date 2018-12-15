@@ -6,6 +6,7 @@ import Dovin
 
 solution :: GameMonad ()
 solution = do
+  let menace = "menace"
   let sacrificeToNecrolisk =
         \name -> do
           validatePhase FirstMain
@@ -15,27 +16,31 @@ solution = do
             <> matchController Active
             <> matchAttribute "creature"
           sacrifice name
-          gainAttribute "menace" "Undercity Necrolisk"
+          gainAttribute menace "Undercity Necrolisk"
           modifyStrength "Undercity Necrolisk" (1, 1)
           whenMatch "Pitiless Plunderer" matchInPlay $ do
             trigger "Pitiless Plunderer"
-            addCard "Treasure" (Active, Play) ["artifact", "token"]
+            withLocation (Active, Play)
+              $ withAttribute token
+              $ addArtifact "Treasure"
 
   step "Initial state" $ do
     setLife Opponent 9
 
-    addCreature "Hunted Witness" (1, 1) (Active, Hand) ["lifelink"]
-    addCreature "Silverclad Ferocidons" (8, 5) (Active, Hand) []
-    addCard "Justice Strike" (Active, Hand) ["instant"]
+    withLocation (Active, Hand) $ do
+      withAttribute lifelink $ addCreature (1, 1) "Hunted Witness"
+      addCreature (8, 5) "Silverclad Ferocidons"
+      addInstant "Justice Strike"
 
-    addCreature "Roc Charger" (9, 3) (Active, Play) ["menace"]
-    addCard "Desecrated Tomb" (Active, Play) ["artifact"]
-    addCreature "Undercity Necrolisk" (3, 3) (Active, Play) []
-    addCreature "Pitiless Plunderer" (1, 4) (Active, Play) []
-    addCreature "Oathsworn Vampire" (2, 2) (Active, Play) []
-
-    addCards 4 "Boros Guildgate" (Active, Play) ["land"]
-    addCards 4 "Gateway Plaza" (Active, Play) ["land"]
+    withLocation (Active, Play) $ do
+      withAttribute menace $ addCreature (9, 3) "Roc Charger"
+      addArtifact "Desecrated Tomb"
+      addCreature (3, 3) "Undercity Necrolisk"
+      addCreature (1, 4) "Pitiless Plunderer"
+      addCreature (2, 2) "Oathsworn Vampire"
+      forM_ [1..4] $ \n -> do
+        addLand (numbered n "Boros Guildgate")
+        addLand (numbered n "Gateway Plaza")
 
   step "Cast Hunted Witness and sac it" $ do
     tapForMana "W" "Boros Guildgate 1"
@@ -44,7 +49,9 @@ solution = do
 
     tapForMana "W" "Boros Guildgate 2"
     sacrificeToNecrolisk "Hunted Witness"
-    addToken "Soldier" (1, 1) (Active, Play) ["lifelink"]
+    withLocation (Active, Play)
+      $ withAttribute lifelink
+      $ addCreature (1, 1) "Soldier"
 
   step "Sac Oathsworn Vampire" $ do
     tapForMana "1" "Treasure"
@@ -68,7 +75,9 @@ solution = do
     resolve "Oathsworn Vampire"
 
     trigger "Desecrated Tomb"
-    addToken "Bat" (1, 1) (Active, Play) ["flying"]
+    withLocation (Active, Play)
+      $ withAttribute flying
+      $ addCreature (1, 1) "Bat"
 
   step "Sac vampire, bat, and plunderer" $ do
     tapForMana "B" "Gateway Plaza 2"
@@ -86,7 +95,9 @@ solution = do
     resolve "Oathsworn Vampire"
 
     trigger "Desecrated Tomb"
-    addToken "Bat" (1, 1) (Active, Play) ["flying"]
+    withLocation (Active, Play)
+      $ withAttribute flying
+      $ addCreature (1, 1) "Bat"
 
     tapForMana "B" "Gateway Plaza 4"
     sacrificeToNecrolisk "Oathsworn Vampire"

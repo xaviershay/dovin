@@ -333,7 +333,8 @@ damagePlayer cn = do
     (life . at Opponent . non 0)
     (\x -> x - view cardPower c)
 
-mentor sourceName targetName = do
+-- TODO: Better name (resolveMentor?), check source has mentor attribute
+triggerMentor sourceName targetName = do
   source <- requireCard sourceName $ matchAttribute "attacking"
   _      <- requireCard targetName $
                  matchAttribute "attacking"
@@ -443,40 +444,6 @@ loseAttribute attr cn = do
   modifying
     (cards . at cn . _Just)
     (removeAttribute attr)
-
-
--- CARD HELPERS
---
--- These are a type of effect that create cards. They can be used for initial
--- board setup, but also to create cards as needed (such as tokens).
-
-addCardRaw :: CardName -> (Int, Int) -> CardLocation -> [CardAttribute] -> GameMonad ()
-addCardRaw name strength loc attrs = do
-  let c = set cardStrength (mkStrength strength) $ set cardAttributes (S.fromList attrs) $ mkCard name loc
-
-  validateRemoved name
-  modifying cards (M.insert name c)
-
-addCard name =
-  addCardRaw name (0, 0)
-
-addCreature name strength loc attrs =
-  addCardRaw name strength loc ("creature":attrs)
-
-addPlaneswalker :: CardName -> Int -> CardLocation -> GameMonad ()
-addPlaneswalker name loyalty loc = do
-  let c = set cardLoyalty loyalty $ set cardAttributes (S.fromList ["planeswalker"]) $ mkCard name loc
-
-  validateRemoved name
-  modifying cards (M.insert name c)
-
-addToken name strength loc attrs =
-  addCreature name strength loc ("token":attrs)
-
-addCards 0 name loc attrs = return ()
-addCards n name loc attrs = do
-  addCard (name <> " " <> show n) loc attrs
-  addCards (n - 1) name loc attrs
 
 -- HIGH LEVEL FUNCTIONS
 --

@@ -8,14 +8,15 @@ module Dovin.Builder (
   -- * Builders
   -- | Each of these terminates a build chain, and will add a card with the
   -- specified type to the board.
-    addCard2
+    addCard
   , addAura
   , addArtifact
-  , addCreature2
+  , addCreature
   , addEnchantment
   , addInstant
   , addLand
-  , addPlaneswalker2
+  , addLands
+  , addPlaneswalker
   , addSorcery
   -- * Fluid interface
   -- | These methods can be chained together to specify different properties of
@@ -26,6 +27,7 @@ module Dovin.Builder (
   ) where
 
 import Control.Lens
+import Control.Monad (forM_)
 import Control.Monad.Reader (ask, local)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
@@ -33,8 +35,8 @@ import qualified Data.Set as S
 import Dovin.Types
 import Dovin.Attributes
 
-addCard2 :: CardName -> GameMonad ()
-addCard2 name = do
+addCard :: CardName -> GameMonad ()
+addCard name = do
   template <- ask
   -- TODO: Add this back in
   --validateRemoved name
@@ -46,27 +48,31 @@ addAura name = withAttribute aura $ addEnchantment name
 addArtifact :: CardName -> GameMonad ()
 addArtifact name = withAttribute artifact $ addEnchantment name
 
-addCreature2 :: (Int, Int) -> CardName -> GameMonad ()
-addCreature2 strength name = local (set cardStrength $ mkStrength strength)
+addCreature :: (Int, Int) -> CardName -> GameMonad ()
+addCreature strength name = local (set cardStrength $ mkStrength strength)
   $ withAttribute creature
-  $ addCard2 name
+  $ addCard name
 
-addPlaneswalker2 :: Int -> CardName -> GameMonad ()
-addPlaneswalker2 loyalty name = local (set cardLoyalty loyalty)
+addPlaneswalker :: Int -> CardName -> GameMonad ()
+addPlaneswalker loyalty name = local (set cardLoyalty loyalty)
   $ withAttribute planeswalker
-  $ addCard2 name
+  $ addCard name
 
 addEnchantment :: CardName -> GameMonad ()
-addEnchantment name = withAttribute enchantment $ addCard2 name
+addEnchantment name = withAttribute enchantment $ addCard name
 
 addInstant :: CardName -> GameMonad ()
-addInstant name = withAttribute instant $ addCard2 name
+addInstant name = withAttribute instant $ addCard name
 
 addLand :: CardName -> GameMonad ()
-addLand name = withAttribute land $ addCard2 name
+addLand name = withAttribute land $ addCard name
+
+addLands :: Int -> CardName -> GameMonad ()
+addLands n name = withAttribute land $ do
+  forM_ [1..n] $ \n -> addCard (numbered n name)
 
 addSorcery :: CardName -> GameMonad ()
-addSorcery name = withAttribute sorcery $ addCard2 name
+addSorcery name = withAttribute sorcery $ addCard name
 
 -- | Add an attribute to the created card, as identified by a string.
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
