@@ -92,3 +92,4 @@ the process of being moved to `Dovin.Actions`. To be moved they must:
 
   * Be unit tested.
   * Be documented.
+  * The primary target card of an action should be the final parameter.
