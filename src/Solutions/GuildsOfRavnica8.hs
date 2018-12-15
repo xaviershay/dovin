@@ -9,6 +9,8 @@ import Dovin
 -- http://www.possibilitystorm.com/089-guilds-of-ravnica-season-puzzle-7-2/
 solution :: GameMonad ()
 solution = do
+  let black = "black"
+
   -- This solutions relies on triggering Diamond Mare to gain life, which in
   -- turns triggers Epicure of Blood to cause the opponent to lose life. This
   -- helper can wrap cast actions with that combination.
@@ -17,7 +19,7 @@ solution = do
         trigger "Diamond Mare"
         c <- requireCard name mempty
 
-        when (hasAttribute "black" c) $ do
+        when (hasAttribute black c) $ do
           gainLife Active 1
           trigger "Epicure of Blood"
           loseLife Opponent 1
@@ -45,43 +47,47 @@ solution = do
   step "Initial state" $ do
     setLife Opponent 7
 
-    addCreature "Epicure of Blood" (4, 4) (Active, Play) []
-    addCreature "Muldrotha, the Gravetide" (6, 6) (Active, Play) []
-    addCreature "Diamond Mare" (1, 3) (Active, Graveyard) ["artifact"]
-    addCard "Detection Tower" (Active, Graveyard) ["land"]
-    addCard "Mox Amber" (Active, Graveyard) ["artifact"]
+    withLocation (Active, Play) $ do
+      addCreature (4, 4) "Epicure of Blood"
+      addCreature (6, 6) "Muldrotha, the Gravetide"
 
-    addCards 3 "Memorial to Folly" (Active, Play) ["land"]
-    addCards 4 "Watery Grave" (Active, Play) ["land"]
-    addCards 4 "Overgrown Tomb" (Active, Play) ["land"]
+      addLands 3 "Memorial to Folly"
+      addLands 4 "Watery Grave"
+      addLands 4 "Overgrown Tomb"
 
-    addCard "March of the Drowned" (Active, Hand) ["sorcery", "black"]
-    addCard "Gruesome Menagerie" (Active, Hand) ["sorcery", "black"]
-    addCard "Dead Weight" (Active, Hand) ["aura", "black"]
-    addCard "Find" (Active, Hand) ["sorcery", "black"]
-    addCreature "Vicious Conquistador" (1, 2) (Active, Graveyard) ["black"]
-    addCreature "Sailor of Means" (1, 4) (Active, Graveyard) []
+    withLocation (Active, Graveyard) $ do
+      withAttribute artifact $ addCreature (1, 3) "Diamond Mare"
+      addLand "Detection Tower"
+      addArtifact "Mox Amber"
+      withAttribute black $ addCreature (1, 2) "Vicious Conquistador"
+      addCreature (1, 4) "Sailor of Means"
+
+    withLocation (Active, Hand) $ withAttribute black $ do
+      addSorcery "March of the Drowned"
+      addSorcery "Gruesome Menagerie"
+      addAura "Dead Weight"
+      addSorcery "Find"
 
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
     castWithMuldrotha "land" "" "Detection Tower"
     castWithMuldrotha "artifact" "" "Mox Amber"
-    tapForMana "Detection Tower" "X"
-    tapForMana "Mox Amber" "X"
+    tapForMana "X" "Detection Tower"
+    tapForMana "X" "Mox Amber"
     castWithMuldrotha "creature" "2" "Diamond Mare"
 
   step "March of the Drowned on Vicious Conquistador" $ do
-    tapForMana "Memorial to Folly 1" "B"
+    tapForMana "B" "Memorial to Folly 1"
     withTriggers (cast "B") "March of the Drowned"
     resolve "March of the Drowned"
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
-    tapForMana "Memorial to Folly 2" "B"
+    tapForMana "B" "Memorial to Folly 2"
     withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"
 
   step "Dead Weight on Vicious Conquistador" $ do
-    tapForMana "Memorial to Folly 3" "B"
+    tapForMana "B" "Memorial to Folly 3"
     withTriggers (cast "B") "Dead Weight"
     target "Vicious Conquistador"
     resolve "Dead Weight"
@@ -90,21 +96,23 @@ solution = do
     moveToGraveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
-    tapForMana "Watery Grave 1" "B"
-    tapForMana "Watery Grave 2" "B"
-    tapForMana "Watery Grave 3" "B"
-    tapForMana "Watery Grave 4" "B"
-    tapForMana "Overgrown Tomb 1" "B"
+    tapForMana "B" "Watery Grave 1"
+    tapForMana "B" "Watery Grave 2"
+    tapForMana "B" "Watery Grave 3"
+    tapForMana "B" "Watery Grave 4"
+    tapForMana "B" "Overgrown Tomb 1"
     withTriggers (cast "3BB") "Gruesome Menagerie"
     resolve "Gruesome Menagerie"
     targetInLocation "Vicious Conquistador" (Active, Graveyard)
     targetInLocation "Sailor of Means" (Active, Graveyard)
     returnToPlay "Vicious Conquistador"
     returnToPlay "Sailor of Means"
-    addCard "Treasure" (Active, Play) ["artifact"]
+    withLocation (Active, Play)
+      $ withAttribute token
+      $ addArtifact "Treasure"
 
   step "Dead Weight on Vicious Conquistador" $ do
-    tapForMana "Overgrown Tomb 2" "B"
+    tapForMana "B" "Overgrown Tomb 2"
     withTriggers (castWithMuldrotha "enchantment" "B") "Dead Weight"
     target "Vicious Conquistador"
     modifyStrength "Vicious Conquistador" (-2, -2)
@@ -112,22 +120,22 @@ solution = do
     moveToGraveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do
-    tapForMana "Overgrown Tomb 3" "B"
-    tapForMana "Overgrown Tomb 4" "B"
+    tapForMana "B" "Overgrown Tomb 3"
+    tapForMana "B" "Overgrown Tomb 4"
     withTriggers (cast "BB") "Find"
     resolve "Find"
     targetInLocation "Vicious Conquistador" (Active, Graveyard)
     returnToHand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
-    tapForMana "Treasure" "B"
+    tapForMana "B" "Treasure"
     sacrifice "Treasure"
     withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"
 
     validateLife Opponent 0
 
-formatter :: Formatter
-formatter = attributeFormatter $ do
+formatter :: Int -> Formatter
+formatter _ = attributeFormatter $ do
   attribute "mana" $ countCards (matchAttribute "land" <> missingAttribute "tapped")
   attribute "life" $ countLife Opponent

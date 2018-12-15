@@ -9,15 +9,19 @@ solution = do
   step "Initial state" $ do
     setLife Opponent 3
 
-    addCard "Plummet" (Active, Hand) ["instant"]
-    addCards 2 "Forest" (Active, Play) ["land"]
-    addToken "Angel" (4, 4) (Opponent, Play) ["angel", "flying"]
+    withLocation (Active, Hand) $ addInstant "Plummet"
+    withLocation (Active, Play) $ do
+      addLand (numbered 1 "Forest")
+      addLand (numbered 2 "Forest")
+
+    withLocation (Opponent, Play) $ do
+      withAttributes [flying, token] $ addCreature (4, 4) "Angel"
 
   step "Plummet to destroy angel" $ do
-    forM_ [1..2] $ \n -> tapForMana (numbered n "Forest") "G"
+    forM_ [1..2] $ \n -> tapForMana "G" (numbered n "Forest")
     cast "1G" "Plummet"
     resolve "Plummet"
     with "Angel" $ \enemy -> do
       target enemy
-      validate enemy $ matchAttribute "flying"
+      validate enemy $ matchAttribute flying
       destroy enemy

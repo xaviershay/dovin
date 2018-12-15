@@ -4,6 +4,7 @@
 module Dovin.Types where
 
 import Control.Lens (Lens', makeLenses, over, view)
+import Control.Monad.Reader (ReaderT)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
 import Control.Monad.State (StateT)
@@ -61,7 +62,7 @@ data Board = Board
   , _phase :: Phase
   }
 
-type GameMonad a = (ExceptT String (StateT Board (WriterT [(String, Board)] Identity))) a
+type GameMonad a = (ExceptT String (ReaderT Card (StateT Board (WriterT [(String, Board)] Identity)))) a
 type Formatter = Board -> String
 
 makeLenses ''Board
@@ -103,3 +104,15 @@ instance Monoid CardStrength where
   mempty = CardStrength 0 0
 
 mkStrength (p, t) = CardStrength p t
+emptyCard = mkCard "" (Active, Hand)
+mkCard name location =
+  Card
+    { _cardName = name
+    , _location = location
+    , _cardAttributes = mempty
+    , _cardStrength = mempty
+    , _cardDamage = 0
+    , _cardLoyalty = 0
+    }
+
+

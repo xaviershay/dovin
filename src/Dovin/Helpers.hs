@@ -7,7 +7,8 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
 import Control.Lens (at, view, use, _1, _2)
-import           Control.Monad.Except (throwError)
+import Control.Monad.Except (throwError)
+import Control.Monad.State (get)
 
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
 applyMatcherWithDesc (CardMatcher d f) c =
@@ -32,6 +33,14 @@ requireCard name f = do
                    Right () -> return card
                    Left msg ->
                      throwError $ name <> " does not match requirements: " <> msg
+
+-- TODO: Should probably be in Dovin.Actions
+validateRemoved :: CardName -> GameMonad ()
+validateRemoved targetName = do
+  board <- get
+  case view (cards . at targetName) board of
+    Nothing -> return ()
+    Just _ -> throwError $ "Card should be removed: " <> targetName
 
 
 -- CARD MATCHERS

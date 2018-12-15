@@ -7,10 +7,12 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Dovin
+import Dovin.Monad
 
 import Control.Monad
 import Control.Lens
 import Control.Monad.Except
+import Data.List (isInfixOf)
 
 prove name m = testCase name $
   case runMonad emptyBoard m of
@@ -19,7 +21,7 @@ prove name m = testCase name $
 
 refute name expectedFailure m = testCase name $
   case runMonad emptyBoard m of
-    (Left msg, _, _) -> expectedFailure @=? msg
+    (Left msg, _, _) -> assertBool ("expected: " <> expectedFailure <> "\n but got: " <> msg) $ expectedFailure `isInfixOf` msg
     (Right (), _, _) -> assertFailure "proof was not refuted"
 
 validateBoardEquals lens expected = do
@@ -52,7 +54,7 @@ test_Test = testGroup "Actions"
         validateBoardEquals manaPool mempty
 
     , refute
-        "fails if mana not available"
+        "requires mana be available"
         "Mana pool () does not contain (B)" $ do
           addCard "Zombie" (Active, Hand) []
           castFromLocation (Active, Hand) "B" "Zombie"
@@ -78,7 +80,7 @@ test_Test = testGroup "Actions"
 
         validate "Zombie" $ matchLocation (Active, Exile)
     , refute
-        "fails if card does not exist at location"
+        "requires card exists"
         "Card does not exist: Zombie" $ do
           move (Active, Hand) (Active, Exile) "Zombie"
     ]
@@ -96,18 +98,57 @@ test_Test = testGroup "Actions"
         spendMana "1R"
         validateBoardEquals manaPool "W"
     , refute
-        "fails if no mana"
+        "requires sufficient mana (colorless)"
         "Mana pool () does not contain (X)" $ do
           spendMana "1"
     , refute
-        "fails if insufficent mana"
+        "requires sufficient mana (colored)"
         "Mana pool () does not contain (X)" $ do
           addMana "R"
           spendMana "2"
     , refute
-        "fails if wrong color mana"
+        "requires right color mana"
         "Mana pool (R) does not contain (W)" $ do
           addMana "R"
           spendMana "W"
+    ]
+  , testGroup "addMana"
+    [ prove "adds mana to pool" $ do
+        addMana "2RG"
+        validateBoardEquals manaPool "GRXX"
+    ]
+  , testGroup "tap"
+    [ prove "taps card in play" $ do
+        addCard "Forest" (Active, Play) []
+        tap "Forest"
+
+        validate "Forest" $ matchAttribute tapped
+    , prove "taps card in opponent's play" $ do
+        addCard "Forest" (Opponent, Play) []
+        tap "Forest"
+
+        validate "Forest" $ matchAttribute tapped
+    , refute
+        "requires card exists"
+        "Card does not exist: Forest" $ do
+          tap "Forest"
+    , refute
+        "requires untapped"
+        "not has attribute tapped" $ do
+          addCard "Forest" (Active, Play) [tapped]
+          tap "Forest"
+    , refute
+        "requires in play"
+        "in location" $ do
+          addCard "Forest" (Active, Graveyard) []
+          tap "Forest"
+    ]
+  , testGroup "tapForMana"
+    [ prove "taps card and adds mana to pool" $ do
+        addCard "Forest" (Active, Play) []
+        tapForMana "G" "Forest"
+
+        validate "Forest" $ matchAttribute tapped
+        validateBoardEquals manaPool "G"
     ]
   ]

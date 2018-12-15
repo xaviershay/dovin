@@ -4,9 +4,11 @@
 module Dovin
   ( module Dovin
   , module Dovin.Actions
-  , module Dovin.Types
-  , module Dovin.Helpers
+  , module Dovin.Attributes
+  , module Dovin.Builder
   , module Dovin.Formatting
+  , module Dovin.Helpers
+  , module Dovin.Types
   ) where
 
 import Data.Char (isDigit)
@@ -24,10 +26,12 @@ import Data.Function
 import System.Exit
 
 import Dovin.Actions
-import Dovin.Types
-import Dovin.Helpers
+import Dovin.Attributes
+import Dovin.Builder
 import Dovin.Formatting
+import Dovin.Helpers
 import Dovin.Monad
+import Dovin.Types
 
 -- CORE TYPES
 --
@@ -47,18 +51,6 @@ setAttribute attr = over cardAttributes (S.insert attr)
 
 removeAttribute :: CardAttribute -> Card -> Card
 removeAttribute attr = over cardAttributes (S.delete attr)
-
-
-mkCard name location =
-  Card
-    { _cardName = name
-    , _location = location
-    , _cardAttributes = mempty
-    , _cardStrength = mempty
-    , _cardDamage = 0
-    , _cardLoyalty = 0
-    }
-
 
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
@@ -121,26 +113,6 @@ strengthEffect (x, y) = Effect
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
 
-tap name = do
-  let tapA = "tapped"
-
-  card <- requireCard name
-    (matchLocation (Active, Play) <> missingAttribute tapA)
-
-  modifying
-    (cards . at name . _Just . cardAttributes)
-    (S.insert tapA)
-
-tapForMana name amount = do
-  tap name
-  addMana amount
-
-addMana :: ManaString -> GameMonad ()
-addMana amount =
-  modifying
-    manaPool
-    (parseMana amount <>)
-
 jumpstart mana discardName castName = do
   spendMana mana
   discard discardName
@@ -198,6 +170,11 @@ targetInLocation targetName zone = do
 
   return ()
 
+targetInLocation2 zone targetName = do
+  card <- requireCard targetName (matchLocation zone)
+
+  return ()
+
 trigger targetName = do
   -- TODO: Technically some cards can trigger from other zones, figure out best
   -- way to represent.
@@ -211,13 +188,6 @@ activate mana targetName = do
   spendMana mana
 
   return ()
-
-validateRemoved :: CardName -> GameMonad ()
-validateRemoved targetName = do
-  board <- get
-  case view (cards . at targetName) board of
-    Nothing -> return ()
-    Just _ -> throwError $ "Card should be removed: " <> targetName
 
 validate :: CardName -> CardMatcher -> GameMonad ()
 validate targetName reqs = do
@@ -246,7 +216,7 @@ validatePhase expected = do
       <> show expected
 
 destroy targetName = do
-  _ <- requireCard targetName (matchInPlay <> missingAttribute "indestructible")
+  _ <- requireCard targetName (matchInPlay <> missingAttribute indestructible)
 
   removeFromPlay targetName
 
@@ -265,6 +235,15 @@ removeFromPlay cardName = do
   else
     let loc = view location card in
       move loc (second (const Graveyard) loc) cardName
+
+exile cardName = do
+  card <- requireCard cardName mempty
+
+  if hasAttribute "token" card then
+    remove cardName
+  else
+    let loc = view location card in
+      move loc (second (const Exile) loc) cardName
 
 copySpell targetName newName = do
   card <- requireCard targetName mempty
@@ -308,8 +287,8 @@ moveToGraveyard cn = do
     (cards . at cn . _Just)
     c'
 
-modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
-modifyStrength cn (x, y) = do
+modifyStrength2 :: (Int, Int) -> CardName -> GameMonad ()
+modifyStrength2 (x, y) cn = do
   _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
   modifying
@@ -320,6 +299,9 @@ modifyStrength cn (x, y) = do
   c <- requireCard cn mempty
 
   when (view cardToughness c <= 0) $ removeFromPlay cn
+
+modifyStrength :: CardName -> (Int, Int) -> GameMonad ()
+modifyStrength cn (x, y) = modifyStrength2 (x, y) cn
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs = do
@@ -344,7 +326,8 @@ damagePlayer cn = do
     (life . at Opponent . non 0)
     (\x -> x - view cardPower c)
 
-mentor sourceName targetName = do
+-- TODO: Better name (resolveMentor?), check source has mentor attribute
+triggerMentor sourceName targetName = do
   source <- requireCard sourceName $ matchAttribute "attacking"
   _      <- requireCard targetName $
                  matchAttribute "attacking"
@@ -352,7 +335,7 @@ mentor sourceName targetName = do
 
   modifyStrength targetName (1, 1)
 
-numbered n name = name <> " " <> show n
+
 fight :: CardName -> CardName -> GameMonad ()
 fight x y = do
   _ <- requireCard x matchInPlay
@@ -384,6 +367,29 @@ fight x y = do
       when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
         destroy y
 
+damageCard :: CardName -> CardName -> GameMonad ()
+damageCard sourceName destName = do
+  source <- requireCard sourceName (matchAttribute creature)
+  dest   <- requireCard destName   (matchAttribute creature)
+
+  let dmg = max 0 $ view cardPower source
+
+  modifying
+    (cards . at destName . _Just . cardDamage)
+    (+ dmg)
+
+  when (hasAttribute lifelink source) $
+    do
+      let owner = fst . view location $ source
+      modifying (life . at owner . non 0) (+ dmg)
+
+  dest <- requireCard destName (matchAttribute creature)
+  return ()
+  -- TODO: Why isn't indestructible check working?
+  -- TODO: Move this in to a state-based check?
+  --when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
+    --destroy sourceName
+
 forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
 forCards matcher f = do
   cs <- use cards
@@ -407,7 +413,8 @@ setLife p n = assign (life . at p) (Just n)
 returnToHand = move (Active, Graveyard) (Active, Hand)
 returnToPlay = move (Active, Graveyard) (Active, Play)
 
-activatePlaneswalker cn loyalty = do
+activatePlaneswalker :: Int -> CardName -> GameMonad ()
+activatePlaneswalker loyalty cn = do
   c <- requireCard cn matchInPlay
 
   if view cardLoyalty c - loyalty < 0 then
@@ -424,40 +431,12 @@ gainAttribute attr cn = do
     (cards . at cn . _Just)
     (setAttribute attr)
 
+loseAttribute attr cn = do
+  c <- requireCard cn mempty
 
--- CARD HELPERS
---
--- These are a type of effect that create cards. They can be used for initial
--- board setup, but also to create cards as needed (such as tokens).
-emptyCard = mkCard "" (Active, Hand)
-
-addCardRaw :: CardName -> (Int, Int) -> CardLocation -> [CardAttribute] -> GameMonad ()
-addCardRaw name strength loc attrs = do
-  let c = set cardStrength (mkStrength strength) $ set cardAttributes (S.fromList attrs) $ mkCard name loc
-
-  validateRemoved name
-  modifying cards (M.insert name c)
-
-addCard name =
-  addCardRaw name (0, 0)
-
-addCreature name strength loc attrs =
-  addCardRaw name strength loc ("creature":attrs)
-
-addPlaneswalker :: CardName -> Int -> CardLocation -> GameMonad ()
-addPlaneswalker name loyalty loc = do
-  let c = set cardLoyalty loyalty $ set cardAttributes (S.fromList ["planeswalker"]) $ mkCard name loc
-
-  validateRemoved name
-  modifying cards (M.insert name c)
-
-addToken name strength loc attrs =
-  addCreature name strength loc ("token":attrs)
-
-addCards 0 name loc attrs = return ()
-addCards n name loc attrs = do
-  addCard (name <> " " <> show n) loc attrs
-  addCards (n - 1) name loc attrs
+  modifying
+    (cards . at cn . _Just)
+    (removeAttribute attr)
 
 -- HIGH LEVEL FUNCTIONS
 --
@@ -533,14 +512,14 @@ printBoard board = do
 
 with x f = f x
 
-run :: (Board -> String) -> GameMonad () -> IO ()
+run :: (Int -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
   forM_ (zip log [1..]) $ \((step, board), n) -> do
     putStr $ show n <> ". "
     putStr step
-    putStrLn (formatter board)
+    putStrLn (formatter n board)
 
   putStrLn ""
   case e of

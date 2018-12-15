@@ -7,26 +7,29 @@ solution = do
   step "Initial state" $ do
     setLife Opponent 9
 
-    addCreature "Ochran Assassin" (1, 1) (Active, Hand) []
-    addCreature "Rhizome Lurcher" (2, 2) (Active, Hand) []
+    withLocation (Active, Hand) $ do
+      addCreature (1, 1) "Ochran Assassin"
+      addCreature (2, 2) "Rhizome Lurcher"
 
-    addCreature "Torch Courier" (1, 1) (Active, Play) []
-    addCreature "Whisper Agent" (3, 2) (Active, Play) ["flying"]
-    addCreature "Whisper, Blood Liturgist" (2, 2) (Active, Play) []
+    withLocation (Active, Play) $ do
+      addCreature (1, 1) "Torch Courier"
+      withAttribute flying $ addCreature (3, 2) "Whisper Agent"
+      addCreature (2, 2) "Whisper, Blood Liturgist"
 
-    addCards 3 "Dragonskull Summit" (Active, Play) ["land"]
-    addCards 4 "Woodland Cemetery" (Active, Play) ["land"]
+      addLands 3 "Dragonskull Summit"
+      addLands 4 "Woodland Cemetery"
 
-    addCreature "Devkarin Dissident" (2, 2) (Active, Graveyard) []
-    addCreature "Underrealm Lich" (4, 3) (Active, Graveyard) []
-    addCreature "Golgari Findbroker" (3, 4) (Active, Graveyard) []
-    addCreature "Erstwhile Trooper" (2, 2) (Active, Graveyard) []
-    addCreature "Bone Dragon" (5, 4) (Active, Graveyard) []
+    withLocation (Active, Graveyard) $ do
+      addCreature (2, 2) "Devkarin Dissident"
+      addCreature (4, 3) "Underrealm Lich"
+      addCreature (3, 4) "Golgari Findbroker"
+      addCreature (2, 2) "Erstwhile Trooper"
+      addCreature (5, 4) "Bone Dragon"
 
   step "Play Ochran Assassin, haste with Torch Courier" $ do
-    tapForMana "Woodland Cemetery 1" "G"
-    tapForMana "Woodland Cemetery 2" "B"
-    tapForMana "Dragonskull Summit 1" "R"
+    tapForMana "G" "Woodland Cemetery 1"
+    tapForMana "B" "Woodland Cemetery 2"
+    tapForMana "R" "Dragonskull Summit 1"
     cast "1BG" "Ochran Assassin"
     resolve "Ochran Assassin"
 
@@ -43,10 +46,10 @@ solution = do
     returnToPlay "Torch Courier"
 
   step "Play Rhizome Lurcher, haste with Torch Courier" $ do
-    tapForMana "Woodland Cemetery 3" "G"
-    tapForMana "Woodland Cemetery 4" "B"
-    tapForMana "Dragonskull Summit 2" "R"
-    tapForMana "Dragonskull Summit 3" "R"
+    tapForMana "G" "Woodland Cemetery 3"
+    tapForMana "B" "Woodland Cemetery 4"
+    tapForMana "R" "Dragonskull Summit 2"
+    tapForMana "R" "Dragonskull Summit 3"
     cast "2BG" "Rhizome Lurcher"
     resolve "Rhizome Lurcher"
 
