@@ -32,12 +32,16 @@ attributeFormatter m = do
           (label, value)
 
 cardFormatter :: String -> CardMatcher -> Formatter
-cardFormatter title matcher board = do
+cardFormatter title matcher board =
   let matchingCs = filter (applyMatcher matcher) (M.elems $ view cards board) in
 
-    "\n      " <> title <> ":\n" <> (intercalate "\n" . sort $ map (("      " <>) . formatCard) matchingCs)
+    "\n      " <> title <> ":\n" <> (intercalate "\n" . sort $ map (("      " <>) . formatCard . applyCardEffects) matchingCs)
 
   where
+    applyCardEffects c =
+      let Right value = execMonad board (applyEffects c) in
+      value
+
     formatCard c =
       "  " <> view cardName c <>
       " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"

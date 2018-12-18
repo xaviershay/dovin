@@ -23,6 +23,7 @@ module Dovin.Builder (
   -- the card to be created.
   , withAttribute
   , withAttributes
+  , withEffect
   , withLocation
   ) where
 
@@ -92,3 +93,7 @@ withAttributes attrs m = do
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   local (set location loc) m
+
+withEffect :: CardMatcher -> (Card -> CardMatcher) -> (Card -> GameMonad Card) -> GameMonad () -> GameMonad ()
+withEffect x y z =
+  local (over cardEffects ((x, y, z):))

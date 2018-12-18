@@ -24,6 +24,7 @@ type ManaString = String
 data Location = Hand | Graveyard | Play | Stack | Exile
   deriving (Show, Eq, Ord)
 
+type CardEffect = (CardMatcher, Card -> CardMatcher, Card -> GameMonad Card)
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
 data CardStrength = CardStrength Int Int deriving (Eq)
@@ -39,8 +40,13 @@ data Card = Card
   , _cardStrength :: CardStrength
   , _cardDamage :: Int
   , _cardLoyalty :: Int
-  } deriving (Show, Eq)
+  , _cardEffects :: [CardEffect]
+  }
 instance Hashable Player
+instance Show Card where
+  show = _cardName
+instance Eq Card where
+  a == b = _cardName a == _cardName b
 
 data CardMatcher = CardMatcher String (Card -> Bool)
 data Effect = Effect (Card -> Card) (Card -> Card)
@@ -113,6 +119,7 @@ mkCard name location =
     , _cardStrength = mempty
     , _cardDamage = 0
     , _cardLoyalty = 0
+    , _cardEffects = mempty
     }
 
 
