@@ -1,5 +1,6 @@
 module Solutions.ExplorersOfIxalanContest where
 
+import Control.Lens (view)
 import Control.Monad
 
 import Dovin
@@ -21,7 +22,16 @@ solution = do
   step "Relevant initial state" $ do
     withLocation (Active, Hand) $ do
       withAttribute goblin $ addCreature (2, 2) "Legion Warboss"
-      withAttribute doublestrike $ addCreature (2, 2) "Kwende, Pride of Femeref"
+      withAttribute doublestrike
+        $ withEffect
+            matchInPlay
+            (\card ->
+                 matchOther (view cardName card)
+              <> matchAttributes [creature, firststrike]
+            )
+            (pure . setAttribute doublestrike)
+        $ addCreature (2, 2) "Kwende, Pride of Femeref"
+
       addSorcery "Switcheroo"
       addInstant "Buccaneer's Bravado"
 
@@ -43,7 +53,14 @@ solution = do
         addCreature (4, 8) "Zetalpa, Primal Dawn"
       withAttribute pirate $ addCreature (4, 4) "Angrath's Marauders"
       withAttribute firststrike $ addCreature (3, 3) "Goblin Chainwhirler"
-      addCreature (3, 3) "Garna, the Bloodflame"
+      withEffect
+        matchInPlay
+        (\card ->
+             matchOther (view cardName card)
+          <> matchAttribute creature
+        )
+        (pure . setAttribute haste)
+        $ addCreature (3, 3) "Garna, the Bloodflame"
 
   step "Cast Legion Warboss and Kwende from hand" $ do
     cast "" "Legion Warboss"
@@ -72,14 +89,6 @@ solution = do
 
     gainAttribute summoned "Kwende, Pride of Femeref"
     gainAttribute summoned "Garna, the Bloodflame"
-
-    forCards
-      (matchLocation (Active, Play) <> matchOther "Garna, the Bloodflame")
-      (gainAttribute haste)
-
-    forCards
-      (matchLocation (Opponent, Play) <> matchAttribute firststrike)
-      (gainAttribute doublestrike)
 
   step "Shapeshift to Adanto Vanguard and make indestructible" $ do
     shapeshift "Adanto Vanguard"
@@ -159,12 +168,12 @@ solution = do
 
   step "Siege-gang all the goblins except Siege-Gang" $ do
     forCards
-      (matchLocation (Active, Play) <> matchAttribute "goblin" <> matchOther "Siege-Gang Commander")
+      (matchLocation (Active, Play) <> matchAttribute goblin <> matchOther "Siege-Gang Commander")
       sacrificeToSiegeGang
 
   step "Shapeshift to Warboss, sacrifice lazav and self to Siege-Gang" $ do
     shapeshift "Legion Warboss"
-    gainAttribute "goblin" lazav
+    gainAttribute goblin lazav
 
     sacrificeToSiegeGang lazav
     sacrificeToSiegeGang "Siege-Gang Commander"
