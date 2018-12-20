@@ -5,6 +5,8 @@ import Control.Monad
 
 import Dovin
 
+-- TODO: This solution is wrong, since mana is supposed to drain between phases
+-- but here we assume it carries over from combat to second main.
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
