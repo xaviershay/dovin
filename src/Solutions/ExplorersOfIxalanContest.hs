@@ -4,6 +4,7 @@ import Control.Monad
 
 import Dovin
 
+-- This solution is not optimal, 130 damage is possible.
 solution :: GameMonad ()
 solution = do
   let goblin = "goblin"
