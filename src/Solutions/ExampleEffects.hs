@@ -27,11 +27,13 @@ solution = do
             (pure . over cardStrength (CardStrength 1 1 <>))
         $ addCreature (4, 4) "Angel"
 
-      withAttributes [flying, token]
+      withAttributes [flying]
         $ addCreature (4, 4) "Angel 2"
-    _ <- requireCard "Angel 2" mempty
+  step "Next" $ do
+    move (Opponent, Play) (Opponent, Graveyard) "Angel"
+  step "Next" $ do
+    move (Opponent, Graveyard) (Opponent, Play) "Angel"
 
-    return ()
 
 formatter _ =
      cardFormatter "hand" (matchLocation (Active, Hand))

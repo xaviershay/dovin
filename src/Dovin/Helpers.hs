@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Dovin.Helpers where
 
 import Dovin.Types
@@ -7,7 +9,7 @@ import Debug.Trace
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
-import Control.Lens (at, view, use, _1, _2)
+import Control.Lens (at, view, use, _1, _2, ASetter, over, _Just, modifying)
 import Control.Monad (foldM)
 import Control.Monad.Except (throwError)
 import Control.Monad.State (get)
@@ -31,22 +33,35 @@ requireCard name f = do
 
   case maybeCard of
     Nothing -> throwError $ "Card does not exist: " <> name
-    Just card -> case applyMatcherWithDesc f card of
-                   Right () -> applyEffects card
-                   Left msg ->
-                     throwError $ name <> " does not match requirements: " <> msg
+    Just card -> do
+      card' <- applyEffects card
+      case applyMatcherWithDesc f card' of
+        Right () -> return card'
+        Left msg ->
+          throwError $ name <> " does not match requirements: " <> msg
 
-applyEffects :: Card -> GameMonad Card
-applyEffects card = do
-  cards <- M.elems <$> use cards
-  let allEffects        = concatMap (\c -> map (\e -> (c, e)) . view cardEffects $ c) cards
+applyEffects :: BaseCard -> GameMonad Card
+applyEffects (BaseCard card) = do
+  cards :: [BaseCard] <- M.elems <$> use cards
+  let allEffects = concatMap
+                     (\c ->
+                       map (\e -> (c, e))
+                         . view cardEffects
+                         $ c
+                     )
+                     . map unwrap $
+                     cards
   let enabledEffects    = filter (\(c, (matcher, _, _)) -> applyMatcher matcher c) allEffects
   let applicableEffects = filter (\(c, (_, f, _)) -> applyMatcher (f c) card) enabledEffects
 
   foldM (\c (_, e) -> applyEffect2 c e) card applicableEffects
 
-applyEffect2 :: Card -> CardEffect -> GameMonad Card
-applyEffect2 card (_, _, f) = f card
+  where
+    applyEffect2 :: Card -> CardEffect -> GameMonad Card
+    applyEffect2 card (_, _, f) = f card
+
+    unwrap :: BaseCard -> Card
+    unwrap (BaseCard card) = card
 
 -- TODO: Should probably be in Dovin.Actions
 validateRemoved :: CardName -> GameMonad ()
@@ -56,6 +71,17 @@ validateRemoved targetName = do
     Nothing -> return ()
     Just _ -> throwError $ "Card should be removed: " <> targetName
 
+allCards :: GameMonad [Card]
+allCards = do
+  bases <- M.elems <$> use cards
+
+  mapM applyEffects bases
+
+modifyCard :: CardName -> ASetter Card Card a b -> (a -> b) -> GameMonad ()
+modifyCard name lens f = 
+  modifying
+    (cards . at name . _Just)
+    (\(BaseCard c) -> BaseCard $ over lens f c)
 
 -- CARD MATCHERS
 --

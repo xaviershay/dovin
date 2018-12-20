@@ -54,14 +54,18 @@ solution = do
       withAttributes [flying, token] $ addCreature (4, 4) "Angel 2"
       withAttributes [flying, token] $ addCreature (4, 4) "Angel 3"
 
-      let cn = "Shalai, Voice of Plenty" in
-        do
-          withAttributes [flying, "angel"] $ addCreature (3, 4) cn
-          addEffect cn
-            (matchOther cn
-              <> matchLocation (Opponent, Play)
-              <> matchAttribute creature)
-            (attributeEffect "hexproof")
+      let matchOtherCreatures =
+              \card ->
+                   matchLocation (view location card)
+                <> matchOther (view cardName card)
+                <> matchAttribute creature
+
+      withAttributes [flying, "angel"]
+        $ withEffect
+            matchInPlay
+            matchOtherCreatures
+            (pure . setAttribute "hexproof")
+        $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
       let cn = "Lyra Dawnbringer" in
         do
@@ -209,11 +213,9 @@ solution = do
 
 formatter :: Int -> Formatter
 formatter _ = attributeFormatter $ do
-  attribute "mana"   $ countCards (matchAttribute "land" <> missingAttribute "tapped")
+  attribute "mana" $
+    countCards (matchAttribute "land" <> missingAttribute "tapped")
   attribute "storm"  $ countValue "storm"
-  attribute "adeliz" $ use (cards
-                             . at "Adeliz, the Cinder Wind"
-                             . non emptyCard
-                             . cardStrength)
+  attribute "adeliz" $
+    view cardStrength <$> requireCard "Adeliz, the Cinder Wind" mempty
   attribute "enemies" $ countCards (matchLocation (Opponent, Play))
-

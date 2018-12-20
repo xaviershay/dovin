@@ -42,7 +42,7 @@ addCard name = do
   template <- ask
   -- TODO: Add this back in
   validateRemoved name
-  modifying cards (M.insert name (set cardName name template))
+  modifying cards (M.insert name (BaseCard $ set cardName name template))
 
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name

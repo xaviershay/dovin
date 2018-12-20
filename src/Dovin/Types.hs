@@ -48,12 +48,14 @@ instance Show Card where
 instance Eq Card where
   a == b = _cardName a == _cardName b
 
+newtype BaseCard = BaseCard Card deriving (Show, Eq)
+
 data CardMatcher = CardMatcher String (Card -> Bool)
 data Effect = Effect (Card -> Card) (Card -> Card)
 type EffectName = String
 
 data Board = Board
-  { _cards :: M.HashMap CardName Card
+  { _cards :: M.HashMap CardName BaseCard
   -- The stack is currently the only location where we care about order, so
   -- store that information alongside the main _cards map. This won't scale -
   -- deck and graveyard need to be ordered also - but works for now. Need to
