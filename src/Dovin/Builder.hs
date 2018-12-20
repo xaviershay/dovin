@@ -23,6 +23,7 @@ module Dovin.Builder (
   -- the card to be created.
   , withAttribute
   , withAttributes
+  , withEffect
   , withLocation
   ) where
 
@@ -41,7 +42,7 @@ addCard name = do
   template <- ask
   -- TODO: Add this back in
   validateRemoved name
-  modifying cards (M.insert name (set cardName name template))
+  modifying cards (M.insert name (BaseCard $ set cardName name template))
 
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name
@@ -92,3 +93,7 @@ withAttributes attrs m = do
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   local (set location loc) m
+
+withEffect :: CardMatcher -> (Card -> CardMatcher) -> (Card -> GameMonad Card) -> GameMonad () -> GameMonad ()
+withEffect applyCondition filter action =
+  local (over cardEffects (mkEffect applyCondition filter action:))

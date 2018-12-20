@@ -40,7 +40,6 @@ emptyBoard = Board
                , _counters = mempty
                , _stack = mempty
                , _life = mempty
-               , _effects = mempty
                , _manaPool = mempty
                , _phase = FirstMain
                }
@@ -54,58 +53,9 @@ removeAttribute attr = over cardAttributes (S.delete attr)
 
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
-  board <- get
+  match <- requireCard name f >> pure True `catchError` (const $ pure False)
 
-  case view (cards . at name) board of
-    Nothing -> return ()
-    Just card -> case applyMatcherWithDesc f card of
-                   Right () -> action
-                   Left msg -> return ()
--- EFFECTS
---
--- An effect is a reversible function that can be applied to a card. They can
--- be used to simplify keeping track of effects as cards enter and leave play.
-
-instance Show Effect where
-  show _ = "<effect>"
-
-instance Semigroup Effect where
-  (Effect f1 g1) <> (Effect f2 g2) = Effect (f1 . f2) (g1 . g2)
-
-instance Monoid Effect where
-  mempty = Effect id id
-
-addEffect :: EffectName -> CardMatcher -> Effect -> GameMonad ()
-addEffect cn f effect =
-  modifying effects (M.insert cn (f, effect))
-
-requireEffect :: EffectName -> GameMonad (CardMatcher, Effect)
-requireEffect effectName = do
-  board <- get
-  case view (effects . at effectName) board of
-    Nothing -> throwError $ "No effect named: " <> effectName
-    Just x -> return x
-
-applyEffect effectName = do
-  (matcher, Effect f _) <- requireEffect effectName
-
-  forCards matcher $ \name -> do
-    modifying
-      (cards . at name . _Just)
-      f
-
-removeEffect effectName = do
-  (matcher, Effect _ f) <- requireEffect effectName
-
-  forCards matcher $ \name -> do
-    modifying
-      (cards . at name . _Just)
-      f
-
-attributeEffect attr = Effect (setAttribute attr) (removeAttribute attr)
-strengthEffect (x, y) = Effect
-  (over cardStrength (mkStrength (x, y) <>))
-  (over cardStrength (mkStrength (-x, -y) <>))
+  when match action
 
 -- ACTIONS
 --
@@ -117,9 +67,7 @@ jumpstart mana discardName castName = do
   spendMana mana
   discard discardName
   castFromLocation (Active, Graveyard) "" castName
-  modifying
-    (cards . at castName . _Just)
-    (setAttribute "exile-when-leave-stack")
+  gainAttribute "exile-when-leave-stack" castName
 
 discard = move (Active, Hand) (Active, Graveyard)
 
@@ -142,18 +90,14 @@ resolve expectedName = do
         assign stack ss
 
         when (hasAttribute "creature" c) $
-          modifying
-            (cards . at name . _Just)
-            (setAttribute "summoned")
+          gainAttribute "summoned" name
 
         if hasAttribute "sorcery" c || hasAttribute "instant" c then
           if hasAttribute "copy" c then
             remove name
           else if hasAttribute "exile-when-leave-stack" c then
             do
-              modifying
-                (cards . at name . _Just)
-                (removeAttribute "exile-when-leave-stack")
+              loseAttribute "exile-when-leave-stack" name
               move (Active, Stack) (Active, Exile) name
           else
             move (Active, Stack) (Active, Graveyard) name
@@ -161,7 +105,7 @@ resolve expectedName = do
           move (Active, Stack) (Active, Play) name
 
 target targetName = do
-  card <- requireCard targetName (matchInPlay <> missingAttribute "hexproof")
+  card <- requireCard targetName (matchInPlay <> missingAttribute hexproof)
 
   return ()
 
@@ -247,7 +191,7 @@ copySpell targetName newName = do
 
   modifying
     cards
-    (M.insert newName newCard)
+    (M.insert newName $ BaseCard newCard)
 
   modifying
     stack
@@ -267,28 +211,16 @@ resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do
   c <- requireCard cn (matchAttribute "creature")
 
-  let c' = set cardStrength (mkStrength desired) c
+  modifyCard cn cardStrength (const $ mkStrength desired)
 
-  assign
-    (cards . at cn . _Just)
-    c'
-
-moveToGraveyard cn = do
-  c <- requireCard cn mempty
-
-  let c' = over location (\(player, _) -> (player, Graveyard)) c
-
-  assign
-    (cards . at cn . _Just)
-    c'
+-- TODO: handle tokens, use `move`
+moveToGraveyard cn = modifyCard cn location (\(player, _) -> (player, Graveyard))
 
 modifyStrength :: (Int, Int) -> CardName -> GameMonad ()
 modifyStrength (x, y) cn = do
   _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
-  modifying
-    (cards . at cn . _Just . cardStrength)
-    (CardStrength x y <>)
+  modifyCard cn cardStrength (CardStrength x y <>)
 
   -- Fetch card again to get new strength
   c <- requireCard cn mempty
@@ -330,26 +262,21 @@ triggerMentor sourceName targetName = do
 
 fight :: CardName -> CardName -> GameMonad ()
 fight x y = do
-  _ <- requireCard x matchInPlay
-  _ <- requireCard y matchInPlay
+  cx <- requireCard x (matchInPlay <> matchAttribute creature)
+  cy <- requireCard y (matchInPlay <> matchAttribute creature)
 
   target x
   target y
 
-  fight' x y
-  unless (x == y) $ fight' y x
+  fight' cx cy
+  unless (cx == cy) $ fight' cy cx
 
   where
-    fight' x y = do
-      cx <- requireCard x (matchAttribute "creature")
-      cy <- requireCard y (matchAttribute "creature")
+    fight' cx cy = do
 
       let xdmg = max 0 $ view cardPower cx
-      let cy' = over cardDamage (+ xdmg) cy
-
-      assign
-        (cards . at y . _Just)
-        cy'
+      modifyCard (view cardName cy) cardDamage (+ xdmg)
+      cy' <- requireCard (view cardName cy) mempty
 
       when (hasAttribute "lifelink" cx) $
         do
@@ -357,7 +284,7 @@ fight x y = do
           modifying (life . at owner . non 0) (+ xdmg)
 
       when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
-        destroy y
+        destroy (view cardName cy)
 
 damageCard :: CardName -> CardName -> GameMonad ()
 damageCard sourceName destName = do
@@ -366,9 +293,7 @@ damageCard sourceName destName = do
 
   let dmg = max 0 $ view cardPower source
 
-  modifying
-    (cards . at destName . _Just . cardDamage)
-    (+ dmg)
+  modifyCard destName cardDamage (+ dmg)
 
   when (hasAttribute lifelink source) $
     do
@@ -384,9 +309,9 @@ damageCard sourceName destName = do
 
 forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
 forCards matcher f = do
-  cs <- use cards
+  cs <- allCards
 
-  let matchingCs = filter (applyMatcher matcher) (M.elems cs)
+  let matchingCs = filter (applyMatcher matcher) cs
 
   forM_ (map (view cardName) matchingCs) f
 
@@ -412,23 +337,17 @@ activatePlaneswalker loyalty cn = do
   if view cardLoyalty c - loyalty < 0 then
     throwError $ cn <> " does not have enough loyalty"
   else
-    modifying
-      (cards . at cn . _Just . cardLoyalty)
-      (+ loyalty)
+    modifyCard cn cardLoyalty (+ loyalty)
 
 gainAttribute attr cn = do
   c <- requireCard cn mempty
 
-  modifying
-    (cards . at cn . _Just)
-    (setAttribute attr)
+  modifyCard cn id (setAttribute attr)
 
 loseAttribute attr cn = do
   c <- requireCard cn mempty
 
-  modifying
-    (cards . at cn . _Just)
-    (removeAttribute attr)
+  modifyCard cn id (removeAttribute attr)
 
 -- HIGH LEVEL FUNCTIONS
 --
@@ -456,52 +375,6 @@ fork options = do
     put b
 
 
-printBoard board = do
-  putStr "Opponent Life: "
-  print $ view (life . at Opponent . non 0) board
-  unless (null $ view manaPool board) $
-    putStrLn $ "Mana Pool: " <> view manaPool board
-  putStrLn ""
-  let sections = groupByWithKey (view location) (M.elems $ view cards board)
-
-  forM_ sections $ \(loc, cs) ->
-    unless (snd loc == Stack) $ do
-      print loc
-      forM_ (sortBy (compare `on` view cardName) cs) $ \c ->
-        putStrLn $ formatCard c
-
-  unless (null $ view stack board) $ do
-    putStrLn "Stack"
-    forM_ (view stack board) $ \cn ->
-      case view (cards . at cn) board of
-        Just c -> putStrLn $ formatCard c
-        Nothing -> fail $ cn <> " was on stack but doesn't exist"
-
-  where
-    formatCard c =
-      "  " <> view cardName c <>
-      " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
-      <> if hasAttribute "creature" c then
-           " ("
-             <> show (view cardPower c)
-             <> "/"
-             <> show (view cardToughness c)
-             <> ", "
-             <> show (view cardDamage c)
-             <> ")"
-         else if hasAttribute "planeswalker" c then
-           " ("
-             <> show (view cardLoyalty c)
-             <> ")"
-         else
-          ""
-
-    -- https://stackoverflow.com/questions/15412027/haskell-equivalent-to-scalas-groupby
-    groupByWithKey :: (Ord b) => (a -> b) -> [a] -> [(b, [a])]
-    groupByWithKey f = map (f . head &&& id)
-                       . groupBy ((==) `on` f)
-                       . sortBy (compare `on` f)
-
 with x f = f x
 
 run :: (Int -> Formatter) -> GameMonad () -> IO ()
@@ -523,21 +396,4 @@ run formatter solution = do
     Right _ -> return ()
 
 runVerbose :: GameMonad () -> IO ()
-runVerbose solution = do
-  let (e, _, log) = runMonad emptyBoard solution
-
-  forM_ (zip log [1..]) $ \((step, board), n) -> do
-    putStr $ show n <> ". "
-    putStrLn step
-    putStrLn ""
-    printBoard board
-    putStrLn ""
-    putStrLn ""
-
-  case e of
-    Left x -> do
-      putStrLn "ERROR:"
-      putStrLn x
-      putStrLn ""
-      System.Exit.exitFailure
-    Right _ -> return ()
+runVerbose = run (\_ -> boardFormatter)

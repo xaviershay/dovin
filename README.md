@@ -9,10 +9,11 @@ Storm](http://www.possibilitystorm.com/)-style Magic: The Gathering puzzles.
 > highlighting its shortcomings, and predicting with startling accuracy exactly
 > how and when it will fail. --- [Dovin Baan, Planeswalker](https://magic.wizards.com/en/story/planeswalkers/dovin-baan)
 
-It provides a haskell DSL for expressing Magic actions, with tracking of life and other
-counters and validation of pre- and post- conditions. For example, if you try
-to tap a permanent that is already tapped, it will error. Or if you try to
-target a creature with hexproof.
+It provides a haskell DSL for expressing Magic actions, with tracking of life
+and other counters and validation of pre- and post- conditions. For example, if
+you try to tap a permanent that is already tapped, it will error. Or if you try
+to target a creature with hexproof. It can also track state-based effects, such
+as "all creatures get +1/+1" or "other creatures gain hexproof".
 
 It does not try to provide a full ruleset implementation, instead it's more
 akin to letting you lay out cards and counters in front of you and manipulate
@@ -25,11 +26,14 @@ though. See `src/Dovin.hs` and `src/Dovin/Actions.hs` for available actions.
 ## Example
 
 ``` haskell
+module Solutions.Example where
+
+import Control.Lens (view)
 import Control.Monad (forM_)
 
 import Dovin
 
-main = runVerbose solution
+main = run formatter solution
 
 solution :: GameMonad ()
 solution = do
@@ -38,46 +42,55 @@ solution = do
 
     withLocation (Active, Hand) $ addInstant "Plummet"
     withLocation (Active, Play) $ do
-      addLand (numbered 1 "Forest")
-      addLand (numbered 2 "Forest")
+      addLands 2 "Forest"
 
     withLocation (Opponent, Play) $ do
       withAttributes [flying, token] $ addCreature (4, 4) "Angel"
+      withAttributes [flying]
+        $ withEffect
+            matchInPlay
+            (\card ->
+                 matchLocation (view location card)
+              <> matchOther (view cardName card)
+              <> matchAttribute creature
+            )
+            (pure . setAttribute hexproof)
+        $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
-  step "Plummet to destroy angel" $ do
+  step "Plummet to destroy Shalai" $ do
     forM_ [1..2] $ \n -> tapForMana "G" (numbered n "Forest")
     cast "1G" "Plummet"
     resolve "Plummet"
-    with "Angel" $ \enemy -> do
+    with "Shalai, Voice of Plenty" $ \enemy -> do
       target enemy
       validate enemy $ matchAttribute flying
       destroy enemy
+
+formatter :: Int -> Formatter
+formatter 2 = manaFormatter
+  <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
+formatter _ = boardFormatter
+
+manaFormatter = attributeFormatter $ do
+  attribute "availble mana" $
+    countCards (matchAttribute land <> missingAttribute tapped)
 ```
 
-`runVerbose` prints out the board state at each step:
+`run` uses the supplied formatter to print out the board state at each step:
 
     1. Initial state
-
-    Opponent Life: 3
-
-    (Active,Hand)
-      Plummet (instant)
-    (Active,Play)
-      Forest 1 (land)
-      Forest 2 (land)
-    (Opponent,Play)
-      Angel (angel,creature,flying,token) (4/4, 0)
-
-
-    2. Plummet to destroy angel
-
-    Opponent Life: 3
-
-    (Active,Graveyard)
-      Plummet (instant)
-    (Active,Play)
-      Forest 1 (land,tapped)
-      Forest 2 (land,tapped)
+          (Active,Hand):
+            Plummet (instant)
+          (Active,Play):
+            Forest 1 (land)
+            Forest 2 (land)
+          (Opponent,Play):
+            Angel (creature,flying,hexproof,token) (4/4, 0)
+            Shalai, Voice of Plenty (creature,flying) (3/4, 0)
+    2. Plummet to destroy Shalai
+          availble mana: 0
+          opponent creatures:
+            Angel (creature,flying,token) (4/4, 0)
 
 See `src/Solutions` for more extensive usage (spoiler alert: these are
 solutions for published Possibility Storm puzzles!)

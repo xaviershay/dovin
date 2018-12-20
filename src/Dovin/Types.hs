@@ -24,6 +24,23 @@ type ManaString = String
 data Location = Hand | Graveyard | Play | Stack | Exile
   deriving (Show, Eq, Ord)
 
+data CardEffect = CardEffect
+  { _effectEnabled :: CardMatcher
+  , _effectFilter :: Card -> CardMatcher
+  , _effectAction :: Card -> GameMonad Card
+  }
+
+mkEffect enabled filter action = CardEffect
+  -- For an effect to be enabled, it's host card must currently match this
+  -- matcher.
+  { _effectEnabled = enabled
+  -- If the effect is enabled, this filter determines wheter any particular
+  -- card is affected by it.
+  , _effectFilter = filter
+  -- The action to apply to affected cards.
+  , _effectAction = action
+  }
+
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
 data CardStrength = CardStrength Int Int deriving (Eq)
@@ -39,15 +56,21 @@ data Card = Card
   , _cardStrength :: CardStrength
   , _cardDamage :: Int
   , _cardLoyalty :: Int
-  } deriving (Show, Eq)
+  , _cardEffects :: [CardEffect]
+  }
 instance Hashable Player
+instance Show Card where
+  show = _cardName
+instance Eq Card where
+  a == b = _cardName a == _cardName b
+
+newtype BaseCard = BaseCard Card deriving (Show, Eq)
 
 data CardMatcher = CardMatcher String (Card -> Bool)
-data Effect = Effect (Card -> Card) (Card -> Card)
 type EffectName = String
 
 data Board = Board
-  { _cards :: M.HashMap CardName Card
+  { _cards :: M.HashMap CardName BaseCard
   -- The stack is currently the only location where we care about order, so
   -- store that information alongside the main _cards map. This won't scale -
   -- deck and graveyard need to be ordered also - but works for now. Need to
@@ -57,7 +80,6 @@ data Board = Board
   -- In theory, life could be just another counter. Need to think more about
   -- making that happen.
   , _life :: M.HashMap Player Int
-  , _effects :: M.HashMap EffectName (CardMatcher, Effect)
   , _manaPool :: ManaPool
   , _phase :: Phase
   }
@@ -67,6 +89,11 @@ type Formatter = Board -> String
 
 makeLenses ''Board
 makeLenses ''Card
+makeLenses ''CardEffect
+
+
+cardLocation :: Control.Lens.Lens' Card (Player, Location)
+cardLocation = location
 
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
@@ -113,6 +140,7 @@ mkCard name location =
     , _cardStrength = mempty
     , _cardDamage = 0
     , _cardLoyalty = 0
+    , _cardEffects = mempty
     }
 
 

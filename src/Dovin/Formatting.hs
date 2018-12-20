@@ -5,7 +5,7 @@ import Control.Lens
 import Control.Monad.Writer
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
-import Data.List (intercalate, sort)
+import Data.List (intercalate, sort, nub)
 
 import Dovin.Helpers
 import Dovin.Monad
@@ -32,12 +32,14 @@ attributeFormatter m = do
           (label, value)
 
 cardFormatter :: String -> CardMatcher -> Formatter
-cardFormatter title matcher board = do
-  let matchingCs = filter (applyMatcher matcher) (M.elems $ view cards board) in
+cardFormatter title matcher board =
+  let matchingCs = filter (applyMatcher matcher) cs in
 
     "\n      " <> title <> ":\n" <> (intercalate "\n" . sort $ map (("      " <>) . formatCard) matchingCs)
 
   where
+    cs = let Right value = execMonad board allCards in value
+
     formatCard c =
       "  " <> view cardName c <>
       " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
@@ -55,7 +57,18 @@ cardFormatter title matcher board = do
              <> ")"
          else
           ""
-  
+
+boardFormatter :: Formatter
+boardFormatter board =
+  let allLocations = nub . sort . map (view location) $ cs in
+
+  let formatters = map (\l -> cardFormatter (show l) (matchLocation l)) allLocations :: [Formatter] in
+
+  mconcat formatters $ board
+
+  where
+    cs = let Right value = execMonad board allCards in value
+
 attribute :: Show a => String -> GameMonad a -> FormatMonad ()
 attribute label m = tell [(label, show <$> m)]
 
@@ -67,7 +80,7 @@ countValue name = use (counters . at name . non 0)
 
 countCards :: CardMatcher -> GameMonad Int
 countCards matcher =
-  length . filter (applyMatcher matcher) . M.elems <$> use cards
+  length . filter (applyMatcher matcher) <$> allCards
 
 countManaPool :: GameMonad Int
 countManaPool =

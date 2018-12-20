@@ -110,9 +110,7 @@ move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
 move from to name = do
   c <- requireCard name $ matchLocation from
 
-  assign
-    (cards . at name . _Just . location)
-    to
+  modifyCard name location (const to)
 
 -- | Remove mana from the pool. Colored mana will be removed first, then extra
 -- mana of any type will be removed to match the colorless required.
@@ -161,6 +159,4 @@ tap name = do
     ((matchLocation (Opponent, Play) `matchOr` matchLocation (Active, Play))
     <> missingAttribute tapped)
 
-  modifying
-    (cards . at name . _Just . cardAttributes)
-    (S.insert tapped)
+  modifyCard name cardAttributes (S.insert tapped)
