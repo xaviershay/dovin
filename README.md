@@ -28,9 +28,6 @@ though. See `src/Dovin.hs` and `src/Dovin/Actions.hs` for available actions.
 ``` haskell
 module Solutions.Example where
 
-import Control.Lens (view)
-import Control.Monad (forM_)
-
 import Dovin
 
 main = run formatter solution
@@ -49,16 +46,13 @@ solution = do
       withAttributes [flying]
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchLocation (view location card)
-              <> matchOther (view cardName card)
-              <> matchAttribute creature
-            )
+            (matchOtherCreatures <> (const $ matchAttribute creature))
             (pure . setAttribute hexproof)
         $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
   step "Plummet to destroy Shalai" $ do
-    forM_ [1..2] $ \n -> tapForMana "G" (numbered n "Forest")
+    tapForMana "G" (numbered 1 "Forest")
+    tapForMana "G" (numbered 2 "Forest")
     cast "1G" "Plummet"
     resolve "Plummet"
     with "Shalai, Voice of Plenty" $ \enemy -> do
