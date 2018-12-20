@@ -51,7 +51,6 @@ instance Eq Card where
 newtype BaseCard = BaseCard Card deriving (Show, Eq)
 
 data CardMatcher = CardMatcher String (Card -> Bool)
-data Effect = Effect (Card -> Card) (Card -> Card)
 type EffectName = String
 
 data Board = Board
@@ -65,7 +64,6 @@ data Board = Board
   -- In theory, life could be just another counter. Need to think more about
   -- making that happen.
   , _life :: M.HashMap Player Int
-  , _effects :: M.HashMap EffectName (CardMatcher, Effect)
   , _manaPool :: ManaPool
   , _phase :: Phase
   }

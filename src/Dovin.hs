@@ -40,7 +40,6 @@ emptyBoard = Board
                , _counters = mempty
                , _stack = mempty
                , _life = mempty
-               , _effects = mempty
                , _manaPool = mempty
                , _phase = FirstMain
                }
@@ -57,52 +56,6 @@ whenMatch name f action = do
   match <- requireCard name f >> pure True `catchError` (const $ pure False)
 
   when match action
-
--- EFFECTS
---
--- An effect is a reversible function that can be applied to a card. They can
--- be used to simplify keeping track of effects as cards enter and leave play.
-
-instance Show Effect where
-  show _ = "<effect>"
-
-instance Semigroup Effect where
-  (Effect f1 g1) <> (Effect f2 g2) = Effect (f1 . f2) (g1 . g2)
-
-instance Monoid Effect where
-  mempty = Effect id id
-
-addEffect :: EffectName -> CardMatcher -> Effect -> GameMonad ()
-addEffect cn f effect =
-  modifying effects (M.insert cn (f, effect))
-
-requireEffect :: EffectName -> GameMonad (CardMatcher, Effect)
-requireEffect effectName = do
-  board <- get
-  case view (effects . at effectName) board of
-    Nothing -> throwError $ "No effect named: " <> effectName
-    Just x -> return x
-
-applyEffect effectName = do
-  (matcher, Effect f _) <- requireEffect effectName
-
-  forCards matcher $ \name -> do
-    modifying
-      (cards . at name . _Just)
-      (\(BaseCard c) -> BaseCard $ f c)
-
-removeEffect effectName = do
-  (matcher, Effect _ f) <- requireEffect effectName
-
-  forCards matcher $ \name -> do
-    modifying
-      (cards . at name . _Just)
-      (\(BaseCard c) -> BaseCard $ f c)
-
-attributeEffect attr = Effect (setAttribute attr) (removeAttribute attr)
-strengthEffect (x, y) = Effect
-  (over cardStrength (mkStrength (x, y) <>))
-  (over cardStrength (mkStrength (-x, -y) <>))
 
 -- ACTIONS
 --
