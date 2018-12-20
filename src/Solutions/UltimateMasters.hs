@@ -1,5 +1,6 @@
 module Solutions.UltimateMasters where
 
+import Control.Lens (over, view)
 import Control.Monad
 
 import Dovin
@@ -25,9 +26,21 @@ solution = do
 
       withAttribute haste $ addCreature (4, 3) "Vengevine"
       modifyStrength (1, 1) "Vengevine" -- counter
-      modifyStrength (1, 1) "Vengevine" -- Mikaeus
 
-      addCreature (5, 5) "Mikaeus, the Unhallowed"
+      -- TODO: The undying effect doesn't actually work properly yet, since the
+      -- affected card loses the attribute when it hits the graveyard. Either
+      -- need to not move card to graveyard at all, or implement proper support
+      -- for undying.
+      withEffect
+        matchInPlay
+        (\card ->
+             matchLocation (view cardLocation card)
+          <> matchOther (view cardName card)
+          <> matchAttributes [creature]
+          <> (invert $ matchAttribute "human")
+        )
+        (pure . over cardStrength (mkStrength (1, 1) <>) . setAttribute undying)
+        $ addCreature (5, 5) "Mikaeus, the Unhallowed"
 
     withLocation (Opponent, Play) $ do
       forM_ [1..7] $ \n -> addLand (numbered n "Plains")
@@ -72,7 +85,6 @@ solution = do
   step "Return Stingerfling with undying from Mikaeus, target Sublime Archangel" $ do
     validate "Stingerfling Spider" $ matchAttribute undying
     returnToPlay "Stingerfling Spider"
-    modifyStrength (1, 1) "Stingerfling Spider"
 
     validate "Sublime Archangel" $ matchAttribute flying
     -- TODO: Add spider to stack
@@ -97,7 +109,6 @@ solution = do
     cast "4R" "Through the Breach"
     resolve "Through the Breach"
     move (Active, Hand) (Active, Play) "Emrakul, the Aeons Torn"
-    modifyStrength (1, 1) "Emrakul, the Aeons Torn"
     gainAttribute undying "Emrakul, the Aeons Torn"
     gainAttribute haste "Emrakul, the Aeons Torn"
 
@@ -109,7 +120,6 @@ solution = do
     activate "2RG" "Raging Ravine 4"
     gainAttribute creature "Raging Ravine 4"
     resetStrength "Raging Ravine 4" (4, 4)
-    modifyStrength (1, 1) "Raging Ravine 4"
 
   step "Attack with everything" $ do
     attackWith
@@ -138,7 +148,6 @@ solution = do
 
     validate "Emrakul, the Aeons Torn" $ matchAttribute undying
     returnToPlay "Emrakul, the Aeons Torn"
-    modifyStrength (1, 1) "Emrakul, the Aeons Torn"
 
     activate "" "Phrexian Altar"
     sacrifice "Emrakul, the Aeons Torn"

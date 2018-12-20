@@ -74,6 +74,9 @@ type Formatter = Board -> String
 makeLenses ''Board
 makeLenses ''Card
 
+cardLocation :: Control.Lens.Lens' Card (Player, Location)
+cardLocation = location
+
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
 cardPower :: Control.Lens.Lens' Card Int

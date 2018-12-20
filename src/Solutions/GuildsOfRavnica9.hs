@@ -75,7 +75,7 @@ solution = do
               <> matchOther (view cardName card)
               <> matchAttributes [creature, angel]
             )
-            (pure . over cardStrength (mkStrength (1, 1) <>))
+            (pure . over cardStrength (mkStrength (1, 1) <>) . setAttribute lifelink)
         $ addCreature (4, 4) "Lyra Dawnbringer"
 
       withAttribute merfolk

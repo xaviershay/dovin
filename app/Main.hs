@@ -14,12 +14,12 @@ import qualified Solutions.UltimateMasters
 
 main :: IO ()
 main = do
-  runVerbose Solutions.Example.solution
-  runVerbose Solutions.GuildsOfRavnicaPre2.solution
-  runVerbose Solutions.GuildsOfRavnica1.solution
-  runVerbose Solutions.GuildsOfRavnica3.solution
-  run Solutions.GuildsOfRavnica8.formatter Solutions.GuildsOfRavnica8.solution
-  run Solutions.GuildsOfRavnica9.formatter Solutions.GuildsOfRavnica9.solution
-  run Solutions.ExplorersOfIxalanContest.formatter Solutions.ExplorersOfIxalanContest.solution
+  --runVerbose Solutions.Example.solution
+  --runVerbose Solutions.GuildsOfRavnicaPre2.solution
+  --runVerbose Solutions.GuildsOfRavnica1.solution
+  --runVerbose Solutions.GuildsOfRavnica3.solution
+  --run Solutions.GuildsOfRavnica8.formatter Solutions.GuildsOfRavnica8.solution
+  --run Solutions.GuildsOfRavnica9.formatter Solutions.GuildsOfRavnica9.solution
+  --run Solutions.ExplorersOfIxalanContest.formatter Solutions.ExplorersOfIxalanContest.solution
   run Solutions.UltimateMasters.formatter Solutions.UltimateMasters.solution
-  run Solutions.ExampleEffects.formatter Solutions.ExampleEffects.solution
+  --run Solutions.ExampleEffects.formatter Solutions.ExampleEffects.solution
