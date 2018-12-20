@@ -101,6 +101,10 @@ matchAttribute :: CardAttribute -> CardMatcher
 matchAttribute attr = CardMatcher ("has attribute " <> attr) $
   S.member attr . view cardAttributes
 
+matchAttributes :: [CardAttribute] -> CardMatcher
+matchAttributes (x:xs) = matchAttribute x <> matchAttributes xs
+matchAttributes [] = mempty
+
 matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
 

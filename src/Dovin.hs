@@ -309,23 +309,21 @@ triggerMentor sourceName targetName = do
 
 fight :: CardName -> CardName -> GameMonad ()
 fight x y = do
-  _ <- requireCard x matchInPlay
-  _ <- requireCard y matchInPlay
+  cx <- requireCard x (matchInPlay <> matchAttribute creature)
+  cy <- requireCard y (matchInPlay <> matchAttribute creature)
 
   target x
   target y
 
-  fight' x y
-  unless (x == y) $ fight' y x
+  fight' cx cy
+  unless (cx == cy) $ fight' cy cx
 
   where
-    fight' x y = do
-      cx <- requireCard x (matchAttribute "creature")
-      cy <- requireCard y (matchAttribute "creature")
+    fight' cx cy = do
 
       let xdmg = max 0 $ view cardPower cx
-      modifyCard y cardDamage (+ xdmg)
-      cy' <- requireCard y mempty
+      modifyCard (view cardName cy) cardDamage (+ xdmg)
+      cy' <- requireCard (view cardName cy) mempty
 
       when (hasAttribute "lifelink" cx) $
         do
@@ -333,7 +331,7 @@ fight x y = do
           modifying (life . at owner . non 0) (+ xdmg)
 
       when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
-        destroy y
+        destroy (view cardName cy)
 
 damageCard :: CardName -> CardName -> GameMonad ()
 damageCard sourceName destName = do

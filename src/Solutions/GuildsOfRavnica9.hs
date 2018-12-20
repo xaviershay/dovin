@@ -26,6 +26,9 @@ solution = do
         withLocation (Active, Play) $
           withAttributes [token, summoned] $ addCreature (1, 4) name
 
+  let angel = "angel"
+  let merfolk = "merfolk"
+
   step "Initial state" $ do
     setLife Opponent 12
 
@@ -43,10 +46,9 @@ solution = do
       withAttribute flying $ addCreature (4, 4) "Adeliz, the Cinder Wind"
       addCreature (1, 4) "Afzocan Archer"
 
-      forM_ [1..4] $ \n -> do
-        addLand (numbered n "Timber Gorge")
-        addLand (numbered n "Submerged Boneyard")
-        addLand (numbered n "Highland Lake")
+      addLands 4 "Timber Gorge"
+      addLands 4 "Submerged Boneyard"
+      addLands 4 "Highland Lake"
 
     withLocation (Opponent, Play) $ do
       withAttribute "merfolk" $ addCreature (2, 2) "Kopala, Warden of Waves"
@@ -54,51 +56,49 @@ solution = do
       withAttributes [flying, token] $ addCreature (4, 4) "Angel 2"
       withAttributes [flying, token] $ addCreature (4, 4) "Angel 3"
 
-      let matchOtherCreatures =
-              \card ->
-                   matchLocation (view location card)
-                <> matchOther (view cardName card)
-                <> matchAttribute creature
-
-      withAttributes [flying, "angel"]
+      withAttributes [flying, angel]
         $ withEffect
             matchInPlay
-            matchOtherCreatures
+            (\card ->
+                 matchLocation (view location card)
+              <> matchOther (view cardName card)
+              <> matchAttribute creature
+            )
             (pure . setAttribute "hexproof")
         $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
-      let cn = "Lyra Dawnbringer" in
-        do
-          withAttributes [flying, lifelink, "angel"] $ addCreature (4, 4) cn
-          addEffect cn
-            (matchOther cn
-              <> matchLocation (Opponent, Play)
-              <> matchAttribute "angel")
-            (attributeEffect lifelink <> strengthEffect (1, 1))
+      withAttributes [flying, lifelink, angel]
+        $ withEffect
+            matchInPlay
+            (\card ->
+                 matchLocation (view location card)
+              <> matchOther (view cardName card)
+              <> matchAttributes [creature, angel]
+            )
+            (pure . over cardStrength (mkStrength (1, 1) <>))
+        $ addCreature (4, 4) "Lyra Dawnbringer"
 
-      let cn = numbered 1 "Merfolk Mistbinder" in
-        do
-          withAttribute "merfolk" $ addCreature (2, 2) cn
-          addEffect cn
-            (matchOther cn
-              <> matchLocation (Opponent, Play)
-              <> matchAttribute "merfolk")
-            (strengthEffect (1, 1))
+      withAttribute merfolk
+        $ withEffect
+            matchInPlay
+            (\card ->
+                 matchLocation (view location card)
+              <> matchOther (view cardName card)
+              <> matchAttributes [creature, merfolk]
+            )
+            (pure . over cardStrength (mkStrength (1, 1) <>))
+        $ addCreature (2, 2) "Merfolk Mistbinder 1"
 
-      let cn = numbered 2 "Merfolk Mistbinder" in
-        do
-          -- Has a +1/+1 counter
-          withAttribute "merfolk" $ addCreature (3, 3) cn
-          addEffect cn
-            (matchOther cn
-              <> matchLocation (Opponent, Play)
-              <> matchAttribute "merfolk")
-            (strengthEffect (1, 1))
-
-    applyEffect "Shalai, Voice of Plenty"
-    applyEffect "Lyra Dawnbringer"
-    applyEffect "Merfolk Mistbinder 1"
-    applyEffect "Merfolk Mistbinder 2"
+      withAttribute merfolk
+        $ withEffect
+            matchInPlay
+            (\card ->
+                 matchLocation (view location card)
+              <> matchOther (view cardName card)
+              <> matchAttributes [creature, merfolk]
+            )
+            (pure . over cardStrength (mkStrength (1, 1) <>))
+        $ addCreature (3, 3) "Merfolk Mistbinder 2"
 
   step "Use Undercity Uprising on Adeliz to destroy Shalai" $ do
     tapForMana "G" (numbered 1 "Timber Gorge")
@@ -114,7 +114,6 @@ solution = do
     with "Shalai, Voice of Plenty" $ \enemy -> do
       fight "Adeliz, the Cinder Wind" enemy
       validate enemy $ matchLocation (Opponent, Graveyard)
-      removeEffect enemy
 
   step "Cast Doublecast" $ do
     tapForMana "R" (numbered 2 "Timber Gorge")
@@ -138,7 +137,6 @@ solution = do
       validate enemy $ matchAttribute flying
       destroy enemy
       validate enemy $ matchLocation (Opponent, Graveyard)
-      removeEffect enemy
 
     forM_ [1..3] $ \n -> do
       resolve (numbered (5 - n) "Plummet")
@@ -155,7 +153,7 @@ solution = do
     tapForMana "U" (numbered 2 "Highland Lake")
     withTriggers (cast "UU") "Quasiduplicate 1"
 
-    with (numbered 2 "Merfolk Mistbinder") $ \enemy -> do
+    with ("Merfolk Mistbinder 2") $ \enemy -> do
       forM_ [1..4] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve $ numbered (5 - n) "Quasiduplicate"
@@ -163,7 +161,6 @@ solution = do
         fight tokenName enemy
 
       validate enemy $ matchLocation (Opponent, Graveyard)
-      removeEffect enemy
 
   step "Jump-start Quasiduplicate again (w/ Waterknot), destroy merfolk" $ do
     tapForMana "U" (numbered 3 "Highland Lake")
@@ -178,7 +175,6 @@ solution = do
         fight tokenName enemy
 
       validate enemy $ matchLocation (Opponent, Graveyard)
-      removeEffect enemy
 
     with "Kopala, Warden of Waves" $ \enemy -> do
       forM_ [3..4] $ \n -> do
