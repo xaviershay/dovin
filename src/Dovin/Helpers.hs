@@ -113,7 +113,8 @@ matchAttributes [] = mempty
 matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
 
-matchOther = invert . matchName
+matchOtherCreatures :: Card -> CardMatcher
+matchOtherCreatures card = matchLocation (view cardLocation card) <> (invert $ matchName (view cardName card))
 
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view (location . _1)

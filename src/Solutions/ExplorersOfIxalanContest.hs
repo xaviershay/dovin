@@ -25,10 +25,7 @@ solution = do
       withAttribute doublestrike
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchOther (view cardName card)
-              <> matchAttributes [creature, firststrike]
-            )
+            (matchOtherCreatures <> (const $ matchAttribute firststrike))
             (pure . setAttribute doublestrike)
         $ addCreature (2, 2) "Kwende, Pride of Femeref"
 
@@ -55,10 +52,7 @@ solution = do
       withAttribute firststrike $ addCreature (3, 3) "Goblin Chainwhirler"
       withEffect
         matchInPlay
-        (\card ->
-             matchOther (view cardName card)
-          <> matchAttribute creature
-        )
+        matchOtherCreatures
         (pure . setAttribute haste)
         $ addCreature (3, 3) "Garna, the Bloodflame"
 
@@ -167,8 +161,10 @@ solution = do
         loseLife Opponent 2
 
   step "Siege-gang all the goblins except Siege-Gang" $ do
+    commander <- requireCard "Siege-Gang Commander" mempty
+
     forCards
-      (matchLocation (Active, Play) <> matchAttribute goblin <> matchOther "Siege-Gang Commander")
+      ((invert . matchName) "Siege-Gang Commander" <> matchAttribute goblin)
       sacrificeToSiegeGang
 
   step "Shapeshift to Warboss, sacrifice lazav and self to Siege-Gang" $ do

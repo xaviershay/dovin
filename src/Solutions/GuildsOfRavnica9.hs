@@ -59,44 +59,28 @@ solution = do
       withAttributes [flying, angel]
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchLocation (view location card)
-              <> matchOther (view cardName card)
-              <> matchAttribute creature
-            )
+            matchOtherCreatures
             (pure . setAttribute hexproof)
         $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
       withAttributes [flying, lifelink, angel]
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchLocation (view location card)
-              <> matchOther (view cardName card)
-              <> matchAttributes [creature, angel]
-            )
+            (matchOtherCreatures <> (const $ matchAttribute angel))
             (pure . over cardStrength (mkStrength (1, 1) <>) . setAttribute lifelink)
         $ addCreature (4, 4) "Lyra Dawnbringer"
 
       withAttribute merfolk
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchLocation (view location card)
-              <> matchOther (view cardName card)
-              <> matchAttributes [creature, merfolk]
-            )
+            (matchOtherCreatures <> (const $ matchAttribute merfolk))
             (pure . over cardStrength (mkStrength (1, 1) <>))
         $ addCreature (2, 2) "Merfolk Mistbinder 1"
 
       withAttribute merfolk
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchLocation (view location card)
-              <> matchOther (view cardName card)
-              <> matchAttributes [creature, merfolk]
-            )
+            (matchOtherCreatures <> (const $ matchAttribute merfolk))
             (pure . over cardStrength (mkStrength (1, 1) <>))
         $ addCreature (3, 3) "Merfolk Mistbinder 2"
 

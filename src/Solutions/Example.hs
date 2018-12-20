@@ -19,10 +19,8 @@ solution = do
       withAttributes [flying]
         $ withEffect
             matchInPlay
-            (\card ->
-                 matchLocation (view location card)
-              <> matchOther (view cardName card)
-              <> matchAttribute creature
+            (  matchOtherCreatures
+            <> (const $ matchAttribute creature)
             )
             (pure . setAttribute hexproof)
         $ addCreature (3, 4) "Shalai, Voice of Plenty"

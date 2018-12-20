@@ -35,12 +35,7 @@ solution = do
       -- for undying.
       withEffect
         matchInPlay
-        (\card ->
-             matchLocation (view cardLocation card)
-          <> matchOther (view cardName card)
-          <> matchAttributes [creature]
-          <> (invert $ matchAttribute "human")
-        )
+        (matchOtherCreatures <> (const $ matchAttributes [creature]))
         (pure . over cardStrength (mkStrength (1, 1) <>) . setAttribute undying)
         $ addCreature (5, 5) "Mikaeus, the Unhallowed"
 
