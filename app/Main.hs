@@ -3,7 +3,6 @@ module Main where
 import Dovin
 
 import qualified Solutions.Example
-import qualified Solutions.ExampleEffects
 import qualified Solutions.GuildsOfRavnicaPre2
 import qualified Solutions.GuildsOfRavnica1
 import qualified Solutions.GuildsOfRavnica3
@@ -22,4 +21,3 @@ main = do
   run Solutions.GuildsOfRavnica9.formatter Solutions.GuildsOfRavnica9.solution
   run Solutions.ExplorersOfIxalanContest.formatter Solutions.ExplorersOfIxalanContest.solution
   run Solutions.UltimateMasters.formatter Solutions.UltimateMasters.solution
-  run Solutions.ExampleEffects.formatter Solutions.ExampleEffects.solution
