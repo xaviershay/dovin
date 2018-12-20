@@ -24,7 +24,23 @@ type ManaString = String
 data Location = Hand | Graveyard | Play | Stack | Exile
   deriving (Show, Eq, Ord)
 
-type CardEffect = (CardMatcher, Card -> CardMatcher, Card -> GameMonad Card)
+data CardEffect = CardEffect
+  { _effectEnabled :: CardMatcher
+  , _effectFilter :: Card -> CardMatcher
+  , _effectAction :: Card -> GameMonad Card
+  }
+
+mkEffect enabled filter action = CardEffect
+  -- For an effect to be enabled, it's host card must currently match this
+  -- matcher.
+  { _effectEnabled = enabled
+  -- If the effect is enabled, this filter determines wheter any particular
+  -- card is affected by it.
+  , _effectFilter = filter
+  -- The action to apply to affected cards.
+  , _effectAction = action
+  }
+
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
 data CardStrength = CardStrength Int Int deriving (Eq)
@@ -73,6 +89,8 @@ type Formatter = Board -> String
 
 makeLenses ''Board
 makeLenses ''Card
+makeLenses ''CardEffect
+
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location

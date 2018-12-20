@@ -42,23 +42,28 @@ requireCard name f = do
 
 applyEffects :: BaseCard -> GameMonad Card
 applyEffects (BaseCard card) = do
-  cards :: [BaseCard] <- M.elems <$> use cards
-  let allEffects = concatMap
-                     (\c ->
-                       map (\e -> (c, e))
-                         . view cardEffects
-                         $ c
-                     )
-                     . map unwrap $
-                     cards
-  let enabledEffects    = filter (\(c, (matcher, _, _)) -> applyMatcher matcher c) allEffects
-  let applicableEffects = filter (\(c, (_, f, _)) -> applyMatcher (f c) card) enabledEffects
+  cs <- map unwrap . M.elems <$> use cards
 
-  foldM (\c (_, e) -> applyEffect2 c e) card applicableEffects
+  let allEffects =
+        concatMap
+          (\c -> map (\e -> (e, c)) . view cardEffects $ c)
+          cs
+
+  let enabledEffects =
+        filter
+          (\(e, c) -> applyMatcher (view effectEnabled e) c)
+          allEffects
+
+  let applicableEffects =
+        filter
+          (\(e, c) -> applyMatcher ((view effectFilter e) c) card)
+          enabledEffects
+
+  foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
 
   where
     applyEffect2 :: Card -> CardEffect -> GameMonad Card
-    applyEffect2 card (_, _, f) = f card
+    applyEffect2 card e = (view effectAction e) card
 
     unwrap :: BaseCard -> Card
     unwrap (BaseCard card) = card
