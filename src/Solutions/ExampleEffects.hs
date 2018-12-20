@@ -29,11 +29,6 @@ solution = do
 
       withAttributes [flying]
         $ addCreature (4, 4) "Angel 2"
-  step "Next" $ do
-    move (Opponent, Play) (Opponent, Graveyard) "Angel"
-  step "Next" $ do
-    move (Opponent, Graveyard) (Opponent, Play) "Angel"
-
 
 formatter _ =
      cardFormatter "hand" (matchLocation (Active, Hand))

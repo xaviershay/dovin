@@ -105,7 +105,7 @@ resolve expectedName = do
           move (Active, Stack) (Active, Play) name
 
 target targetName = do
-  card <- requireCard targetName (matchInPlay <> missingAttribute "hexproof")
+  card <- requireCard targetName (matchInPlay <> missingAttribute hexproof)
 
   return ()
 

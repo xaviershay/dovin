@@ -14,7 +14,7 @@ import qualified Solutions.UltimateMasters
 
 main :: IO ()
 main = do
-  runVerbose Solutions.Example.solution
+  run Solutions.Example.formatter Solutions.Example.solution
   runVerbose Solutions.GuildsOfRavnicaPre2.solution
   runVerbose Solutions.GuildsOfRavnica1.solution
   runVerbose Solutions.GuildsOfRavnica3.solution

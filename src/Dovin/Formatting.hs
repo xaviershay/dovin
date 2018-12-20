@@ -57,11 +57,11 @@ cardFormatter title matcher board =
              <> ")"
          else
           ""
-  
+
 boardFormatter :: Formatter
 boardFormatter board =
   let allLocations = nub . sort . map (view location) $ cs in
-  
+
   let formatters = map (\l -> cardFormatter (show l) (matchLocation l)) allLocations :: [Formatter] in
 
   mconcat formatters $ board

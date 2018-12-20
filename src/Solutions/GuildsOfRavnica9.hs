@@ -64,7 +64,7 @@ solution = do
               <> matchOther (view cardName card)
               <> matchAttribute creature
             )
-            (pure . setAttribute "hexproof")
+            (pure . setAttribute hexproof)
         $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
       withAttributes [flying, lifelink, angel]

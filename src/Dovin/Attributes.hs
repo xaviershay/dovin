@@ -32,6 +32,8 @@ indestructible :: CardAttribute
 indestructible = "indestructible"
 instant :: CardAttribute
 instant = "instant"
+hexproof :: CardAttribute
+hexproof = "hexproof"
 land :: CardAttribute
 land = "land"
 legendary :: CardAttribute
