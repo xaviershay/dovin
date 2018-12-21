@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-
 module Dovin
   ( module Dovin
   , module Dovin.Actions
@@ -10,18 +8,13 @@ module Dovin
   , module Dovin.Types
   ) where
 
-import Data.Char (isDigit)
+import Control.Arrow (second)
 import Control.Lens
+import Control.Monad.Except
+import Control.Monad.State
+import Control.Monad.Writer
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
-import Data.Hashable
-import GHC.Generics hiding (to)
-import           Control.Monad.Except
-import           Control.Monad.Writer
-import           Control.Monad.State hiding (state)
-import Control.Arrow ((&&&), second)
-import Data.List
-import Data.Function
 import System.Exit
 
 import Dovin.Actions
@@ -52,7 +45,7 @@ removeAttribute attr = over cardAttributes (S.delete attr)
 
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
-  match <- requireCard name f >> pure True `catchError` (const $ pure False)
+  match <- requireCard name f >> pure True `catchError` const (pure False)
 
   when match action
 
@@ -132,7 +125,7 @@ destroy targetName = do
 
   removeFromPlay targetName
 
-sacrifice targetName = removeFromPlay targetName
+sacrifice = removeFromPlay
 
 remove :: CardName -> GameMonad ()
 remove cn = do
@@ -368,4 +361,4 @@ run formatter solution = do
     Right _ -> return ()
 
 runVerbose :: GameMonad () -> IO ()
-runVerbose = run (\_ -> boardFormatter)
+runVerbose = run (const boardFormatter)

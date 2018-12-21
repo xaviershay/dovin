@@ -70,7 +70,7 @@ addLand :: CardName -> GameMonad ()
 addLand name = withAttribute land $ addCard name
 
 addLands :: Int -> CardName -> GameMonad ()
-addLands n name = withAttribute land $ do
+addLands n name = withAttribute land $
   forM_ [1..n] $ \n -> addCard (numbered n name)
 
 addSorcery :: CardName -> GameMonad ()
@@ -80,19 +80,17 @@ addSorcery name = withAttribute sorcery $ addCard name
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
 -- defined in "Dovin.Attributes".
 withAttribute :: String -> GameMonad () -> GameMonad ()
-withAttribute attr m = do
-  local (over cardAttributes (S.insert attr)) m
+withAttribute attr = local (over cardAttributes (S.insert attr))
 
 -- | Helper version of 'withAttribute' for adding multiple attributes at a
 -- time.
 withAttributes :: [String] -> GameMonad () -> GameMonad ()
-withAttributes attrs m = do
-  local (over cardAttributes (S.union . S.fromList $ attrs)) m
+withAttributes attrs =
+  local (over cardAttributes (S.union . S.fromList $ attrs))
 
 -- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
-withLocation loc m = do
-  local (set location loc) m
+withLocation loc = local (set location loc)
 
 withEffect :: CardMatcher -> (Card -> CardMatcher) -> (Card -> GameMonad Card) -> GameMonad () -> GameMonad ()
 withEffect applyCondition filter action =

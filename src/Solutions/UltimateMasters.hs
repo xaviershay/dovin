@@ -1,6 +1,6 @@
 module Solutions.UltimateMasters where
 
-import Control.Lens (over, view)
+import Control.Lens (over)
 import Control.Monad
 
 import Dovin

@@ -57,8 +57,7 @@ addMana amount =
     (parseMana amount <>)
 
 -- | Casts a card from hand. See 'castFromLocation' for specification.
-cast mana name = do
-  castFromLocation (Active, Hand) mana name
+cast = castFromLocation (Active, Hand)
 
 -- | Move a card to the stack, spending the specified mana. If not tracking
 -- mana, use the empty string to cast for no mana. Typically you will want to
@@ -83,7 +82,7 @@ castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
 castFromLocation loc mana name = do
   card <- requireCard name mempty
 
-  when (not $ hasAttribute instant card) validateCanCastSorcery
+  unless (hasAttribute instant card) validateCanCastSorcery
 
   move loc (Active, Stack) name
 
@@ -171,13 +170,13 @@ move from to name = do
 --
 --     * Mana pool is reduced.
 spendMana :: ManaString -> GameMonad ()
-spendMana amount = do
+spendMana amount =
   forM_ (parseMana amount) $ \mana -> do
     pool <- use manaPool
     if mana == 'X' && (not . null $ pool) || mana `elem` pool then
       modifying
         manaPool
-        (deleteFirst (if mana == 'X' then (const True) else (==) mana))
+        (deleteFirst (if mana == 'X' then const True else (==) mana))
     else
       throwError $ "Mana pool (" <> pool <> ") does not contain (" <> [mana] <> ")"
   where
@@ -259,8 +258,8 @@ validatePhase expected = do
 validateCanCastSorcery :: GameMonad ()
 validateCanCastSorcery = do
   validatePhase FirstMain
-    `catchError` (const $ validatePhase SecondMain)
-    `catchError` (const $ throwError "not in a main phase")
+    `catchError` const (validatePhase SecondMain)
+    `catchError` const (throwError "not in a main phase")
 
   s <- use stack
 

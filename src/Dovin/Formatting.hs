@@ -18,11 +18,11 @@ blankFormatter :: Formatter
 blankFormatter _ = ""
 
 attributeFormatter :: FormatMonad () -> Formatter
-attributeFormatter m = do
+attributeFormatter m =
   f $ execWriter m
   where
     f :: [(String, GameMonad String)] -> Formatter
-    f attrs board = do
+    f attrs board =
       "\n      " <> (intercalate ", " . map (\(x, y) -> x <> ": " <> y) $
         map formatAttribute attrs)
 
@@ -63,9 +63,11 @@ boardFormatter :: Formatter
 boardFormatter board =
   let allLocations = nub . sort . map (view location) $ cs in
 
-  let formatters = map (\l -> cardFormatter (show l) (matchLocation l)) allLocations :: [Formatter] in
+  let formatters = map
+                     (\l -> cardFormatter (show l) (matchLocation l))
+                     allLocations in
 
-  mconcat formatters $ board
+  mconcat formatters board
 
   where
     cs = let Right value = execMonad board allCards in value

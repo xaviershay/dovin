@@ -1,6 +1,5 @@
 module Solutions.ExplorersOfIxalanContest where
 
-import Control.Lens (view)
 import Control.Monad
 
 import Dovin

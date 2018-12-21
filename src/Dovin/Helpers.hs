@@ -53,18 +53,17 @@ applyEffects (BaseCard card) = do
 
   let applicableEffects =
         filter
-          (\(e, c) -> applyMatcher ((view effectFilter e) c) card)
+          (\(e, c) -> applyMatcher (view effectFilter e c) card)
           enabledEffects
 
   foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
 
   where
     applyEffect2 :: Card -> CardEffect -> GameMonad Card
-    applyEffect2 card e = (view effectAction e) card
+    applyEffect2 card e = view effectAction e card
 
     unwrap :: BaseCard -> Card
     unwrap (BaseCard card) = card
-
 
 allCards :: GameMonad [Card]
 allCards = do
@@ -97,14 +96,13 @@ matchAttribute attr = CardMatcher ("has attribute " <> attr) $
   S.member attr . view cardAttributes
 
 matchAttributes :: [CardAttribute] -> CardMatcher
-matchAttributes (x:xs) = matchAttribute x <> matchAttributes xs
-matchAttributes [] = mempty
+matchAttributes = foldr ((<>) . matchAttribute) mempty
 
 matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
 
 matchOtherCreatures :: Card -> CardMatcher
-matchOtherCreatures card = matchLocation (view cardLocation card) <> (invert $ matchName (view cardName card))
+matchOtherCreatures card = matchLocation (view cardLocation card) <> invert (matchName (view cardName card))
 
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view (location . _1)

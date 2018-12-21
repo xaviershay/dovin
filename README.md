@@ -91,8 +91,9 @@ solutions for published Possibility Storm puzzles!)
 
 ## Development
 
-    stack build
-    stack exec dovin # Runs all solutions
+    bin/dev  # Launch an interactive REPL
+    bin/test # Runs all tests and lints
+    bin/run  # Runs all solutions
 
 `src/Dovin.hs` is currently a dumping ground for prototype code. Actions are in
 the process of being moved to `Dovin.Actions`. To be moved they must:
