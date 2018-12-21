@@ -128,22 +128,6 @@ activate mana targetName = do
 
   return ()
 
-validate :: CardName -> CardMatcher -> GameMonad ()
-validate targetName reqs = do
-  _ <- requireCard targetName reqs
-  return ()
-
-validateLife :: Player -> Int -> GameMonad ()
-validateLife player n = do
-  current <- use (life . at player . non 0)
-
-  when (current /= n) $
-    throwError $ show player
-      <> " life was "
-      <> show current
-      <> ", expected "
-      <> show n
-
 destroy targetName = do
   _ <- requireCard targetName (matchInPlay <> missingAttribute indestructible)
 

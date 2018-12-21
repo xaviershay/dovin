@@ -16,6 +16,12 @@ module Dovin.Actions (
   -- * Uncategorized
   , transitionTo
   , transitionToForced
+  -- * Validations
+  , validate
+  , validateCanCastSorcery
+  , validateLife
+  , validatePhase
+  , validateRemoved
   --, resolve
   -- * Low-level
   -- | These actions provide low-level control over the game. Where possible,
@@ -30,9 +36,10 @@ import           Dovin.Attributes
 import           Dovin.Helpers
 import           Dovin.Types
 
-import           Control.Lens         (assign, at, modifying, non, use)
-import           Control.Monad        (forM_, when)
-import           Control.Monad.Except (throwError)
+import           Control.Lens         (assign, at, modifying, non, use, view)
+import           Control.Monad        (forM_, when, unless)
+import           Control.Monad.Except (throwError, catchError)
+import           Control.Monad.State  (get)
 import qualified Data.Set as S
 
 -- | Add mana to your mana pool.
@@ -67,8 +74,7 @@ cast mana name = do
 --
 --     * Card exists in location.
 --     * Mana is available.
---     * If not an instant, that the stack is empty.
---     * If not an instant, that in a main phase.
+--     * If not an instant, see 'validateCanCastSorcery` for extra validations.
 --
 --   [Effects]:
 --
@@ -202,3 +208,81 @@ tap name = do
     <> missingAttribute tapped)
 
   modifyCard name cardAttributes (S.insert tapped)
+
+-- | Validate that a card matches a matcher.
+--
+-- > validate "Angrath's Marauders" $ matchAttribute "pirate"
+--
+-- [Validates]
+--
+--     * Card matches matcher.
+validate :: CardName -> CardMatcher -> GameMonad ()
+validate targetName reqs = do
+  _ <- requireCard targetName reqs
+  return ()
+
+-- | Validates that a card is no longer present in the game. Particularly
+-- helpful for checking destruction of tokens.
+--
+-- > validateRemoved "Angel"
+--
+-- [Validates]
+--
+--     * Name does not refer to a card.
+validateRemoved :: CardName -> GameMonad ()
+validateRemoved targetName = do
+  board <- get
+  case view (cards . at targetName) board of
+    Nothing -> return ()
+    Just _ -> throwError $ "Card should be removed: " <> targetName
+
+-- | Validates that the game is in a particular phase.
+--
+-- > validatePhase BeginCombat
+--
+-- [Validates]
+--
+--     * Game is in the given phase.
+validatePhase :: Phase -> GameMonad ()
+validatePhase expected = do
+  actual <- use phase
+
+  when (actual /= expected) $
+    throwError $ "phase was "
+      <> show actual
+      <> ", expected "
+      <> show expected
+
+-- | Validates that a sorcery is able to be cast.
+--
+-- [Validates]
+--
+--     * Stack is empty.
+--     * In a main phase.
+validateCanCastSorcery :: GameMonad ()
+validateCanCastSorcery = do
+  validatePhase FirstMain
+    `catchError` (const $ validatePhase SecondMain)
+    `catchError` (const $ throwError "not in a main phase")
+
+  s <- use stack
+
+  unless (null s) $ throwError "stack is not empty"
+
+-- | Validates a player has a specific life total.
+--
+-- > validateLife Opponent 0
+--
+-- [Validates]
+--
+--     * Player life equals amount.
+validateLife :: Player -> Int -> GameMonad ()
+validateLife player n = do
+  current <- use (life . at player . non 0)
+
+  when (current /= n) $
+    throwError $ show player
+      <> " life was "
+      <> show current
+      <> ", expected "
+      <> show n

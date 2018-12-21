@@ -34,6 +34,7 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
 import Dovin.Attributes
+import Dovin.Actions
 import Dovin.Helpers
 import Dovin.Types
 

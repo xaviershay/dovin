@@ -68,33 +68,6 @@ applyEffects (BaseCard card) = do
     unwrap :: BaseCard -> Card
     unwrap (BaseCard card) = card
 
--- TODO: Should probably be in Dovin.Actions
-validateRemoved :: CardName -> GameMonad ()
-validateRemoved targetName = do
-  board <- get
-  case view (cards . at targetName) board of
-    Nothing -> return ()
-    Just _ -> throwError $ "Card should be removed: " <> targetName
-
-validatePhase :: Phase -> GameMonad ()
-validatePhase expected = do
-  actual <- use phase
-
-  when (actual /= expected) $
-    throwError $ "phase was "
-      <> show actual
-      <> ", expected "
-      <> show expected
-
-validateCanCastSorcery :: GameMonad ()
-validateCanCastSorcery = do
-  validatePhase FirstMain
-    `catchError` (const $ validatePhase SecondMain)
-    `catchError` (const $ throwError "not in a main phase")
-
-  s <- use stack
-
-  unless (null s) $ throwError "stack is not empty"
 
 allCards :: GameMonad [Card]
 allCards = do
