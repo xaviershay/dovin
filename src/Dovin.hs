@@ -1,4 +1,3 @@
-{-# LANGAUGE FlexibleContexts #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Dovin

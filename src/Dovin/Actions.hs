@@ -34,12 +34,9 @@ module Dovin.Actions (
 
 import           Dovin.Attributes
 import           Dovin.Helpers
+import           Dovin.Prelude
 import           Dovin.Types
 
-import           Control.Lens         (assign, at, modifying, non, use, view)
-import           Control.Monad        (forM_, when, unless)
-import           Control.Monad.Except (throwError, catchError)
-import           Control.Monad.State  (get)
 import qualified Data.Set as S
 
 -- | Add mana to your mana pool.
@@ -231,8 +228,8 @@ validate targetName reqs = do
 --     * Name does not refer to a card.
 validateRemoved :: CardName -> GameMonad ()
 validateRemoved targetName = do
-  board <- get
-  case view (cards . at targetName) board of
+  card <- use $ cards . at targetName
+  case card of
     Nothing -> return ()
     Just _ -> throwError $ "Card should be removed: " <> targetName
 

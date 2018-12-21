@@ -3,16 +3,13 @@
 module Dovin.Helpers where
 
 import Dovin.Types
+import Dovin.Prelude
 
 import Data.List (sort)
-import Debug.Trace
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
-import Control.Lens (at, view, use, _1, _2, ASetter, over, _Just, modifying)
-import Control.Monad (foldM, when, unless)
-import Control.Monad.Except (throwError, catchError)
-import Control.Monad.State (get)
+import Control.Lens (_1, _2, ASetter, _Just)
 
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
 applyMatcherWithDesc (CardMatcher d f) c =

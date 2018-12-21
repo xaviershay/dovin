@@ -27,8 +27,6 @@ module Dovin.Builder (
   , withLocation
   ) where
 
-import Control.Lens
-import Control.Monad (forM_)
 import Control.Monad.Reader (ask, local)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
@@ -36,6 +34,7 @@ import qualified Data.Set as S
 import Dovin.Attributes
 import Dovin.Actions
 import Dovin.Helpers
+import Dovin.Prelude
 import Dovin.Types
 
 addCard :: CardName -> GameMonad ()
