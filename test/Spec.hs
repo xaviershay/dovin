@@ -100,10 +100,45 @@ test_Test = testGroup "Actions"
         move (Active, Hand) (Active, Exile) "Forest"
 
         validate "Forest" $ matchLocation (Active, Exile)
+    , prove "does not allow tokens to leave play" $ do
+        withAttribute token
+          $ withLocation (Active, Play)
+          $ addArtifact "Treasure"
+
+        move (Active, Play) (Active, Graveyard) "Treasure"
+        validateRemoved "Treasure"
+    , prove "does not allow copies to leave play" $ do
+        withAttribute copy
+          $ withLocation (Active, Stack)
+          $ addInstant "Shock"
+
+        move (Active, Stack) (Active, Graveyard) "Shock"
+        validateRemoved "Shock"
+    , prove "exiles jumpstart'ed cards" $ do
+        withAttribute exileWhenLeaveStack
+          $ withLocation (Active, Stack)
+          $ addInstant "Chemister's Insight"
+
+        move (Active, Stack) (Active, Graveyard) "Chemister's Insight"
+        validate "Chemister's Insight" $
+             matchLocation (Active, Exile)
+          <> invert (matchAttribute exileWhenLeaveStack)
+    , refute
+        "cannot move to stack"
+        "cannot move directly to stack" $ do
+          withLocation (Active, Hand) $ addInstant "Shock"
+
+          move (Active, Hand) (Active, Stack) "Shock"
     , refute
         "requires card exists"
         "Card does not exist: Forest" $ do
           move (Active, Hand) (Active, Exile) "Forest"
+    ]
+  , testGroup "moveToGraveyard"
+    [ prove "moves card to graveyard" $ do
+        withLocation (Opponent, Hand) $ addLand "Forest"
+        moveToGraveyard "Forest"
+        validate "Forest" $ matchLocation (Opponent, Graveyard)
     ]
   , testGroup "spendMana"
     [ prove "removes colored mana from pool" $ do
@@ -192,4 +227,17 @@ test_Test = testGroup "Actions"
         transitionToForced FirstMain
         validatePhase FirstMain
     ]
+  , testGroup "resolveTop"
+    [ prove "resolves top card of stack" $ do
+        withLocation (Active, Hand) $ addInstant "Shock"
+        cast "" "Shock" >> resolveTop
+
+        validate "Shock" $ matchLocation (Active, Graveyard)
+        validateBoardEquals stack mempty
+    , refute
+        "requires non-empty stack"
+        "stack is empty" $ do
+          resolveTop
+    ]
+
   ]

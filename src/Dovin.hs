@@ -40,9 +40,6 @@ emptyBoard = Board
 setAttribute :: CardAttribute -> Card -> Card
 setAttribute attr = over cardAttributes (S.insert attr)
 
-removeAttribute :: CardAttribute -> Card -> Card
-removeAttribute attr = over cardAttributes (S.delete attr)
-
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
   match <- requireCard name f >> pure True `catchError` const (pure False)
@@ -59,7 +56,7 @@ jumpstart mana discardName castName = do
   spendMana mana
   discard discardName
   castFromLocation (Active, Graveyard) "" castName
-  gainAttribute "exile-when-leave-stack" castName
+  gainAttribute exileWhenLeaveStack castName
 
 discard = move (Active, Hand) (Active, Graveyard)
 
@@ -87,9 +84,9 @@ resolve expectedName = do
         if hasAttribute "sorcery" c || hasAttribute "instant" c then
           if hasAttribute "copy" c then
             remove name
-          else if hasAttribute "exile-when-leave-stack" c then
+          else if hasAttribute exileWhenLeaveStack c then
             do
-              loseAttribute "exile-when-leave-stack" name
+              loseAttribute exileWhenLeaveStack name
               move (Active, Stack) (Active, Exile) name
           else
             move (Active, Stack) (Active, Graveyard) name
@@ -126,11 +123,6 @@ destroy targetName = do
   removeFromPlay targetName
 
 sacrifice = removeFromPlay
-
-remove :: CardName -> GameMonad ()
-remove cn = do
-  modifying cards (M.delete cn)
-  modifying stack (filter (/= cn))
 
 removeFromPlay cardName = do
   card <- requireCard cardName matchInPlay
@@ -178,9 +170,6 @@ resetStrength cn desired = do
   c <- requireCard cn (matchAttribute "creature")
 
   modifyCard cn cardStrength (const $ mkStrength desired)
-
--- TODO: handle tokens, use `move`
-moveToGraveyard cn = modifyCard cn location (\(player, _) -> (player, Graveyard))
 
 modifyStrength :: (Int, Int) -> CardName -> GameMonad ()
 modifyStrength (x, y) cn = do
@@ -308,11 +297,6 @@ gainAttribute attr cn = do
   c <- requireCard cn mempty
 
   modifyCard cn id (setAttribute attr)
-
-loseAttribute attr cn = do
-  c <- requireCard cn mempty
-
-  modifyCard cn id (removeAttribute attr)
 
 -- HIGH LEVEL FUNCTIONS
 --

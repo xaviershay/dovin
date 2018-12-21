@@ -23,8 +23,8 @@ solution = do
       addPlaneswalker 3 "Liliana of the Veil"
       addArtifact "Phrexian Altar"
       addArtifact "Engineered Explosives"
-      forM_ [1..8] $ \n -> addLand (numbered n "Swamp")
-      forM_ [1..4] $ \n -> addLand (numbered n "Raging Ravine")
+      addLands 8 "Swamp"
+      addLands 4 "Raging Ravine"
 
       withAttribute haste $ addCreature (4, 3) "Vengevine"
       modifyStrength (1, 1) "Vengevine" -- counter
@@ -40,8 +40,8 @@ solution = do
         $ addCreature (5, 5) "Mikaeus, the Unhallowed"
 
     withLocation (Opponent, Play) $ do
-      forM_ [1..7] $ \n -> addLand (numbered n "Plains")
-      forM_ [1..2] $ \n -> addLand (numbered n "Forest")
+      addLands 7 "Plains"
+      addLands 2 "Forest"
 
       addLand "Dark Depths"
 
@@ -61,8 +61,7 @@ solution = do
 
   step "Reanimate Stingerfling, targeting Reya" $ do
     tapForMana "B" "Swamp 1"
-    cast "B" "Reanimate"
-    resolve "Reanimate"
+    cast "B" "Reanimate" >> resolveTop
     targetInLocation (Active, Graveyard) "Stingerfling Spider"
     returnToPlay "Stingerfling Spider"
 

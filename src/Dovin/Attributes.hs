@@ -14,6 +14,8 @@ aura :: CardAttribute
 aura = "aura"
 artifact :: CardAttribute
 artifact = "artifact"
+copy :: CardAttribute
+copy = "copy"
 creature :: CardAttribute
 creature = "creature"
 deathtouch :: CardAttribute
@@ -22,6 +24,8 @@ doublestrike :: CardAttribute
 doublestrike = "doublestrike"
 enchantment :: CardAttribute
 enchantment = "enchantment"
+exileWhenLeaveStack :: CardAttribute
+exileWhenLeaveStack = "exile-when-leave-stack"
 firststrike :: CardAttribute
 firststrike = "firststrike"
 flying :: CardAttribute

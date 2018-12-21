@@ -123,3 +123,12 @@ applyMatcher matcher c =
   case applyMatcherWithDesc matcher c of
     Left _ -> False
     Right _ -> True
+
+loseAttribute attr cn = do
+  c <- requireCard cn mempty
+
+  modifyCard cn id (removeAttribute attr)
+
+removeAttribute :: CardAttribute -> Card -> Card
+removeAttribute attr = over cardAttributes (S.delete attr)
+

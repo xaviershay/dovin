@@ -12,8 +12,10 @@ module Dovin.Actions (
   -- * Casting
     cast
   , castFromLocation
+  , resolveTop
   , tapForMana
   -- * Uncategorized
+  , moveToGraveyard
   , transitionTo
   , transitionToForced
   -- * Validations
@@ -28,6 +30,7 @@ module Dovin.Actions (
   -- try to use the more descriptive higher-level actions.
   , addMana
   , move
+  , remove
   , spendMana
   , tap
   ) where
@@ -38,6 +41,9 @@ import           Dovin.Prelude
 import           Dovin.Types
 
 import qualified Data.Set as S
+import qualified Data.HashMap.Strict as M
+
+import Control.Arrow (second)
 
 -- | Add mana to your mana pool.
 --
@@ -82,9 +88,10 @@ castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
 castFromLocation loc mana name = do
   card <- requireCard name mempty
 
+  validate name $ matchLocation loc
   unless (hasAttribute instant card) validateCanCastSorcery
 
-  move loc (Active, Stack) name
+  modifyCard name location $ const (view cardOwner card, Stack)
 
   card <- requireCard name mempty
 
@@ -99,6 +106,26 @@ castFromLocation loc mana name = do
   modifying
     stack
     ((:) name)
+
+-- | Resolves the top card of the stack. Use this for simple cast-and-resolve
+-- scenarios. For more complicated stack states, prefer 'resolve' with a named
+-- spell to ensure the expected one is resolving.
+--
+-- [Validates]
+--
+--     * Stack is not empty.
+--
+-- [Effects]
+--
+--     * Move card to graveyard of owner. See 'move' for possible alternate
+--       effects, depending on card attributes.
+resolveTop :: GameMonad ()
+resolveTop = do
+  s <- use stack
+
+  case s of
+    []     -> throwError $ "stack is empty"
+    (x:xs) -> moveToGraveyard x >> assign stack xs
 
 -- | Combination of 'tap' and 'addMana', see them for specification.
 tapForMana :: ManaString -> CardName -> GameMonad ()
@@ -146,15 +173,56 @@ transitionToForced newPhase = do
 -- [Validates]:
 --
 --     * Card exists in source location.
+--     * Destination is not stack (use a 'cast' variant instead)
 --
 -- [Effects]:
 --
 --     * Card moved to destination location.
+--     * If card has 'token' attribute, remove from game instead.
+--     * If card has 'copy' attribute, remove from game instead.
+--     * If card has 'exileWhenLeaveStack' attribute and leaving stack, move to
+--       exile instead.
 move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
 move from to name = do
   c <- requireCard name $ matchLocation from
 
-  modifyCard name location (const to)
+  when (snd to == Stack) $
+    throwError "cannot move directly to stack"
+
+  when (snd from == Stack) $
+    modifying stack (filter (/= name))
+
+  if snd to /= Play && (hasAttribute token c || hasAttribute copy c) then
+    remove name
+  else if hasAttribute exileWhenLeaveStack c then
+    do
+      loseAttribute exileWhenLeaveStack name
+      move (Active, Stack) (Active, Exile) name
+  else
+    modifyCard name location (const to)
+
+-- | Move card to graveyard of owner. (Note: currently owner of card isn't
+-- tracked, so moves to current controller graveyard instead. This incorrect
+-- and will be fixed in a future version.)
+--
+-- [Validates]
+--
+--     * Card exists.
+--
+-- [Effects]
+--
+--     * See 'move'.
+moveToGraveyard cn = do
+  c <- requireCard cn mempty
+
+  let location = view cardLocation c
+
+  move location (second (const Graveyard) location) cn
+
+remove :: CardName -> GameMonad ()
+remove cn = do
+  modifying cards (M.delete cn)
+  modifying stack (filter (/= cn))
 
 -- | Remove mana from the pool. Colored mana will be removed first, then extra
 -- mana of any type will be removed to match the colorless required.

@@ -3,7 +3,7 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', makeLenses, over, view)
+import Control.Lens (Lens', makeLenses, over, view, _1)
 import Control.Monad.Reader (ReaderT)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
@@ -109,6 +109,9 @@ makeLenses ''CardEffect
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location
+
+cardOwner :: Control.Lens.Lens' Card Player
+cardOwner = cardLocation . _1
 
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
