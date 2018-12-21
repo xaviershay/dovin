@@ -67,15 +67,21 @@ cast mana name = do
 --
 --     * Card exists in location.
 --     * Mana is available.
+--     * If not an instant, that the stack is empty.
+--     * If not an instant, that in a main phase.
 --
 --   [Effects]:
 --
 --     * Card moved to top of stack.
 --     * Mana removed from pool.
---     * Counter @storm@ incremented if card has @instant@ or @sorcery@
+--     * Counter 'storm' incremented if card has 'instant' or 'sorcery'
 --       attribute.
 castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
 castFromLocation loc mana name = do
+  card <- requireCard name mempty
+
+  when (not $ hasAttribute instant card) validateCanCastSorcery
+
   move loc (Active, Stack) name
 
   card <- requireCard name mempty
@@ -83,9 +89,9 @@ castFromLocation loc mana name = do
   spendMana mana
 
   when
-    (hasAttribute "sorcery" card || hasAttribute "instant" card) $
+    (hasAttribute sorcery card || hasAttribute instant card) $
     modifying
-      (counters . at "storm" . non 0)
+      (counters . at storm . non 0)
       (+ 1)
 
   modifying

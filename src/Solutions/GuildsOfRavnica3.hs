@@ -9,7 +9,7 @@ solution = do
   let menace = "menace"
   let sacrificeToNecrolisk =
         \name -> do
-          validatePhase FirstMain
+          validateCanCastSorcery
           activate "1" "Undercity Necrolisk"
           validate name $
                matchInPlay

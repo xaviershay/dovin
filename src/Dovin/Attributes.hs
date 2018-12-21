@@ -44,6 +44,8 @@ planeswalker :: CardAttribute
 planeswalker = "planeswalker"
 sorcery :: CardAttribute
 sorcery = "sorcery"
+storm :: CardAttribute
+storm = "storm"
 summoned :: CardAttribute
 summoned = "summonded"
 undying :: CardAttribute

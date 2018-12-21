@@ -10,8 +10,8 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
 import Control.Lens (at, view, use, _1, _2, ASetter, over, _Just, modifying)
-import Control.Monad (foldM)
-import Control.Monad.Except (throwError)
+import Control.Monad (foldM, when, unless)
+import Control.Monad.Except (throwError, catchError)
 import Control.Monad.State (get)
 
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
@@ -76,6 +76,26 @@ validateRemoved targetName = do
     Nothing -> return ()
     Just _ -> throwError $ "Card should be removed: " <> targetName
 
+validatePhase :: Phase -> GameMonad ()
+validatePhase expected = do
+  actual <- use phase
+
+  when (actual /= expected) $
+    throwError $ "phase was "
+      <> show actual
+      <> ", expected "
+      <> show expected
+
+validateCanCastSorcery :: GameMonad ()
+validateCanCastSorcery = do
+  validatePhase FirstMain
+    `catchError` (const $ validatePhase SecondMain)
+    `catchError` (const $ throwError "not in a main phase")
+
+  s <- use stack
+
+  unless (null s) $ throwError "stack is not empty"
+
 allCards :: GameMonad [Card]
 allCards = do
   bases <- M.elems <$> use cards
@@ -83,7 +103,7 @@ allCards = do
   mapM applyEffects bases
 
 modifyCard :: CardName -> ASetter Card Card a b -> (a -> b) -> GameMonad ()
-modifyCard name lens f = 
+modifyCard name lens f =
   modifying
     (cards . at name . _Just)
     (\(BaseCard c) -> BaseCard $ over lens f c)

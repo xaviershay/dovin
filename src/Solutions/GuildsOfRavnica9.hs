@@ -15,8 +15,9 @@ solution = do
   let withTriggers = \action name -> do
         action name
         trigger "Thousand-Year Storm"
-        storm $ \n -> copySpell name
-                        (numbered (n + 1) (zipWith const name (drop 2 name)))
+        triggerStorm $
+          \n -> copySpell name
+                  (numbered (n + 1) (zipWith const name (drop 2 name)))
 
         trigger "Adeliz, the Cinder Wind"
         modifyStrength (1, 1) "Adeliz, the Cinder Wind"

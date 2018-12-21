@@ -144,16 +144,6 @@ validateLife player n = do
       <> ", expected "
       <> show n
 
-validatePhase :: Phase -> GameMonad ()
-validatePhase expected = do
-  actual <- use phase
-
-  when (actual /= expected) $
-    throwError $ "phase was "
-      <> show actual
-      <> ", expected "
-      <> show expected
-
 destroy targetName = do
   _ <- requireCard targetName (matchInPlay <> missingAttribute indestructible)
 
@@ -197,8 +187,8 @@ copySpell targetName newName = do
     stack
     ((:) newName)
 
-storm :: (Int -> GameMonad ()) -> GameMonad ()
-storm action = do
+triggerStorm :: (Int -> GameMonad ()) -> GameMonad ()
+triggerStorm action = do
   maybeStorm <- use $ counters . at "storm"
 
   case maybeStorm of

@@ -59,6 +59,27 @@ test_Test = testGroup "Actions"
           withLocation (Active, Hand) $ addCreature (1, 1) "Zombie"
           castFromLocation (Active, Hand) "B" "Zombie"
 
+    , prove "can cast non-instant in second main" $ do
+        withLocation (Active, Hand) $ addSorcery "Lava Spike"
+        transitionTo SecondMain
+        castFromLocation (Active, Hand) "" "Lava Spike"
+
+    , refute
+        "requires main phase for non-instant"
+        "not in a main phase" $ do
+          withLocation (Active, Hand) $ addSorcery "Lava Spike"
+          transitionTo BeginCombat
+          castFromLocation (Active, Hand) "" "Lava Spike"
+
+    , refute
+        "requires stack to be empty for non-instant"
+        "stack is not empty" $ do
+          withLocation (Active, Hand) $ addInstant "Shock"
+          withLocation (Active, Hand) $ addSorcery "Lava Spike"
+
+          castFromLocation (Active, Hand) "" "Shock"
+          castFromLocation (Active, Hand) "" "Lava Spike"
+
     , prove "increases storm count if instant" $ do
         withLocation (Active, Hand) $ addInstant "Shock"
         castFromLocation (Active, Hand) "" "Shock"
