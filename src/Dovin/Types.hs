@@ -47,7 +47,22 @@ data CardStrength = CardStrength Int Int deriving (Eq)
 instance Show CardStrength where
   show (CardStrength p t) = show p <> "/" <> show t
 
-data Phase = FirstMain | Combat deriving (Show, Eq)
+-- | A phase or step in a turn. Phases and steps are not distinguished between
+-- because haven't seen a need to.
+data Phase
+  = Untap
+  | Upkeep
+  | DrawStep
+  | FirstMain
+  | BeginCombat
+  | DeclareAttackers
+  | DeclareBlockers
+  | FirstStrikeDamage
+  | CombatDamage
+  | EndCombat
+  | SecondMain
+  | EndStep
+  deriving (Show, Eq, Ord)
 
 data Card = Card
   { _cardName :: CardName

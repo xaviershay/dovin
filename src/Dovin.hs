@@ -229,8 +229,7 @@ modifyStrength (x, y) cn = do
 
 attackWith :: [CardName] -> GameMonad ()
 attackWith cs = do
-  validatePhase FirstMain
-  assign phase Combat
+  transitionTo DeclareAttackers
 
   forM_ cs $ \cn -> do
     c <- requireCard cn

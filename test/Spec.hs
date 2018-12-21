@@ -33,7 +33,7 @@ validateBoardEquals lens expected = do
 test_Test = testGroup "Actions"
   [ testGroup "cast"
     [ prove "casts from hand to stack" $ do
-        addCard "Zombie" (Active, Hand) []
+        withLocation (Active, Hand) $ addCreature (1, 1) "Zombie"
         addMana "B"
         castFromLocation (Active, Hand) "B" "Zombie"
         validate "Zombie" $ matchLocation (Active, Stack)
@@ -42,12 +42,12 @@ test_Test = testGroup "Actions"
     , refute
         "requires card to be in hand"
         "Zombie does not match requirements: in location (Active,Hand)" $ do
-          addCard "Zombie" (Active, Graveyard) []
+          withLocation (Active, Play) $ addCreature (1, 1) "Zombie"
           cast "" "Zombie"
     ]
   , testGroup "castFromLocation"
     [ prove "places card on top of stack, spending mana" $ do
-        addCard "Zombie" (Active, Graveyard) []
+        withLocation (Active, Graveyard) $ addCreature (1, 1) "Zombie"
         addMana "B"
         castFromLocation (Active, Graveyard) "B" "Zombie"
         validate "Zombie" $ matchLocation (Active, Stack)
@@ -56,33 +56,33 @@ test_Test = testGroup "Actions"
     , refute
         "requires mana be available"
         "Mana pool () does not contain (B)" $ do
-          addCard "Zombie" (Active, Hand) []
+          withLocation (Active, Hand) $ addCreature (1, 1) "Zombie"
           castFromLocation (Active, Hand) "B" "Zombie"
 
     , prove "increases storm count if instant" $ do
-        addCard "Shock" (Active, Hand) ["instant"]
+        withLocation (Active, Hand) $ addInstant "Shock"
         castFromLocation (Active, Hand) "" "Shock"
         validateBoardEquals (counters . at "storm" . non 0) 1
 
     , prove "increases storm count if sorcery" $ do
-        addCard "Lava Spike" (Active, Hand) ["sorcery"]
+        withLocation (Active, Hand) $ addSorcery "Lava Spike"
         castFromLocation (Active, Hand) "" "Lava Spike"
 
     , prove "does not increase storm count otherwise" $ do
-        addCard "Mox Amber" (Active, Hand) []
+        withLocation (Active, Hand) $ addArtifact "Mox Amber"
         castFromLocation (Active, Hand) "" "Mox Amber"
         validateBoardEquals (counters . at "storm" . non 0) 0
     ]
   , testGroup "move"
     [ prove "moves card from one location to another" $ do
-        addCard "Zombie" (Active, Hand) []
-        move (Active, Hand) (Active, Exile) "Zombie"
+        withLocation (Active, Hand) $ addLand "Forest"
+        move (Active, Hand) (Active, Exile) "Forest"
 
-        validate "Zombie" $ matchLocation (Active, Exile)
+        validate "Forest" $ matchLocation (Active, Exile)
     , refute
         "requires card exists"
-        "Card does not exist: Zombie" $ do
-          move (Active, Hand) (Active, Exile) "Zombie"
+        "Card does not exist: Forest" $ do
+          move (Active, Hand) (Active, Exile) "Forest"
     ]
   , testGroup "spendMana"
     [ prove "removes colored mana from pool" $ do
@@ -119,12 +119,12 @@ test_Test = testGroup "Actions"
     ]
   , testGroup "tap"
     [ prove "taps card in play" $ do
-        addCard "Forest" (Active, Play) []
+        withLocation (Active, Play) $ addLand "Forest"
         tap "Forest"
 
         validate "Forest" $ matchAttribute tapped
     , prove "taps card in opponent's play" $ do
-        addCard "Forest" (Opponent, Play) []
+        withLocation (Active, Play) $ addLand "Forest"
         tap "Forest"
 
         validate "Forest" $ matchAttribute tapped
@@ -135,20 +135,40 @@ test_Test = testGroup "Actions"
     , refute
         "requires untapped"
         "not has attribute tapped" $ do
-          addCard "Forest" (Active, Play) [tapped]
+          withAttribute tapped $ withLocation (Active, Play) $ addLand "Forest"
           tap "Forest"
     , refute
         "requires in play"
         "in location" $ do
-          addCard "Forest" (Active, Graveyard) []
+          withLocation (Active, Graveyard) $ addLand "Forest"
           tap "Forest"
     ]
   , testGroup "tapForMana"
     [ prove "taps card and adds mana to pool" $ do
-        addCard "Forest" (Active, Play) []
+        withLocation (Active, Play) $ addLand "Forest"
         tapForMana "G" "Forest"
 
         validate "Forest" $ matchAttribute tapped
         validateBoardEquals manaPool "G"
+    ]
+  , testGroup "transitionTo"
+    [ prove "moves to new state" $ do
+        transitionTo BeginCombat
+        validatePhase BeginCombat
+    , prove "empties mana pool" $ do
+        addMana "B"
+        transitionTo BeginCombat
+        validateBoardEquals manaPool mempty
+    , refute
+        "requires later phase"
+        "FirstMain does not occur after BeginCombat" $ do
+          transitionTo BeginCombat
+          transitionTo FirstMain
+    ]
+  , testGroup "transitionToForced"
+    [ prove "can transition backwards" $ do
+        transitionTo BeginCombat
+        transitionToForced FirstMain
+        validatePhase FirstMain
     ]
   ]

@@ -175,6 +175,8 @@ solution = do
     addMana "U"
 
   step "Cast Vengeful Rebirth on Mikaeus, targeting opponent" $ do
+    transitionTo SecondMain
+
     tapForMana "B" "Swamp 2"
     cast "4GR" "Vengeful Rebirth"
     resolve "Vengeful Rebirth"

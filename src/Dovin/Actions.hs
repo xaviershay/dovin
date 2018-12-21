@@ -13,6 +13,9 @@ module Dovin.Actions (
     cast
   , castFromLocation
   , tapForMana
+  -- * Uncategorized
+  , transitionTo
+  , transitionToForced
   --, resolve
   -- * Low-level
   -- | These actions provide low-level control over the game. Where possible,
@@ -27,7 +30,7 @@ import           Dovin.Attributes
 import           Dovin.Helpers
 import           Dovin.Types
 
-import           Control.Lens         (assign, at, modifying, non, use, _Just)
+import           Control.Lens         (assign, at, modifying, non, use)
 import           Control.Monad        (forM_, when)
 import           Control.Monad.Except (throwError)
 import qualified Data.Set as S
@@ -94,6 +97,39 @@ tapForMana :: ManaString -> CardName -> GameMonad ()
 tapForMana amount name = do
   tap name
   addMana amount
+
+-- | Transition to a new game phase or step.
+--
+-- > transitionTo DeclareAttackers
+--
+-- [Validates]
+--
+--   * The new phase would occur after the current phase in a normal turn.
+--
+-- [Effects]
+--
+--   * Empty the mana pool.
+--   * Transition to new phase.
+transitionTo :: Phase -> GameMonad ()
+transitionTo newPhase = do
+  actual <- use phase
+
+  when (newPhase <= actual) $
+    throwError $ "phase "
+      <> show newPhase
+      <> " does not occur after "
+      <> show actual
+
+  transitionToForced newPhase
+
+-- | Equivalent to 'transitionTo' except it skips all validation. Useful when
+-- an effect has modified the normal order of phases, such as adding an extra
+-- combat step.
+transitionToForced :: Phase -> GameMonad ()
+transitionToForced newPhase = do
+  assign manaPool mempty
+  assign phase newPhase
+
 
 -- | Move a card from one location to another.
 --
