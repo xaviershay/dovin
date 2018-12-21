@@ -12,6 +12,7 @@ module Dovin.Actions (
   -- * Casting
     cast
   , castFromLocation
+  , resolve
   , resolveTop
   , tapForMana
   -- * Uncategorized
@@ -24,7 +25,6 @@ module Dovin.Actions (
   , validateLife
   , validatePhase
   , validateRemoved
-  --, resolve
   -- * Low-level
   -- | These actions provide low-level control over the game. Where possible,
   -- try to use the more descriptive higher-level actions.
@@ -107,6 +107,34 @@ castFromLocation loc mana name = do
     stack
     ((:) name)
 
+-- | Resolves a card on the stack.
+--
+-- > cast "R" "Shock" >> resolve "Shock"
+--
+-- [Validates]
+--
+--     * Stack is not empty.
+--     * Card is on top of stack.
+--
+-- [Effects]
+--
+--     * See 'resolveTop'.
+resolve :: CardName -> GameMonad ()
+resolve expectedName = do
+  s <- use stack
+
+  case s of
+    [] -> throwError $ "stack is empty, expecting " <> expectedName
+    (name:ss) -> do
+      unless (name == expectedName) $
+        throwError $ "unexpected top of stack: expected "
+                       <> expectedName
+                       <> ", got "
+                       <> name
+
+      resolveTop
+
+
 -- | Resolves the top card of the stack. Use this for simple cast-and-resolve
 -- scenarios. For more complicated stack states, prefer 'resolve' with a named
 -- spell to ensure the expected one is resolving.
@@ -174,6 +202,7 @@ transitionToForced newPhase = do
 --
 --     * Card exists in source location.
 --     * Destination is not stack (use a 'cast' variant instead)
+--     * Destination does not match source.
 --
 -- [Effects]:
 --
@@ -182,6 +211,8 @@ transitionToForced newPhase = do
 --     * If card has 'copy' attribute, remove from game instead.
 --     * If card has 'exileWhenLeaveStack' attribute and leaving stack, move to
 --       exile instead.
+--     * If destination is play, add 'summoned' attribute.
+--     * If destination is not in play, remove 'summoned' attribute.
 move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
 move from to name = do
   c <- requireCard name $ matchLocation from
@@ -191,6 +222,11 @@ move from to name = do
 
   when (snd from == Stack) $
     modifying stack (filter (/= name))
+
+  if (snd to == Play) then
+    gainAttribute summoned name
+  else
+    loseAttribute summoned name
 
   if snd to /= Play && (hasAttribute token c || hasAttribute copy c) then
     remove name

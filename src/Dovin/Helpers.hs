@@ -132,3 +132,11 @@ loseAttribute attr cn = do
 removeAttribute :: CardAttribute -> Card -> Card
 removeAttribute attr = over cardAttributes (S.delete attr)
 
+gainAttribute attr cn = do
+  c <- requireCard cn mempty
+
+  modifyCard cn id (setAttribute attr)
+
+setAttribute :: CardAttribute -> Card -> Card
+setAttribute attr = over cardAttributes (S.insert attr)
+

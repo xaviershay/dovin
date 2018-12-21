@@ -37,9 +37,6 @@ emptyBoard = Board
                }
 
 
-setAttribute :: CardAttribute -> Card -> Card
-setAttribute attr = over cardAttributes (S.insert attr)
-
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
   match <- requireCard name f >> pure True `catchError` const (pure False)
@@ -59,39 +56,6 @@ jumpstart mana discardName castName = do
   gainAttribute exileWhenLeaveStack castName
 
 discard = move (Active, Hand) (Active, Graveyard)
-
-resolve :: CardName -> GameMonad ()
-resolve expectedName = do
-  s <- use stack
-
-  case s of
-    [] -> throwError $ "No spell on stack to resolve for: " <> expectedName
-    (name:ss) ->
-
-      if name /= expectedName then
-        throwError $ "Top spell on stack does not match: expected "
-                       <> name
-                       <> ", got "
-                       <> expectedName
-      else do
-        c <- requireCard name mempty
-
-        assign stack ss
-
-        when (hasAttribute "creature" c) $
-          gainAttribute "summoned" name
-
-        if hasAttribute "sorcery" c || hasAttribute "instant" c then
-          if hasAttribute "copy" c then
-            remove name
-          else if hasAttribute exileWhenLeaveStack c then
-            do
-              loseAttribute exileWhenLeaveStack name
-              move (Active, Stack) (Active, Exile) name
-          else
-            move (Active, Stack) (Active, Graveyard) name
-        else
-          move (Active, Stack) (Active, Play) name
 
 target targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute hexproof)
@@ -293,10 +257,6 @@ activatePlaneswalker loyalty cn = do
   else
     modifyCard cn cardLoyalty (+ loyalty)
 
-gainAttribute attr cn = do
-  c <- requireCard cn mempty
-
-  modifyCard cn id (setAttribute attr)
 
 -- HIGH LEVEL FUNCTIONS
 --

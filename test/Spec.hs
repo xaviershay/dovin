@@ -123,6 +123,19 @@ test_Test = testGroup "Actions"
         validate "Chemister's Insight" $
              matchLocation (Active, Exile)
           <> invert (matchAttribute exileWhenLeaveStack)
+    , prove "adds summonded attribute when moving to play" $ do
+        withLocation (Active, Hand) $ addLand "Forest"
+        move (Active, Hand) (Active, Play) "Forest"
+
+        validate "Forest" $ matchAttribute summoned
+    , prove "removes summonded attribute when leaving play" $ do
+        withAttribute summoned
+          $ withLocation (Active, Play)
+          $ addLand "Forest"
+
+        move (Active, Play) (Active, Hand) "Forest"
+
+        validate "Forest" $ invert (matchAttribute summoned)
     , refute
         "cannot move to stack"
         "cannot move directly to stack" $ do
@@ -238,6 +251,27 @@ test_Test = testGroup "Actions"
         "requires non-empty stack"
         "stack is empty" $ do
           resolveTop
+    ]
+  , testGroup "resolve"
+    [ prove "resolves top card of stack" $ do
+        withLocation (Active, Hand) $ addInstant "Shock"
+        cast "" "Shock" >> resolve "Shock"
+
+        validate "Shock" $ matchLocation (Active, Graveyard)
+        validateBoardEquals stack mempty
+    , refute
+        "requires top card to match provided"
+        "unexpected top of stack: expected Shock 1, got Shock 2" $ do
+          withLocation (Active, Hand) $ addInstant "Shock 1"
+          withLocation (Active, Hand) $ addInstant "Shock 2"
+          cast "" "Shock 1"
+          cast "" "Shock 2"
+          resolve "Shock 1"
+    , refute
+        "requires non-empty stack"
+        "stack is empty" $ do
+          withLocation (Active, Hand) $ addInstant "Shock"
+          resolve "Shock"
     ]
 
   ]
