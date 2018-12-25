@@ -153,7 +153,16 @@ resolveTop = do
 
   case s of
     []     -> throwError $ "stack is empty"
-    (x:xs) -> moveToGraveyard x >> assign stack xs
+    (x:xs) -> do
+      c <- requireCard x mempty
+
+      if hasAttribute instant c || hasAttribute sorcery c then
+        moveToGraveyard x
+      else
+        -- TODO: Don't assume active, document+test
+        move (Active, Stack) (Active, Play) x
+
+      assign stack xs
 
 -- | Combination of 'tap' and 'addMana', see them for specification.
 tapForMana :: ManaString -> CardName -> GameMonad ()

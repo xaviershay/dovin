@@ -159,8 +159,10 @@ attackWith cs = do
                   `matchOr`
                   missingAttribute "summoned"
                 ))
-    tap cn
-    gainAttribute "attacking" cn
+    forCards
+      (matchName cn <> missingAttribute vigilance)
+      tap
+    gainAttribute attacking cn
 
 damagePlayer cn = do
   c <- requireCard cn matchInPlay
@@ -170,9 +172,9 @@ damagePlayer cn = do
 
 -- TODO: Better name (resolveMentor?), check source has mentor attribute
 triggerMentor sourceName targetName = do
-  source <- requireCard sourceName $ matchAttribute "attacking"
+  source <- requireCard sourceName $ matchAttribute attacking
   _      <- requireCard targetName $
-                 matchAttribute "attacking"
+                 matchAttribute attacking
               <> matchLesserPower (view cardPower source)
 
   modifyStrength (1, 1) targetName

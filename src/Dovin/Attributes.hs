@@ -10,6 +10,8 @@ import Dovin.Types
 numbered :: Int -> CardName -> CardName
 numbered n name = name <> " " <> show n
 
+attacking :: CardAttribute
+attacking = "attacking"
 aura :: CardAttribute
 aura = "aura"
 artifact :: CardAttribute
