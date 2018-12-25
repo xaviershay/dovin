@@ -10,10 +10,10 @@ import qualified Solutions.GuildsOfRavnica8
 import qualified Solutions.GuildsOfRavnica9
 import qualified Solutions.ExplorersOfIxalanContest
 import qualified Solutions.UltimateMasters
+import qualified Solutions.ToughestOfTheTough
 
 main :: IO ()
-main = do
-  runAll
+main = runAll
 
 runAll = do
   run Solutions.Example.formatter Solutions.Example.solution
@@ -24,3 +24,4 @@ runAll = do
   run Solutions.GuildsOfRavnica9.formatter Solutions.GuildsOfRavnica9.solution
   run Solutions.ExplorersOfIxalanContest.formatter Solutions.ExplorersOfIxalanContest.solution
   run Solutions.UltimateMasters.formatter Solutions.UltimateMasters.solution
+  run Solutions.ToughestOfTheTough.formatter Solutions.ToughestOfTheTough.solution
