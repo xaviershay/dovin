@@ -57,3 +57,5 @@ solution = do
     damagePlayer "Aurelia, Exemplar of Justice"
 
     validateLife Opponent 0
+
+formatter _ = boardFormatter

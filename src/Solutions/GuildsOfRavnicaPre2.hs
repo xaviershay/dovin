@@ -69,3 +69,5 @@ solution = do
     damagePlayer "Rhizome Lurcher"
 
     validateLife Opponent 0
+
+formatter _ = boardFormatter

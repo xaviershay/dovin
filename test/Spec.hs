@@ -8,6 +8,7 @@ import Test.Tasty.HUnit
 
 import Dovin
 import Dovin.Monad
+import qualified Solutions
 
 import Control.Monad
 import Control.Lens
@@ -29,6 +30,11 @@ validateBoardEquals lens expected = do
 
   unless (x == expected) $
     throwError ("want: " <> show expected <> ", got: " <> show x)
+
+test_Solutions = testGroup "Solutions" $
+  map solutionTestCase Solutions.all
+
+solutionTestCase (name, solution, _) = prove name solution
 
 test_Test = testGroup "Actions"
   [ testGroup "cast"

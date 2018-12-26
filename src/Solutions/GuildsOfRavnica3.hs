@@ -122,3 +122,5 @@ solution = do
         damagePlayer "Roc Charger"
         validateLife Opponent 0
     ]
+
+formatter _ = boardFormatter

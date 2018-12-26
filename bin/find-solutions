@@ -1,0 +1,21 @@
+#!stack runghc
+
+main = do
+  putStrLn "module Solutions where"
+  putStrLn "all :: [String]"
+  putStrLn "all = []"
+
+-- #function join_by { local IFS="$1"; shift; echo "$*"; }
+-- #
+-- #SRC=$1
+-- #DEST=$3
+-- #DIR=$(echo $SRC | cut -f 1 -d .)
+-- #SOLUTIONS=$(find $DIR -type f -exec basename {} \; |
+-- #            cut -f 1 -d . |
+-- #            sed -e 's/\(.*\)/("\1",(\1.formatter,\1.solution))/')
+-- #cat > $DEST <<EOS
+-- #module Solutions where
+-- #
+-- #all :: [String]
+-- #all = [$(join_by , $SOLUTIONS)]
+-- #EOS
