@@ -16,7 +16,7 @@ module Dovin.Actions (
   , resolveTop
   , tapForMana
   -- * Uncategorized
-  , moveToGraveyard
+  , moveTo
   , transitionTo
   , transitionToForced
   -- * Validations
@@ -145,8 +145,10 @@ resolve expectedName = do
 --
 -- [Effects]
 --
---     * Move card to graveyard of owner. See 'move' for possible alternate
---       effects, depending on card attributes.
+--     * If spell, move card to graveyard of owner.
+--     * If permanent, move card to play area of owner.
+--     * See 'move' for possible alternate effects, depending on card
+--       attributes.
 resolveTop :: GameMonad ()
 resolveTop = do
   s <- use stack
@@ -157,10 +159,9 @@ resolveTop = do
       c <- requireCard x mempty
 
       if hasAttribute instant c || hasAttribute sorcery c then
-        moveToGraveyard x
+        moveTo Graveyard x
       else
-        -- TODO: Don't assume active, document+test
-        move (Active, Stack) (Active, Play) x
+        moveTo Play x
 
       assign stack xs
 
@@ -210,16 +211,18 @@ transitionToForced newPhase = do
 -- [Validates]:
 --
 --     * Card exists in source location.
---     * Destination is not stack (use a 'cast' variant instead)
+--     * Destination is not stack (use a 'cast' variant instead).
 --     * Destination does not match source.
 --
 -- [Effects]:
 --
 --     * Card moved to destination location.
---     * If card has 'token' attribute, remove from game instead.
---     * If card has 'copy' attribute, remove from game instead.
+--     * If card has 'token' attribute and destination is not in play, remove
+--       from game instead.
+--     * If card has 'copy' attribute and leaving stack, remove from game
+--       instead. (TODO: Spec this properly)
 --     * If card has 'exileWhenLeaveStack' attribute and leaving stack, move to
---       exile instead.
+--       exile instead. (TODO: Spec this properly)
 --     * If destination is play, add 'summoned' attribute.
 --     * If destination is not in play, remove 'summoned' attribute.
 move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
@@ -246,23 +249,25 @@ move from to name = do
   else
     modifyCard name location (const to)
 
--- | Move card to graveyard of owner. (Note: currently owner of card isn't
--- tracked, so moves to current controller graveyard instead. This incorrect
--- and will be fixed in a future version.)
+-- | Move card to location with same controller.
 --
--- [Validates]
+-- > moveTo Graveyard "Forest"
+--
+-- [Validates]:
 --
 --     * Card exists.
 --
--- [Effects]
+-- [Effects]:
 --
---     * See 'move'.
-moveToGraveyard cn = do
+--     * Card is moved to location.
+--     * See 'move' for possible alternate effects, depending on card
+moveTo :: Location -> CardName -> GameMonad ()
+moveTo dest cn = do
   c <- requireCard cn mempty
 
   let location = view cardLocation c
 
-  move location (second (const Graveyard) location) cn
+  move location (second (const dest) location) cn
 
 remove :: CardName -> GameMonad ()
 remove cn = do

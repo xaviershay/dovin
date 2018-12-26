@@ -147,10 +147,10 @@ test_Test = testGroup "Actions"
         "Card does not exist: Forest" $ do
           move (Active, Hand) (Active, Exile) "Forest"
     ]
-  , testGroup "moveToGraveyard"
-    [ prove "moves card to graveyard" $ do
+  , testGroup "moveTo"
+    [ prove "moves card to graveyard of same owner" $ do
         withLocation (Opponent, Hand) $ addLand "Forest"
-        moveToGraveyard "Forest"
+        moveTo Graveyard "Forest"
         validate "Forest" $ matchLocation (Opponent, Graveyard)
     ]
   , testGroup "spendMana"
@@ -241,11 +241,17 @@ test_Test = testGroup "Actions"
         validatePhase FirstMain
     ]
   , testGroup "resolveTop"
-    [ prove "resolves top card of stack" $ do
+    [ prove "resolves top spell from stack" $ do
         withLocation (Active, Hand) $ addInstant "Shock"
         cast "" "Shock" >> resolveTop
 
         validate "Shock" $ matchLocation (Active, Graveyard)
+        validateBoardEquals stack mempty
+    , prove "resolves top permanent of stack" $ do
+        withLocation (Active, Hand) $ addArtifact "Mox Opal"
+        cast "" "Mox Opal" >> resolveTop
+
+        validate "Mox Opal" $ matchLocation (Active, Play)
         validateBoardEquals stack mempty
     , refute
         "requires non-empty stack"

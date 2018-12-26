@@ -93,7 +93,7 @@ solution = do
     resolve "Dead Weight"
     modifyStrength (-2, -2) "Vicious Conquistador"
     resetStrength "Vicious Conquistador" (1, 2)
-    moveToGraveyard "Dead Weight"
+    moveTo Graveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
     tapForMana "B" "Watery Grave 1"
@@ -117,7 +117,7 @@ solution = do
     target "Vicious Conquistador"
     modifyStrength (-2, -2) "Vicious Conquistador"
     resetStrength "Vicious Conquistador" (1, 2)
-    moveToGraveyard "Dead Weight"
+    moveTo Graveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do
     tapForMana "B" "Overgrown Tomb 3"
