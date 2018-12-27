@@ -214,7 +214,7 @@ test_Test = testGroup "Actions"
           tap "Forest"
     , refute
         "requires in play"
-        "in location" $ do
+        "in play" $ do
           withLocation (Active, Graveyard) $ addLand "Forest"
           tap "Forest"
     ]
@@ -245,6 +245,32 @@ test_Test = testGroup "Actions"
         transitionTo BeginCombat
         transitionToForced FirstMain
         validatePhase FirstMain
+    ]
+  , testGroup "untap"
+    [ prove "untaps card in play" $ do
+        withLocation (Active, Play) $ withAttribute tapped $  addLand "Forest"
+        untap "Forest"
+
+        validate "Forest" $ missingAttribute tapped
+    , prove "untaps card in opponent's play" $ do
+        withLocation (Opponent, Play) $ withAttribute tapped $ addLand "Forest"
+        untap "Forest"
+
+        validate "Forest" $ missingAttribute tapped
+    , refute
+        "requires card exists"
+        "Card does not exist: Forest" $ do
+          untap "Forest"
+    , refute
+        "requires tapped"
+        "has attribute tapped" $ do
+          withLocation (Active, Play) $ addLand "Forest"
+          untap "Forest"
+    , refute
+        "requires in play"
+        "in play" $ do
+          withLocation (Active, Graveyard) $ addLand "Forest"
+          untap "Forest"
     ]
   , testGroup "resolveTop"
     [ prove "resolves top spell from stack" $ do

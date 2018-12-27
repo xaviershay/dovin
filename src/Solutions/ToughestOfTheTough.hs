@@ -8,13 +8,6 @@ import qualified Data.Set as S
 blocked = "blocked"
 
 -- TODO: Document, test, move to Dovin.Actions
-untap :: CardName -> GameMonad ()
-untap name = do
-  card <- requireCard name $ matchInPlay <> matchAttribute tapped
-
-  modifyCard name cardAttributes (S.delete tapped)
-
--- TODO: Document, test, move to Dovin.Actions
 exerted = "exerted"
 
 -- TODO: Document, test, move to Dovin.Actions

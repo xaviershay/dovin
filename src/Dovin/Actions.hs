@@ -34,6 +34,7 @@ module Dovin.Actions (
   , remove
   , spendMana
   , tap
+  , untap
   ) where
 
 import           Dovin.Attributes
@@ -41,7 +42,6 @@ import           Dovin.Helpers
 import           Dovin.Prelude
 import           Dovin.Types
 
-import qualified Data.Set as S
 import qualified Data.HashMap.Strict as M
 
 import Control.Arrow (second)
@@ -356,11 +356,26 @@ spendMana amount =
 --   * Card gains tapped attribute.
 tap :: CardName -> GameMonad ()
 tap name = do
-  card <- requireCard name
-    ((matchLocation (Opponent, Play) `matchOr` matchLocation (Active, Play))
-    <> missingAttribute tapped)
+  validate name $ matchInPlay <> missingAttribute tapped
 
-  modifyCard name cardAttributes (S.insert tapped)
+  gainAttribute tapped name
+
+-- | Untaps a card.
+--
+-- [Validates]:
+--
+--   * Card is in play.
+--   * Card is tapped.
+--
+-- [Effects]:
+--
+--   * Card loses tapped attribute.
+untap :: CardName -> GameMonad ()
+untap name = do
+  validate name $ matchInPlay <> matchAttribute tapped
+
+  loseAttribute tapped name
+
 
 -- | Validate that a card matches a matcher.
 --

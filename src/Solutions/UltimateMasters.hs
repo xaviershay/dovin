@@ -132,13 +132,12 @@ solution = do
       ]
 
   step "Assume opponent activates Dark Depths to block Emrakul in response to Annihilator trigger" $ do
-    -- TODO: Allow acting as opponent
-    -- as Opponent $ do
-    --   forM_ [1..7] $ \n -> tap (numbered n "Plains")
-    --   forM_ [1..2] $ \n -> tap (numbered n "Forest")
-    withLocation (Opponent, Play)
-      $ withAttributes [indestructible, flying, token]
-      $ addCreature (20, 20) "Marit Large"
+    as Opponent $ do
+      forM_ [1..7] $ \n -> tap (numbered n "Plains")
+      forM_ [1..2] $ \n -> tap (numbered n "Forest")
+      withLocation (Opponent, Play)
+        $ withAttributes [indestructible, flying, token]
+        $ addCreature (20, 20) "Marit Large"
 
     gainAttribute "blocked" "Emrakul, the Aeons Torn"
 
