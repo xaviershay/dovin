@@ -3,17 +3,7 @@ module Solutions.ToughestOfTheTough where
 import Dovin.Prelude
 import Dovin
 
-import qualified Data.Set as S
-
 blocked = "blocked"
-
--- TODO: Document, test, move to Dovin.Actions
-exerted = "exerted"
-
--- TODO: Document, test, move to Dovin.Actions
--- TODO: Validate: phase and attacking
-exertTrigger cn = do
-    gainAttribute exerted cn
 
 solution :: GameMonad ()
 solution = do
@@ -67,7 +57,7 @@ solution = do
       , "Tilonalli's Skinshifter"
       ]
 
-    exertTrigger "Tah-Crop Elite"
+    exert "Tah-Crop Elite"
 
     trigger "Tilonalli's Skinshifter"
     target "Tah-Crop Elite"

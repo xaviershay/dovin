@@ -28,6 +28,8 @@ doublestrike :: CardAttribute
 doublestrike = "doublestrike"
 enchantment :: CardAttribute
 enchantment = "enchantment"
+exerted :: CardAttribute
+exerted = "exerted"
 exileWhenLeaveStack :: CardAttribute
 exileWhenLeaveStack = "exile-when-leave-stack"
 firststrike :: CardAttribute
@@ -55,7 +57,7 @@ sorcery = "sorcery"
 storm :: CardAttribute
 storm = "storm"
 summoned :: CardAttribute
-summoned = "summonded"
+summoned = "summoned"
 undying :: CardAttribute
 undying = "undying"
 tapped :: CardAttribute

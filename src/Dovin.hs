@@ -142,24 +142,6 @@ modifyStrength (x, y) cn = do
 
   when (view cardToughness c <= 0) $ removeFromPlay cn
 
-attackWith :: [CardName] -> GameMonad ()
-attackWith cs = do
-  transitionTo DeclareAttackers
-
-  forM_ cs $ \cn -> do
-    c <- requireCard cn
-           (matchLocation (Active, Play)
-             <> matchAttribute "creature"
-             <> (
-                  matchAttribute "haste"
-                  `matchOr`
-                  missingAttribute "summoned"
-                ))
-    forCards
-      (matchName cn <> missingAttribute vigilance)
-      tap
-    gainAttribute attacking cn
-
 damagePlayer cn = do
   c <- requireCard cn matchInPlay
   modifying
@@ -222,14 +204,6 @@ damageCard sourceName destName = do
   -- TODO: Move this in to a state-based check?
   --when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
     --destroy sourceName
-
-forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
-forCards matcher f = do
-  cs <- allCards
-
-  let matchingCs = filter (applyMatcher matcher) cs
-
-  forM_ (map (view cardName) matchingCs) f
 
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =

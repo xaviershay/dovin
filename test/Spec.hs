@@ -129,12 +129,12 @@ test_Test = testGroup "Actions"
         validate "Chemister's Insight" $
              matchLocation (Active, Exile)
           <> invert (matchAttribute exileWhenLeaveStack)
-    , prove "adds summonded attribute when moving to play" $ do
+    , prove "adds summoned attribute when moving to play" $ do
         withLocation (Active, Hand) $ addLand "Forest"
         move (Active, Hand) (Active, Play) "Forest"
 
         validate "Forest" $ matchAttribute summoned
-    , prove "removes summonded attribute when leaving play" $ do
+    , prove "removes summoned attribute when leaving play" $ do
         withAttribute summoned
           $ withLocation (Active, Play)
           $ addLand "Forest"
@@ -353,6 +353,61 @@ test_Test = testGroup "Actions"
 
         cast "" "Lava Spike"
         splice "Lava Spike" "" "Glacial Ray"
+    ]
+  , testGroup "attackWith"
+    [ prove "attacks with listed creatures" $ do
+        withLocation (Active, Play) $ do
+          addCreature (1, 1) "Bat 1"
+          addCreature (1, 1) "Bat 2"
+          addCreature (1, 1) "Bat 3"
+
+        attackWith ["Bat 1", "Bat 2"]
+
+        validatePhase DeclareAttackers
+        validate "Bat 1" $ matchAttributes [attacking, tapped]
+        validate "Bat 2" $ matchAttributes [attacking, tapped]
+        validate "Bat 3" $ missingAttribute attacking
+        validate "Bat 3" $ missingAttribute tapped
+    , prove "does not tap vigilant attackers" $ do
+        withLocation (Active, Play) $ do
+          withAttribute vigilance $ addCreature (1, 1) "Bat"
+
+        attackWith ["Bat"]
+        validate "Bat" $ matchAttribute attacking
+        validate "Bat" $ missingAttribute tapped
+    , refute
+        "prevents summoned creatures from attacking"
+        "does not have summoning sickness" $ do
+          withLocation (Active, Play) $ do
+            withAttributes [summoned] $ addCreature (1, 1) "Bat"
+
+          attackWith ["Bat"]
+    , prove "allows hasty creatures to attack" $ do
+        withLocation (Active, Play) $ do
+          withAttributes [haste, summoned] $ addCreature (1, 1) "Bat"
+
+        attackWith ["Bat"]
+        validate "Bat" $ matchAttributes [attacking, tapped]
+    ]
+  , testGroup "exert"
+    [ prove "exerts an attacking creature" $ do
+        withLocation (Active, Play) $ addCreature (1, 1) "Bat"
+        attackWith ["Bat"]
+        exert "Bat"
+        validate "Bat" $ matchAttribute exerted
+    , refute
+        "requires DeclareAttackers phase"
+        "phase was SecondMain, expected DeclareAttackers" $ do
+          withLocation (Active, Play) $ addCreature (1, 1) "Bat"
+          attackWith ["Bat"]
+          transitionTo SecondMain
+          exert "Bat"
+    , refute
+        "requires attacking creature"
+        "has attribute attacking" $ do
+          withLocation (Active, Play) $ addCreature (1, 1) "Bat"
+          transitionTo DeclareAttackers
+          exert "Bat"
     ]
   ]
 

@@ -17,6 +17,8 @@ module Dovin.Actions (
   , splice
   , tapForMana
   -- * Uncategorized
+  , attackWith
+  , exert
   , moveTo
   , transitionTo
   , transitionToForced
@@ -287,6 +289,67 @@ move from to name = do
     modifyCard name cardPlusOneCounters (+ 1)
   else
     modifyCard name location (const to)
+
+-- | Start an attack with the given creatures.
+--
+-- > attackWith ["Fanatical Firebrand"]
+--
+-- [Validates]
+--
+--   * Cards are in play.
+--   * Cards have 'creature' attribute.
+--   * Cards either have 'haste' or are missing 'summoned'.
+--
+-- [Effects]
+--
+--   * Cards become tapped, unless they have 'vigilance'.
+--   * Cards gain 'attacking' attribute.
+--   * Transitions to 'DeclareAttackers' step.
+attackWith :: [CardName] -> GameMonad ()
+attackWith cs = do
+  transitionTo DeclareAttackers
+
+  forM_ cs $ \cn -> do
+    c <- requireCard cn
+           (matchInPlay
+             <> matchAttribute "creature"
+             <> ( labelMatch ("does not have summoning sickness") $
+                    matchAttribute haste
+                    `matchOr`
+                    missingAttribute summoned
+                ))
+    forCards
+      (matchName cn <> missingAttribute vigilance)
+      tap
+    gainAttribute attacking cn
+
+-- | Exert a card. Works best when card has an associated effect that applies
+-- when 'exerted' attribute is present.
+--
+-- > withAttributes [flying]
+-- >   $ withEffect
+-- >       (matchInPlay <> matchAttribute exerted)
+-- >       (    matchLocation . view cardLocation
+-- >         <> const (matchAttribute creature)
+-- >       )
+-- >       (pure . over cardStrength (mkStrength (1, 1) <>))
+-- >   $ addCreature (2, 2) "Tah-Crop Elite"
+-- > attackWith ["Tah-Crop Elite"]
+-- > exert "Tah-Crop Elite"
+--
+-- [Validates]
+--
+--   * In 'DeclareAttackers' phase.
+--   * Card has 'attacking' attribute.
+--
+-- [Effects]
+--
+--   * Card gains 'exerted' attribute.
+exert :: CardName -> GameMonad ()
+exert cn = do
+  validatePhase DeclareAttackers
+  validate cn $ matchAttribute attacking
+  gainAttribute exerted cn
 
 -- | Move card to location with same controller.
 --

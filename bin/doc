@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec stack haddock --no-haddock-deps --file-watch

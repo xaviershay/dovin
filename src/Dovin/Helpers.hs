@@ -124,6 +124,8 @@ missingAttribute = invert . matchAttribute
 invert :: CardMatcher -> CardMatcher
 invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f
 
+labelMatch :: String -> CardMatcher -> CardMatcher
+labelMatch label (CardMatcher d f) = CardMatcher label f
 applyMatcher :: CardMatcher -> Card -> Bool
 applyMatcher matcher c =
   case applyMatcherWithDesc matcher c of
@@ -145,4 +147,12 @@ gainAttribute attr cn = do
 
 setAttribute :: CardAttribute -> Card -> Card
 setAttribute attr = over cardAttributes (S.insert attr)
+
+forCards :: CardMatcher -> (CardName -> GameMonad ()) -> GameMonad ()
+forCards matcher f = do
+  cs <- allCards
+
+  let matchingCs = filter (applyMatcher matcher) cs
+
+  forM_ (map (view cardName) matchingCs) f
 
