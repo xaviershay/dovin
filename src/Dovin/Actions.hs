@@ -343,16 +343,14 @@ attackWith cs = do
 --
 -- [Validates]
 --
---   * In 'DeclareAttackers' phase.
---   * Card has 'attacking' attribute.
+--   * Card has 'tapped' attribute.
 --
 -- [Effects]
 --
 --   * Card gains 'exerted' attribute.
 exert :: CardName -> GameMonad ()
 exert cn = do
-  validatePhase DeclareAttackers
-  validate cn $ matchAttribute attacking
+  validate cn $ matchAttribute tapped
   gainAttribute exerted cn
 
 -- | Move card to location with same controller.

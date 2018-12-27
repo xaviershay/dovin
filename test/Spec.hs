@@ -299,25 +299,5 @@ test_Test = testGroup "Actions"
         attackWith ["Bat"]
         validate "Bat" $ matchAttributes [attacking, tapped]
     ]
-  , testGroup "exert"
-    [ prove "exerts an attacking creature" $ do
-        withLocation (Active, Play) $ addCreature (1, 1) "Bat"
-        attackWith ["Bat"]
-        exert "Bat"
-        validate "Bat" $ matchAttribute exerted
-    , refute
-        "requires DeclareAttackers phase"
-        "phase was SecondMain, expected DeclareAttackers" $ do
-          withLocation (Active, Play) $ addCreature (1, 1) "Bat"
-          attackWith ["Bat"]
-          transitionTo SecondMain
-          exert "Bat"
-    , refute
-        "requires attacking creature"
-        "has attribute attacking" $ do
-          withLocation (Active, Play) $ addCreature (1, 1) "Bat"
-          transitionTo DeclareAttackers
-          exert "Bat"
-    ]
   ]
 
