@@ -1,4 +1,5 @@
 module Solutions where
+import qualified Solutions.Dominaria5
 import qualified Solutions.Example
 import qualified Solutions.ExplorersOfIxalanContest
 import qualified Solutions.GuildsOfRavnica1
@@ -10,6 +11,7 @@ import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
 
 all = [
+  ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter),
   ("Example", Solutions.Example.solution, Solutions.Example.formatter),
   ("ExplorersOfIxalanContest", Solutions.ExplorersOfIxalanContest.solution, Solutions.ExplorersOfIxalanContest.formatter),
   ("GuildsOfRavnica1", Solutions.GuildsOfRavnica1.solution, Solutions.GuildsOfRavnica1.formatter),

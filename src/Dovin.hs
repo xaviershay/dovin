@@ -199,11 +199,11 @@ damageCard sourceName destName = do
       modifying (life . at owner . non 0) (+ dmg)
 
   dest <- requireCard destName (matchAttribute creature)
-  return ()
+
   -- TODO: Why isn't indestructible check working?
   -- TODO: Move this in to a state-based check?
-  --when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
-    --destroy sourceName
+  when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
+    destroy destName
 
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
