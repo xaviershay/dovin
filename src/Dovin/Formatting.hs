@@ -49,8 +49,15 @@ cardFormatter title matcher board =
              <> show (view cardPower c)
              <> "/"
              <> show (view cardToughness c)
-             <> ", "
-             <> show (view cardDamage c)
+             <> (let n = view cardPlusOneCounters c in
+                   if n > 0 then
+                      ", +" <> show n <> "/+" <> show n
+                  else
+                    mempty)
+             <> (if view cardDamage c > 0 then
+                  ", " <> show (view cardDamage c)
+                else
+                  mempty)
              <> ")"
          else if hasAttribute "planeswalker" c then
            " ("

@@ -72,6 +72,9 @@ data Card = Card
   , _cardDamage :: Int
   , _cardLoyalty :: Int
   , _cardEffects :: [CardEffect]
+
+  -- Can probably generalize this more at some point.
+  , _cardPlusOneCounters :: Int
   }
 instance Hashable Player
 instance Show Card where
@@ -159,6 +162,7 @@ mkCard name location =
     , _cardDamage = 0
     , _cardLoyalty = 0
     , _cardEffects = mempty
+    , _cardPlusOneCounters = 0
     }
 
 

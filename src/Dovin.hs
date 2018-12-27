@@ -91,11 +91,7 @@ sacrifice = removeFromPlay
 removeFromPlay cardName = do
   card <- requireCard cardName matchInPlay
 
-  if hasAttribute "token" card then
-    remove cardName
-  else
-    let loc = view location card in
-      move loc (second (const Graveyard) loc) cardName
+  moveTo Graveyard cardName
 
 exile cardName = do
   card <- requireCard cardName mempty

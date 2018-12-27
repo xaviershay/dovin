@@ -25,6 +25,7 @@ module Dovin.Builder (
   , withAttributes
   , withEffect
   , withLocation
+  , withPlusOneCounters
   ) where
 
 import Control.Monad.Reader (ask, local)
@@ -92,6 +93,18 @@ withAttributes attrs =
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
 withLocation loc = local (set location loc)
 
-withEffect :: CardMatcher -> (Card -> CardMatcher) -> (Card -> GameMonad Card) -> GameMonad () -> GameMonad ()
+-- | Add an effect to the created card.
+withEffect ::
+  CardMatcher -- ^ A matcher that must apply to this card for this affect to
+              -- apply. 'matchInPlay' is a typical value.
+ -> (Card -> CardMatcher) -- ^ Given the current card, return a matcher that
+                          -- matches cards that this affect applies to.
+ -> (Card -> GameMonad Card) -- ^ Apply an effect to the given card.
+ -> GameMonad ()
+ -> GameMonad ()
 withEffect applyCondition filter action =
   local (over cardEffects (mkEffect applyCondition filter action:))
+
+-- | Set the number of +1/+1 counters of the created card.
+withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()
+withPlusOneCounters = local . set cardPlusOneCounters

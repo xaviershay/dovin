@@ -9,7 +9,7 @@ import Data.List (sort)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
-import Control.Lens (_1, _2, ASetter, _Just)
+import Control.Lens (_1, _2, ASetter, both, _Just)
 
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
 applyMatcherWithDesc (CardMatcher d f) c =
@@ -56,7 +56,13 @@ applyEffects (BaseCard card) = do
           (\(e, c) -> applyMatcher (view effectFilter e c) card)
           enabledEffects
 
-  foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
+  card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
+
+  let counterModifier = mconcat
+                          . replicate (view cardPlusOneCounters card')
+                          . mkStrength $ (1, 1)
+
+  return $ over cardStrength (counterModifier <>) card'
 
   where
     applyEffect2 :: Card -> CardEffect -> GameMonad Card

@@ -14,6 +14,7 @@ module Dovin.Actions (
   , castFromLocation
   , resolve
   , resolveTop
+  , splice
   , tapForMana
   -- * Uncategorized
   , moveTo
@@ -165,6 +166,26 @@ resolveTop = do
 
       assign stack xs
 
+-- | Splices a spell on to a previously cast arcane spell. TODO: Spec this.
+--
+-- > splice "Goryo's Vengeance" "2RR" "Through the Breach"
+--
+-- [Validates]
+--
+--   * Target spell is arcane.
+--   * Target spell is on stack.
+--   * Spliced spell is in hand.
+--   * See 'spendMana' for additional validations.
+--
+-- [Effects]
+--
+--   * See 'spendMana' for additional effects.
+splice :: CardName -> ManaString -> CardName -> GameMonad ()
+splice target cost name = do
+  validate target $ matchAttribute arcane <> matchLocation (Active, Stack)
+  validate name $ matchLocation (Active, Hand)
+  spendMana cost
+
 -- | Combination of 'tap' and 'addMana', see them for specification.
 tapForMana :: ManaString -> CardName -> GameMonad ()
 tapForMana amount name = do
@@ -223,6 +244,14 @@ transitionToForced newPhase = do
 --       instead. (TODO: Spec this properly)
 --     * If card has 'exileWhenLeaveStack' attribute and leaving stack, move to
 --       exile instead. (TODO: Spec this properly)
+--     * If card has 'undying', is moving from play to graveyard, and has no
+--       +1/+1 counters, add a +1/+1 counter instead. (Note: undying should
+--       move card to graveyard then back to play for owner, but since neither
+--       triggers nor owner tracking are implemented, this simplification is
+--       valid.) (TODO: Spec this)
+--     * If card is leaving play, remove all damage.
+--     * If destination is not in play, remove any +1/+1 counters. (TODO: Spec
+--       this)
 --     * If destination is play, add 'summoned' attribute.
 --     * If destination is not in play, remove 'summoned' attribute.
 move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
@@ -235,10 +264,15 @@ move from to name = do
   when (snd from == Stack) $
     modifying stack (filter (/= name))
 
+  when (snd to /= Play) $
+    modifyCard name cardDamage (const 0)
+
   if (snd to == Play) then
     gainAttribute summoned name
   else
-    loseAttribute summoned name
+    do
+      loseAttribute summoned name
+      modifyCard name cardPlusOneCounters (const 0)
 
   if snd to /= Play && (hasAttribute token c || hasAttribute copy c) then
     remove name
@@ -246,6 +280,8 @@ move from to name = do
     do
       loseAttribute exileWhenLeaveStack name
       move (Active, Stack) (Active, Exile) name
+  else if snd from == Play && snd to == Graveyard && view cardPlusOneCounters c == 0 && hasAttribute undying c then
+    modifyCard name cardPlusOneCounters (+ 1)
   else
     modifyCard name location (const to)
 
