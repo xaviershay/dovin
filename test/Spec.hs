@@ -286,4 +286,47 @@ test_Test = testGroup "Actions"
           resolve "Shock"
     ]
 
+  , testGroup "splice"
+    [ prove "splices on to an arcane spell" $ do
+        withLocation (Active, Hand) $ do
+          addInstant "Glacial Ray"
+          withAttribute arcane $ addInstant "Lava Spike"
+
+        addMana "RRR"
+        cast "R" "Lava Spike"
+        splice "Lava Spike" "1R" "Glacial Ray"
+        resolveTop
+
+        validate "Glacial Ray" $ matchLocation (Active, Hand)
+        validateBoardEquals stack mempty
+        validateBoardEquals manaPool mempty
+    , refute
+      "requires arcane"
+      "has attribute arcane" $ do
+        withLocation (Active, Hand) $ do
+          addInstant "Glacial Ray"
+          addInstant "Lava Spike"
+
+        cast "" "Lava Spike"
+        splice "Lava Spike" "" "Glacial Ray"
+    , refute
+      "requires spliced spell on stack"
+      "Lava Spike not on stack" $ do
+        withLocation (Active, Hand) $ do
+          addInstant "Glacial Ray"
+          withAttribute arcane $ addInstant "Lava Spike"
+
+        splice "Lava Spike" "" "Glacial Ray"
+    , refute
+      "requires spell in hand"
+      "Glacial Ray not in hand" $ do
+        withLocation (Active, Graveyard) $
+          addInstant "Glacial Ray"
+        withLocation (Active, Hand) $
+          withAttribute arcane $ addInstant "Lava Spike"
+
+        cast "" "Lava Spike"
+        splice "Lava Spike" "" "Glacial Ray"
+    ]
   ]
+

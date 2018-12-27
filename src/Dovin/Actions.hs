@@ -166,7 +166,7 @@ resolveTop = do
 
       assign stack xs
 
--- | Splices a spell on to a previously cast arcane spell. TODO: Spec this.
+-- | Splices a spell on to a previously cast arcane spell.
 --
 -- > splice "Goryo's Vengeance" "2RR" "Through the Breach"
 --
@@ -182,8 +182,11 @@ resolveTop = do
 --   * See 'spendMana' for additional effects.
 splice :: CardName -> ManaString -> CardName -> GameMonad ()
 splice target cost name = do
-  validate target $ matchAttribute arcane <> matchLocation (Active, Stack)
-  validate name $ matchLocation (Active, Hand)
+  validate target $ matchAttribute arcane
+  validate target (matchLocation (Active, Stack))
+    `catchError` const (throwError $ target <> " not on stack")
+  validate name (matchLocation (Active, Hand))
+    `catchError` const (throwError $ name <> " not in hand")
   spendMana cost
 
 -- | Combination of 'tap' and 'addMana', see them for specification.
