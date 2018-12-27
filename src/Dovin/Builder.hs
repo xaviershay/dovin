@@ -41,7 +41,6 @@ import Dovin.Types
 addCard :: CardName -> GameMonad ()
 addCard name = do
   template <- ask
-  -- TODO: Add this back in
   validateRemoved name
   modifying cards (M.insert name (BaseCard $ set cardName name template))
 
