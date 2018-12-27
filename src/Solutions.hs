@@ -1,4 +1,5 @@
 module Solutions where
+import qualified Solutions.Core19_9
 import qualified Solutions.Dominaria5
 import qualified Solutions.Example
 import qualified Solutions.ExplorersOfIxalanContest
@@ -11,6 +12,7 @@ import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
 
 all = [
+  ("Core19_9", Solutions.Core19_9.solution, Solutions.Core19_9.formatter),
   ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter),
   ("Example", Solutions.Example.solution, Solutions.Example.formatter),
   ("ExplorersOfIxalanContest", Solutions.ExplorersOfIxalanContest.solution, Solutions.ExplorersOfIxalanContest.formatter),

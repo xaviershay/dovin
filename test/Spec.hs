@@ -141,7 +141,15 @@ test_Test = testGroup "Actions"
 
         move (Active, Play) (Active, Hand) "Forest"
 
-        validate "Forest" $ invert (matchAttribute summoned)
+        validate "Forest" $ missingAttribute summoned
+    , prove "removes tapped attribute when leaving play" $ do
+        withAttribute tapped
+          $ withLocation (Active, Play)
+          $ addLand "Forest"
+
+        move (Active, Play) (Active, Hand) "Forest"
+
+        validate "Forest" $ missingAttribute tapped
     , refute
         "cannot move to stack"
         "cannot move directly to stack" $ do

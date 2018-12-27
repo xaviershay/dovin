@@ -255,6 +255,7 @@ transitionToForced newPhase = do
 --       triggers nor owner tracking are implemented, this simplification is
 --       valid.) (TODO: Spec this)
 --     * If card is leaving play, remove all damage.
+--     * If card is leaving play, remove 'tapped'.
 --     * If destination is not in play, remove any +1/+1 counters. (TODO: Spec
 --       this)
 --     * If destination is play, add 'summoned' attribute.
@@ -269,8 +270,9 @@ move from to name = do
   when (snd from == Stack) $
     modifying stack (filter (/= name))
 
-  when (snd to /= Play) $
+  when (snd to /= Play) $ do
     modifyCard name cardDamage (const 0)
+    loseAttribute tapped name
 
   if (snd to == Play) then
     gainAttribute summoned name
