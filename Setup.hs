@@ -33,7 +33,6 @@ writeAllSolutions = do
   let array = "all = [\n  " <> (intercalate ",\n  " . map formatSolution $ modules) <> "\n  ]"
 
   let contents = unlines [header, imports, array]
-  putStrLn contents
   rewriteFileEx normal "src/Solutions.hs" contents
 
   where
