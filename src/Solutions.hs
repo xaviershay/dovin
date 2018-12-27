@@ -6,7 +6,7 @@ import qualified Solutions.GuildsOfRavnica3
 import qualified Solutions.GuildsOfRavnica8
 import qualified Solutions.GuildsOfRavnica9
 import qualified Solutions.GuildsOfRavnicaPre2
-import qualified Solutions.ToughestOfTheTough
+import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
 
 all = [
@@ -17,6 +17,6 @@ all = [
   ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter),
   ("GuildsOfRavnica9", Solutions.GuildsOfRavnica9.solution, Solutions.GuildsOfRavnica9.formatter),
   ("GuildsOfRavnicaPre2", Solutions.GuildsOfRavnicaPre2.solution, Solutions.GuildsOfRavnicaPre2.formatter),
-  ("ToughestOfTheTough", Solutions.ToughestOfTheTough.solution, Solutions.ToughestOfTheTough.formatter),
+  ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter),
   ("UltimateMasters", Solutions.UltimateMasters.solution, Solutions.UltimateMasters.formatter)
   ]

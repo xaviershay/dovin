@@ -1,4 +1,4 @@
-module Solutions.ToughestOfTheTough where
+module Solutions.RivalsOfIxalan7 where
 
 import Dovin.Prelude
 import Dovin
