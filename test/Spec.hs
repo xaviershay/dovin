@@ -3,38 +3,7 @@
 
 module Spec where
 
-import Test.Tasty
-import Test.Tasty.HUnit
-
-import Dovin
-import Dovin.Monad
-import qualified Solutions
-
-import Control.Monad
-import Control.Lens
-import Control.Monad.Except
-import Data.List (isInfixOf)
-
-prove name m = testCase name $
-  case runMonad emptyBoard m of
-    (Left msg, _, _) -> assertFailure msg
-    (Right (), _, _) -> return mempty
-
-refute name expectedFailure m = testCase name $
-  case runMonad emptyBoard m of
-    (Left msg, _, _) -> assertBool ("expected: " <> expectedFailure <> "\n but got: " <> msg) $ expectedFailure `isInfixOf` msg
-    (Right (), _, _) -> assertFailure "proof was not refuted"
-
-validateBoardEquals lens expected = do
-  x <- use lens
-
-  unless (x == expected) $
-    throwError ("want: " <> show expected <> ", got: " <> show x)
-
-test_Solutions = testGroup "Solutions" $
-  map solutionTestCase Solutions.all
-
-solutionTestCase (name, solution, _) = prove name solution
+import TestPrelude
 
 test_Test = testGroup "Actions"
   [ testGroup "cast"
@@ -99,73 +68,6 @@ test_Test = testGroup "Actions"
         withLocation (Active, Hand) $ addArtifact "Mox Amber"
         castFromLocation (Active, Hand) "" "Mox Amber"
         validateBoardEquals (counters . at "storm" . non 0) 0
-    ]
-  , testGroup "move"
-    [ prove "moves card from one location to another" $ do
-        withLocation (Active, Hand) $ addLand "Forest"
-        move (Active, Hand) (Active, Exile) "Forest"
-
-        validate "Forest" $ matchLocation (Active, Exile)
-    , prove "does not allow tokens to leave play" $ do
-        withAttribute token
-          $ withLocation (Active, Play)
-          $ addArtifact "Treasure"
-
-        move (Active, Play) (Active, Graveyard) "Treasure"
-        validateRemoved "Treasure"
-    , prove "does not allow copies to leave play" $ do
-        withAttribute copy
-          $ withLocation (Active, Stack)
-          $ addInstant "Shock"
-
-        move (Active, Stack) (Active, Graveyard) "Shock"
-        validateRemoved "Shock"
-    , prove "exiles jumpstart'ed cards" $ do
-        withAttribute exileWhenLeaveStack
-          $ withLocation (Active, Stack)
-          $ addInstant "Chemister's Insight"
-
-        move (Active, Stack) (Active, Graveyard) "Chemister's Insight"
-        validate "Chemister's Insight" $
-             matchLocation (Active, Exile)
-          <> invert (matchAttribute exileWhenLeaveStack)
-    , prove "adds summoned attribute when moving to play" $ do
-        withLocation (Active, Hand) $ addLand "Forest"
-        move (Active, Hand) (Active, Play) "Forest"
-
-        validate "Forest" $ matchAttribute summoned
-    , prove "removes summoned attribute when leaving play" $ do
-        withAttribute summoned
-          $ withLocation (Active, Play)
-          $ addLand "Forest"
-
-        move (Active, Play) (Active, Hand) "Forest"
-
-        validate "Forest" $ missingAttribute summoned
-    , prove "removes tapped attribute when leaving play" $ do
-        withAttribute tapped
-          $ withLocation (Active, Play)
-          $ addLand "Forest"
-
-        move (Active, Play) (Active, Hand) "Forest"
-
-        validate "Forest" $ missingAttribute tapped
-    , refute
-        "cannot move to stack"
-        "cannot move directly to stack" $ do
-          withLocation (Active, Hand) $ addInstant "Shock"
-
-          move (Active, Hand) (Active, Stack) "Shock"
-    , refute
-        "requires card exists"
-        "Card does not exist: Forest" $ do
-          move (Active, Hand) (Active, Exile) "Forest"
-    ]
-  , testGroup "moveTo"
-    [ prove "moves card to graveyard of same owner" $ do
-        withLocation (Opponent, Hand) $ addLand "Forest"
-        moveTo Graveyard "Forest"
-        validate "Forest" $ matchLocation (Opponent, Graveyard)
     ]
   , testGroup "spendMana"
     [ prove "removes colored mana from pool" $ do

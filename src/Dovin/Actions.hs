@@ -243,26 +243,26 @@ transitionToForced newPhase = do
 -- [Effects]:
 --
 --     * Card moved to destination location.
---     * If card has 'token' attribute and destination is not in play, remove
---       from game instead.
---     * If card has 'copy' attribute and leaving stack, remove from game
---       instead. (TODO: Spec this properly)
---     * If card has 'exileWhenLeaveStack' attribute and leaving stack, move to
---       exile instead. (TODO: Spec this properly)
+--     * If card is leaving play, remove all damage, counters, and gained
+--       attributes.
+--     * If card has 'token' attribute and leaving play, remove from game
+--       instead.
+--     * If card has 'copy' attribute, remove from game instead.
+--     * If card has 'exileWhenLeaveStack' attribute, move to exile and remove
+--       'exileWhenLeaveStack' instead.
 --     * If card has 'undying', is moving from play to graveyard, and has no
---       +1/+1 counters, add a +1/+1 counter instead. (Note: undying should
+--       +1\/+1 counters, add a +1\/+1 counter instead. (Note: undying should
 --       move card to graveyard then back to play for owner, but since neither
 --       triggers nor owner tracking are implemented, this simplification is
---       valid.) (TODO: Spec this)
---     * If card is leaving play, remove all damage.
---     * If card is leaving play, remove 'tapped'.
---     * If destination is not in play, remove any +1/+1 counters. (TODO: Spec
---       this)
---     * If destination is play, add 'summoned' attribute.
---     * If destination is not in play, remove 'summoned' attribute.
+--       valid.)
+--     * If card is entering play or changing controller, add 'summoned'
+--       attribute.
 move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
 move from to name = do
   c <- requireCard name $ matchLocation from
+
+  when (from == to) $
+    throwError "cannot move to same location"
 
   when (snd to == Stack) $
     throwError "cannot move directly to stack"
@@ -270,27 +270,29 @@ move from to name = do
   when (snd from == Stack) $
     modifying stack (filter (/= name))
 
-  when (snd to /= Play) $ do
-    modifyCard name cardDamage (const 0)
-    loseAttribute tapped name
-
-  if (snd to == Play) then
+  when (snd to == Play) $
     gainAttribute summoned name
-  else
-    do
-      loseAttribute summoned name
-      modifyCard name cardPlusOneCounters (const 0)
 
-  if snd to /= Play && (hasAttribute token c || hasAttribute copy c) then
+  when (snd from == Play && snd to /= Play) $ do
+    modifyCard name cardPlusOneCounters (const 0)
+    modifyCard name cardDamage (const 0)
+    modifyCard name cardAttributes (const $ view cardDefaultAttributes c)
+
+  -- These conditionals are acting on the card state _before_ any of the above
+  -- changes were applied.
+  if snd to /= Play && hasAttribute token c then
+    remove name
+  else if hasAttribute copy c then
     remove name
   else if hasAttribute exileWhenLeaveStack c then
     do
       loseAttribute exileWhenLeaveStack name
-      move (Active, Stack) (Active, Exile) name
+      moveTo Exile name
   else if snd from == Play && snd to == Graveyard && view cardPlusOneCounters c == 0 && hasAttribute undying c then
     modifyCard name cardPlusOneCounters (+ 1)
   else
     modifyCard name location (const to)
+
 
 -- | Start an attack with the given creatures.
 --

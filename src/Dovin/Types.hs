@@ -67,6 +67,7 @@ data Phase
 data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
+  , _cardDefaultAttributes :: CardAttributes
   , _cardAttributes :: CardAttributes
   , _cardStrength :: CardStrength
   , _cardDamage :: Int
@@ -108,7 +109,6 @@ type Formatter = Board -> String
 makeLenses ''Board
 makeLenses ''Card
 makeLenses ''CardEffect
-
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location
@@ -157,6 +157,7 @@ mkCard name location =
   Card
     { _cardName = name
     , _location = location
+    , _cardDefaultAttributes = mempty
     , _cardAttributes = mempty
     , _cardStrength = mempty
     , _cardDamage = 0
@@ -164,5 +165,3 @@ mkCard name location =
     , _cardEffects = mempty
     , _cardPlusOneCounters = 0
     }
-
-

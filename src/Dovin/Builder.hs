@@ -34,7 +34,6 @@ import qualified Data.Set as S
 
 import Dovin.Attributes
 import Dovin.Actions
-import Dovin.Helpers
 import Dovin.Prelude
 import Dovin.Types
 
@@ -80,13 +79,14 @@ addSorcery name = withAttribute sorcery $ addCard name
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
 -- defined in "Dovin.Attributes".
 withAttribute :: String -> GameMonad () -> GameMonad ()
-withAttribute attr = local (over cardAttributes (S.insert attr))
+withAttribute attr = withAttributes [attr]
 
 -- | Helper version of 'withAttribute' for adding multiple attributes at a
 -- time.
 withAttributes :: [String] -> GameMonad () -> GameMonad ()
 withAttributes attrs =
-  local (over cardAttributes (S.union . S.fromList $ attrs))
+  let f = S.union . S.fromList $ attrs in
+  local (over cardAttributes f . over cardDefaultAttributes f)
 
 -- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()

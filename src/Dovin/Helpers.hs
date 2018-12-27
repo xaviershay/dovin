@@ -90,10 +90,17 @@ modifyCard name lens f =
 --
 -- A wrapping type is used since I intend to add labels/introspection
 -- capabilities at some point.
+matchDamage :: Int -> CardMatcher
+matchDamage n = CardMatcher (show n <> " damage") $
+  (==) n . view cardDamage
+
+matchPlusOneCounters :: Int -> CardMatcher
+matchPlusOneCounters n = CardMatcher (show n <> " +1/+1 counters") $
+  (==) n . view cardPlusOneCounters
 
 matchLocation :: CardLocation -> CardMatcher
 matchLocation loc = CardMatcher ("in location " <> show loc) $
-  (==) loc . view location
+  (==) loc . view cardLocation
 
 matchInPlay = CardMatcher "in play" $ \c -> snd (view location c) == Play
 
