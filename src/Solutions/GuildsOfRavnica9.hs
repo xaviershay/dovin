@@ -129,7 +129,6 @@ solution = do
         target enemy
         validate enemy $ matchAttribute flying
         destroy enemy
-        validateRemoved enemy
 
     resolve "Plummet 1" -- No target
 

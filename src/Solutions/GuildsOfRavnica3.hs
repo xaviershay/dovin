@@ -4,6 +4,11 @@ import Control.Monad
 
 import Dovin
 
+-- This solution re-uses the "Treasure" card to avoid having to track a counter
+-- for each new one created. This has the downside of requiring explicit
+-- state-based action calls - a new one can't be created until the old one has
+-- been removed. In hindsight, probably would be easier to follow by keeping a
+-- running counter of treasures and refering to them separately.
 solution :: GameMonad ()
 solution = do
   let menace = "menace"
@@ -59,8 +64,9 @@ solution = do
       $ addCreature (1, 1) "Soldier"
 
   step "Sac Oathsworn Vampire" $ do
-    tapForMana "1" "Treasure"
-    sacrifice "Treasure"
+    withStateBasedActions $ do
+      tapForMana "1" "Treasure"
+      sacrifice "Treasure"
     sacrificeToNecrolisk "Oathsworn Vampire"
 
   step "Justice Strike soldier to trigger life gain" $ do
@@ -88,14 +94,17 @@ solution = do
     tapForMana "B" "Gateway Plaza 2"
     sacrificeToNecrolisk "Oathsworn Vampire"
 
-    tapForMana "1" "Treasure"
-    sacrifice "Treasure"
+    withStateBasedActions $ do
+      tapForMana "1" "Treasure"
+      sacrifice "Treasure"
     sacrificeToNecrolisk "Bat"
 
   step "Repeat vampire/bat cycle" $ do
-    tapForMana "B" "Gateway Plaza 3"
-    tapForMana "1" "Treasure"
-    sacrifice "Treasure"
+    withStateBasedActions $ do
+      tapForMana "B" "Gateway Plaza 3"
+      tapForMana "1" "Treasure"
+      sacrifice "Treasure"
+
     castFromLocation (Active, Graveyard) "1B" "Oathsworn Vampire"
     resolve "Oathsworn Vampire"
 
@@ -107,8 +116,9 @@ solution = do
     tapForMana "B" "Gateway Plaza 4"
     sacrificeToNecrolisk "Oathsworn Vampire"
 
-    tapForMana "1" "Treasure"
-    sacrifice "Treasure"
+    withStateBasedActions $ do
+      tapForMana "1" "Treasure"
+      sacrifice "Treasure"
     sacrificeToNecrolisk "Bat"
 
   step "Attack with Roc and Necrolisk" $ do

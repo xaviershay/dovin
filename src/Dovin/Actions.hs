@@ -35,8 +35,8 @@ module Dovin.Actions (
   -- | Fine-grained control over when state-based actions are run. By default,
   -- all actions will 'runStateBasedEffects' on completion, so most of the time
   -- you don't need to use these functions explicitly.
-  , deferStateBasedActions
   , runStateBasedActions
+  , withStateBasedActions
   -- * Low-level
   -- | These actions provide low-level control over the game. Where possible,
   -- try to use the more descriptive higher-level actions.
@@ -257,14 +257,14 @@ transitionToForced newPhase = do
 --     * Card exists in source location.
 --     * Destination is not stack (use a 'cast' variant instead).
 --     * Destination does not match source.
+--     * If card has 'token' attribute, source is in play. (Removing token once
+--       they have left play is handled by 'runStateBasedActions'.)
 --
 -- [Effects]:
 --
 --     * Card moved to destination location.
 --     * If card is leaving play, remove all damage, counters, and gained
 --       attributes.
---     * If card has 'token' attribute and leaving play, remove from game
---       instead.
 --     * If card has 'copy' attribute, remove from game instead.
 --     * If card has 'exileWhenLeaveStack' attribute, move to exile and remove
 --       'exileWhenLeaveStack' instead.
@@ -285,6 +285,9 @@ move from to name = action "move" $ do
   when (snd to == Stack) $
     throwError "cannot move directly to stack"
 
+  when (hasAttribute token c && snd from /= Play) $
+    throwError "cannot move token from non-play location"
+
   when (snd from == Stack) $
     modifying stack (filter (/= name))
 
@@ -298,9 +301,7 @@ move from to name = action "move" $ do
 
   -- These conditionals are acting on the card state _before_ any of the above
   -- changes were applied.
-  if snd to /= Play && hasAttribute token c then
-    remove name
-  else if hasAttribute copy c then
+  if hasAttribute copy c then
     remove name
   else if hasAttribute exileWhenLeaveStack c then
     do
@@ -672,8 +673,8 @@ validateLife player n = do
 
 -- | Pause running of state-based actions for the duration of the action,
 -- running them at the end.
-deferStateBasedActions :: GameMonad () -> GameMonad ()
-deferStateBasedActions m = do
+withStateBasedActions :: GameMonad () -> GameMonad ()
+withStateBasedActions m = do
   local (set envSBAEnabled False) m
   runStateBasedActions
 
@@ -681,9 +682,10 @@ deferStateBasedActions m = do
 --
 --     * If a creature does not have 'indestructible', and has damage exceeding
 --       toughess or 'deathtouched' attribute, destroy it.
+--     * If a card is a 'token' and is not in play, remove it.
 --
 -- These are run implicitly at the end of each 'step', so it's not usually
--- needed to call this explicitly. Even then, using 'deferStateBasedActions' is
+-- needed to call this explicitly. Even then, using 'withStateBasedActions' is
 -- usually preferred.
 runStateBasedActions :: GameMonad ()
 runStateBasedActions = do
@@ -697,15 +699,17 @@ runStateBasedActions = do
           runDamageActions
 
   -- TODO: Move token handling to SBA
-  --      forCards
-  --        (invert matchInPlay)
-  --        $ \cn -> do
-  --                   c <- requireCard cn mempty
-
-  --                   when (hasAttribute token c) $
-  --                     remove cn
+        forCards
+          (invert matchInPlay)
+          runTokenActions
 
   where
+    runTokenActions cn = do
+      c <- requireCard cn mempty
+
+      when (hasAttribute token c) $
+        remove cn
+
     runDamageActions cn = do
       c <- requireCard cn mempty
 
@@ -723,7 +727,7 @@ runStateBasedActions = do
 -- Nested 'step' invocations execute the nested action but have no other
 -- effects - generally they should be avoided.
 step :: String -> GameMonad () -> GameMonad ()
-step desc m = deferStateBasedActions $ do
+step desc m = withStateBasedActions $ do
   b <- get
   let (e, b', _) = runMonad b m
 

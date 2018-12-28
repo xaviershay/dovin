@@ -8,13 +8,6 @@ test_Move = testGroup "move/moveTo"
       move (Active, Hand) (Active, Exile) "Forest"
 
       validate "Forest" $ matchLocation (Active, Exile)
-  , prove "does not allow tokens to leave play" $ do
-      withAttribute token
-        $ withLocation (Active, Play)
-        $ addArtifact "Treasure"
-
-      move (Active, Play) (Active, Graveyard) "Treasure"
-      validateRemoved "Treasure"
   , prove "does not allow spell copies to move off the stack" $ do
       withAttribute copy
         $ withLocation (Active, Stack)
@@ -74,6 +67,13 @@ test_Move = testGroup "move/moveTo"
       withLocation (Opponent, Hand) $ addLand "Forest"
       moveTo Graveyard "Forest"
       validate "Forest" $ matchLocation (Opponent, Graveyard)
+  , prove "can change controller of token" $ do
+      withLocation (Active, Play)
+        $ withAttribute token
+        $ addArtifact "Treasure"
+
+      move (Active, Play) (Opponent, Play) "Treasure"
+      validate "Treasure" $ matchLocation (Opponent, Play)
   , refute
       "cannot move to stack"
       "cannot move directly to stack" $ do
@@ -90,4 +90,12 @@ test_Move = testGroup "move/moveTo"
         withLocation (Active, Hand) $ addInstant "Shock"
 
         move (Active, Hand) (Active, Hand) "Shock"
+  , refute
+      "cannot move token from non-play location"
+      "cannot move token from non-play location" $ do
+        withLocation (Active, Graveyard)
+          $ withAttribute token
+          $ addArtifact "Treasure"
+
+        move (Active, Graveyard) (Active, Play) "Treasure"
   ]
