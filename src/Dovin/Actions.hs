@@ -61,6 +61,7 @@ import Control.Arrow (second)
 import Control.Monad.Reader (local)
 import Control.Monad.State
 import Control.Monad.Writer
+import Control.Lens
 
 action :: String -> GameMonad () -> GameMonad ()
 action name m = m
@@ -690,13 +691,27 @@ withStateBasedActions m = do
 -- These are run implicitly at the end of each 'step', so it's not usually
 -- needed to call this explicitly. Even then, using 'withStateBasedActions' is
 -- usually preferred.
+--
+-- Running state-based actions can in turn trigger more state-based actions.
+-- This method loops until no more are generated, which has the potential for
+-- non-termination for pathological game states.
 runStateBasedActions :: GameMonad ()
 runStateBasedActions = do
   enabled <- view envSBAEnabled
-  -- TODO: Loop until no more actions performed
   when enabled
     $ local (set envSBAEnabled False)
-    $ forCards mempty $ \cn -> do
+    $ runStateBasedActions'
+
+  where
+    sbaCounter :: Control.Lens.Lens' Board Int
+    sbaCounter = counters . at "sba-counter" . non 0
+
+    runStateBasedActions' = do
+      assign sbaCounter 0
+
+      let incrementCounter = modifying sbaCounter (+ 1)
+
+      forCards mempty $ \cn -> do
         c <- requireCard cn mempty
 
         when (applyMatcher (matchInPlay <> matchAttribute creature) c) $ do
@@ -705,11 +720,11 @@ runStateBasedActions = do
 
           unless (hasAttribute indestructible c) $
             when (dmg >= toughness || hasAttribute deathtouched c) $
-              moveTo Graveyard cn
+              moveTo Graveyard cn >> incrementCounter
 
         when (applyMatcher (invert matchInPlay) c) $
           when (hasAttribute token c) $
-            remove cn
+            remove cn >> incrementCounter
 
         let matchStack =
                 matchLocation (Active, Stack)
@@ -717,7 +732,11 @@ runStateBasedActions = do
 
         when (applyMatcher (invert matchStack) c) $
           when (hasAttribute copy c) $
-            remove cn
+            remove cn >> incrementCounter
+
+      n <- use sbaCounter
+
+      when (n > 0) runStateBasedActions'
 
 -- | Define a high-level step in the proof. A proof typically consists on
 -- multiple steps. Each step is a human-readable description, then a definition

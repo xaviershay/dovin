@@ -41,4 +41,12 @@ test_SBAs = testGroup "state-based actions"
            $ addArtifact "Shock"
 
        validateRemoved "Shock"
+   , prove "correctly removes damaged tokens" $ do
+       withStateBasedActions $ do
+         withLocation (Active, Play)
+           $ withAttribute token
+           $ addCreature (1, 1) "Spirit"
+
+         damage (const 1) (targetCard "Spirit") "Spirit"
+       validateRemoved "Spirit"
   ]
