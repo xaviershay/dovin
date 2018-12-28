@@ -54,7 +54,7 @@ solution = do
     triggerMentor "Barging Sergeant" "Aurelia, Exemplar of Justice"
     triggerMentor "Goblin Banneret" "Aurelia, Exemplar of Justice"
 
-    damagePlayer "Aurelia, Exemplar of Justice"
+    combatDamage [] "Aurelia, Exemplar of Justice"
 
     validateLife Opponent 0
 

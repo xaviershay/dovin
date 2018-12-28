@@ -187,8 +187,9 @@ solution = do
 
   step "Attack with Adeliz and initial archer for lethal" $ do
     attackWith ["Adeliz, the Cinder Wind", "Afzocan Archer"]
-    damagePlayer "Adeliz, the Cinder Wind"
-    damagePlayer "Afzocan Archer"
+
+    combatDamage [] "Adeliz, the Cinder Wind"
+    combatDamage [] "Afzocan Archer"
 
     validateLife Opponent 0
 

@@ -1,8 +1,7 @@
 module Solutions.ExplorersOfIxalanContest where
 
-import Control.Monad
-
 import Dovin
+import Dovin.Prelude
 
 -- This solution is not optimal, 130 damage is possible.
 solution :: GameMonad ()
@@ -129,35 +128,26 @@ solution = do
         <> (matchAttribute firststrike `matchOr` matchAttribute doublestrike)
       )
       $ \cn -> do
-        -- Just damage/fight twice rather than double damage. Not technically
-        -- correct, but works for this set of triggers.
-        damagePlayer cn
-        damagePlayer cn
-        damageCard cn lazav
-        damageCard cn lazav
+        damage ((* 2) . view cardPower) (targetCard lazav) cn
+        damage ((* 2) . view cardPower) (targetPlayer Opponent) cn
 
   step "Regular damage from enemies to lazav, doubled from Angrath's, bounced to opponent from Truefire" $ do
     forCards (matchLocation (Opponent, Play) <> matchAttribute "blocking")
       $ \cn -> do
-        -- Just damage/fight twice rather than double damage. Not technically
-        -- correct, but works for this set of triggers.
-        damagePlayer cn
-        damagePlayer cn
-        damageCard lazav cn
-        damageCard cn lazav
-        damageCard cn lazav
+        damage ((* 2) . view cardPower) (targetCard lazav) cn
+        damage (view cardPower) (targetCard cn) lazav
+        damage ((* 2) . view cardPower) (targetPlayer Opponent) cn
 
   step "Regular damage from attackers to player" $ do
     forCards
-      (matchLocation (Active, Play) <> matchAttribute "attacking" <> missingAttribute "blocked")
-      damagePlayer
+      (matchLocation (Active, Play) <> matchAttribute attacking <> missingAttribute "blocked")
+      (combatDamage [])
 
   let sacrificeToSiegeGang = \name -> do
         activate "" "Siege-Gang Commander"
         validate name $ matchAttribute goblin
         sacrifice name
-        -- Should be damage not lose life, but works for now
-        loseLife Opponent 2
+        damage (const 2) (targetPlayer Opponent) "Siege-Gang Commander"
 
   step "Siege-gang all the goblins except Siege-Gang" $ do
     commander <- requireCard "Siege-Gang Commander" mempty

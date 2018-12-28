@@ -1,6 +1,7 @@
 module Solutions.Dominaria5 where
 
 import Dovin
+import Dovin.Prelude
 
 solution :: GameMonad ()
 solution = do
@@ -37,7 +38,7 @@ solution = do
     cast "R" "Mutiny" >> resolveTop
     target "Bonded Horncrest"
     target "Aerial Responder 1"
-    damageCard "Bonded Horncrest" "Aerial Responder 1"
+    damage (view cardPower) (targetCard "Aerial Responder 1") "Bonded Horncrest"
 
   step "Cast Karn, using legend rule to remove the existing one" $ do
     tapForMana "U" "Sulfur Falls 2"
@@ -58,6 +59,9 @@ solution = do
     destroy "Aerial Responder 2"
 
   step "Attack with all for lethal, since Horncrest can't block alone" $ do
+    validate "Aerial Responder 1" $ invert matchInPlay
+    validate "Aerial Responder 2" $ invert matchInPlay
+
     attackWith
       [ "Weldfast Wingsmith"
       , "Storm Fleet Swashbuckler"
@@ -66,11 +70,11 @@ solution = do
 
     forCards
       (matchAttributes [attacking, doublestrike])
-      damagePlayer
+      (combatDamage [])
 
     forCards
       (matchAttributes [attacking])
-      damagePlayer
+      (combatDamage [])
 
     validateLife Opponent 0
 

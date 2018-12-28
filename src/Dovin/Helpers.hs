@@ -94,6 +94,10 @@ matchDamage :: Int -> CardMatcher
 matchDamage n = CardMatcher (show n <> " damage") $
   (==) n . view cardDamage
 
+matchLoyalty :: Int -> CardMatcher
+matchLoyalty n = CardMatcher (show n <> " loyalty") $
+  (==) n . view cardLoyalty
+
 matchPlusOneCounters :: Int -> CardMatcher
 matchPlusOneCounters n = CardMatcher (show n <> " +1/+1 counters") $
   (==) n . view cardPlusOneCounters

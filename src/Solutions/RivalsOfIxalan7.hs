@@ -44,12 +44,14 @@ solution = do
     activate "" "Fanatical Firebrand"
     tap "Fanatical Firebrand"
     sacrifice "Fanatical Firebrand"
+    target "Needletooth Raptor"
 
-    -- TODO: Deal 5 damage instead of just destroying outright
-    destroy "Aerial Responder"
-    validate "Aerial Responder" $ matchLocation (Opponent, Graveyard)
+    trigger "Needletooth Raptor"
+    damage (const 5) (targetCard "Aerial Responder") "Needletooth Raptor"
 
   step "Attack with all, Skinshifter as Tah-Crop and exerting Tah-Crop" $ do
+    validate "Aerial Responder" $ invert matchInPlay
+
     attackWith
       [ "Tah-Crop Elite"
       , "Rowdy Crew"
@@ -67,20 +69,14 @@ solution = do
 
   fork
     [ step "No spire, block out ground damage" $ do
-        gainAttribute blocked "Needletooth Raptor"
-        gainAttribute blocked "Rowdy Crew"
+        combatDamage [] "Tah-Crop Elite"
+        combatDamage [] "Tilonalli's Skinshifter"
+        combatDamage ["Bellowing Aegisaur 1"] "Rowdy Crew"
+        combatDamage ["Bellowing Aegisaur 2"] "Needletooth Raptor"
 
-        damagePlayer "Tah-Crop Elite"
-        damagePlayer "Tilonalli's Skinshifter"
-        -- TODO: Support trample properly
-        modifyStrength (-5, 0) "Rowdy Crew"
-        damagePlayer "Rowdy Crew"
         validateLife Opponent 0
 
     , step "Spire one of the flyers, sure strike pushes through damage" $ do
-        gainAttribute blocked "Needletooth Raptor"
-        gainAttribute blocked "Rowdy Crew"
-
         tap "Spires of Orcaza"
         untap "Tah-Crop Elite"
         loseAttribute attacking "Tah-Crop Elite"
@@ -90,12 +86,12 @@ solution = do
         cast "1R" "Sure Strike" >> resolveTop
         target "Tilonalli's Skinshifter"
         modifyStrength (3, 0) "Tilonalli's Skinshifter"
-        damagePlayer "Tilonalli's Skinshifter"
-        -- TODO: Support trample properly
-        modifyStrength (-5, 0) "Rowdy Crew"
-        damagePlayer "Rowdy Crew"
-        validateLife Opponent 0
 
+        combatDamage [] "Tilonalli's Skinshifter"
+        combatDamage ["Bellowing Aegisaur 1"] "Rowdy Crew"
+        combatDamage ["Bellowing Aegisaur 2"] "Needletooth Raptor"
+
+        validateLife Opponent 0
     ]
 
 

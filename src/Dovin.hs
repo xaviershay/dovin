@@ -142,12 +142,6 @@ modifyStrength (x, y) cn = do
 
   when (view cardToughness c <= 0) $ removeFromPlay cn
 
-damagePlayer cn = do
-  c <- requireCard cn matchInPlay
-  modifying
-    (life . at Opponent . non 0)
-    (\x -> x - view cardPower c)
-
 -- TODO: Better name (resolveMentor?), check source has mentor attribute
 triggerMentor sourceName targetName = do
   source <- requireCard sourceName $ matchAttribute attacking
@@ -184,27 +178,6 @@ fight x y = do
       when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
         destroy (view cardName cy)
 
-damageCard :: CardName -> CardName -> GameMonad ()
-damageCard sourceName destName = do
-  source <- requireCard sourceName (matchAttribute creature)
-  dest   <- requireCard destName   (matchAttribute creature)
-
-  let dmg = max 0 $ view cardPower source
-
-  modifyCard destName cardDamage (+ dmg)
-
-  when (hasAttribute lifelink source) $
-    do
-      let owner = fst . view location $ source
-      modifying (life . at owner . non 0) (+ dmg)
-
-  dest <- requireCard destName (matchAttribute creature)
-
-  -- TODO: Why isn't indestructible check working?
-  -- TODO: Move this in to a state-based check?
-  when (not (hasAttribute indestructible dest) && (view cardDamage dest >= view cardToughness dest || (dmg > 0 && hasAttribute deathtouch source ))) $
-    destroy destName
-
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
   modifying
@@ -232,20 +205,6 @@ activatePlaneswalker loyalty cn = do
 
 -- HIGH LEVEL FUNCTIONS
 --
--- A proof consists on multiple steps. Each step is a human-readable
--- description, then a definition of that step using actions. If a step fails,
--- no subsequent steps will be run.
-step :: String -> GameMonad () -> GameMonad ()
-step desc m = do
-  b <- get
-  let (e, b', _) = runMonad b m
-
-  tell [(desc, b')]
-  put b'
-
-  case e of
-    Left x -> throwError x
-    Right _ -> return ()
 
 fork :: [GameMonad ()] -> GameMonad ()
 fork options = do

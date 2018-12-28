@@ -39,7 +39,7 @@ import Dovin.Types
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
-  template <- ask
+  template <- view envTemplate
   validateRemoved name
   modifying cards (M.insert name (BaseCard $ set cardName name template))
 
@@ -50,12 +50,12 @@ addArtifact :: CardName -> GameMonad ()
 addArtifact name = withAttribute artifact $ addEnchantment name
 
 addCreature :: (Int, Int) -> CardName -> GameMonad ()
-addCreature strength name = local (set cardStrength $ mkStrength strength)
+addCreature strength name = local (set (envTemplate . cardStrength) $ mkStrength strength)
   $ withAttribute creature
   $ addCard name
 
 addPlaneswalker :: Int -> CardName -> GameMonad ()
-addPlaneswalker loyalty name = local (set cardLoyalty loyalty)
+addPlaneswalker loyalty name = local (set (envTemplate . cardLoyalty) loyalty)
   $ withAttribute planeswalker
   $ addCard name
 
@@ -86,11 +86,12 @@ withAttribute attr = withAttributes [attr]
 withAttributes :: [String] -> GameMonad () -> GameMonad ()
 withAttributes attrs =
   let f = S.union . S.fromList $ attrs in
-  local (over cardAttributes f . over cardDefaultAttributes f)
+  local (over (envTemplate . cardAttributes) f
+       . over (envTemplate . cardDefaultAttributes) f)
 
 -- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
-withLocation loc = local (set location loc)
+withLocation loc = local (set (envTemplate . cardLocation) loc)
 
 -- | Add an effect to the created card.
 withEffect ::
@@ -102,8 +103,8 @@ withEffect ::
  -> GameMonad ()
  -> GameMonad ()
 withEffect applyCondition filter action =
-  local (over cardEffects (mkEffect applyCondition filter action:))
+  local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()
-withPlusOneCounters = local . set cardPlusOneCounters
+withPlusOneCounters = local . set (envTemplate . cardPlusOneCounters)

@@ -24,6 +24,8 @@ creature :: CardAttribute
 creature = "creature"
 deathtouch :: CardAttribute
 deathtouch = "deathtouch"
+deathtouched :: CardAttribute
+deathtouched = "deathtouched"
 doublestrike :: CardAttribute
 doublestrike = "doublestrike"
 enchantment :: CardAttribute

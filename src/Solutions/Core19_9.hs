@@ -106,7 +106,7 @@ solution = do
   step "Activate Aetherflux Reservoir, targeting opponent" $ do
     activate "" "Aetherflux Reservoir"
     loseLife Active 50
-    loseLife Opponent 50
+    damage (const 50) (targetPlayer Opponent) "Aetherflux Reservoir"
     validateLife Opponent 0
 
 matchPowerstones = matchName "Powerstone Shard 1"

@@ -144,7 +144,7 @@ solution = do
   step "Deal damage. Emrakul returns with undying" $ do
     forCards
       (matchLocation (Active, Play) <> matchAttribute "attacking" <> missingAttribute "blocked")
-      damagePlayer
+      (combatDamage [])
 
     fight "Emrakul, the Aeons Torn" "Marit Large"
 
@@ -163,8 +163,7 @@ solution = do
 
     targetInLocation (Active, Graveyard) "Mikaeus, the Unhallowed"
     returnToHand "Mikaeus, the Unhallowed"
-    -- TODO: Should be damage
-    loseLife Opponent 6
+    damage (const 6) (targetPlayer Opponent) "Vengeful Rebirth"
 
     validateLife Opponent 0
 

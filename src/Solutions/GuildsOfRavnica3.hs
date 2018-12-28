@@ -42,6 +42,11 @@ solution = do
         addLand (numbered n "Boros Guildgate")
         addLand (numbered n "Gateway Plaza")
 
+    withLocation (Opponent, Play) $ do
+      addCreature (4, 3) "Rekindling Phoenix 1"
+      addCreature (4, 3) "Rekindling Phoenix 2"
+      addCreature (4, 3) "Aurelia, Exemplar of Justice"
+
   step "Cast Hunted Witness and sac it" $ do
     tapForMana "W" "Boros Guildgate 1"
     cast "W" "Hunted Witness"
@@ -112,14 +117,16 @@ solution = do
 
     attackWith ["Roc Charger", "Undercity Necrolisk"]
 
+  let blockers = ["Rekindling Phoenix 1", "Rekindling Phoenix 2"]
+
   fork $
     [ step "Roc is blocked" $ do
-        gainAttribute "blocked" "Roc Charger"
-        damagePlayer "Undercity Necrolisk"
+        combatDamage blockers "Roc Charger"
+        combatDamage [] "Undercity Necrolisk"
         validateLife Opponent 0
     , step "Undercity Necrolisk is blocked" $ do
-        gainAttribute "blocked" "Undercity Necrolisk"
-        damagePlayer "Roc Charger"
+        combatDamage [] "Roc Charger"
+        combatDamage blockers "Undercity Necrolisk"
         validateLife Opponent 0
     ]
 

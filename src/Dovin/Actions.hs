@@ -9,8 +9,9 @@ Actions are /not/ atomic: if one fails, some effects may have already been
 applied.
 -}
 module Dovin.Actions (
+  step
   -- * Casting
-    cast
+  , cast
   , castFromLocation
   , resolve
   , resolveTop
@@ -18,6 +19,8 @@ module Dovin.Actions (
   , tapForMana
   -- * Uncategorized
   , attackWith
+  , combatDamage
+  , damage
   , exert
   , moveTo
   , transitionTo
@@ -28,6 +31,12 @@ module Dovin.Actions (
   , validateLife
   , validatePhase
   , validateRemoved
+  -- * State-based Actions
+  -- | Fine-grained control over when state-based actions are run. By default,
+  -- all actions will 'runStateBasedEffects' on completion, so most of the time
+  -- you don't need to use these functions explicitly.
+  , deferStateBasedActions
+  , runStateBasedActions
   -- * Low-level
   -- | These actions provide low-level control over the game. Where possible,
   -- try to use the more descriptive higher-level actions.
@@ -43,10 +52,19 @@ import           Dovin.Attributes
 import           Dovin.Helpers
 import           Dovin.Prelude
 import           Dovin.Types
+import Dovin.Monad
 
 import qualified Data.HashMap.Strict as M
+import Data.Maybe (listToMaybe)
 
 import Control.Arrow (second)
+import Control.Monad.Reader (local)
+import Control.Monad.State
+import Control.Monad.Writer
+
+action :: String -> GameMonad () -> GameMonad ()
+action name m = m
+
 
 -- | Add mana to your mana pool.
 --
@@ -88,7 +106,7 @@ cast = castFromLocation (Active, Hand)
 --     * Counter 'storm' incremented if card has 'instant' or 'sorcery'
 --       attribute.
 castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
-castFromLocation loc mana name = do
+castFromLocation loc mana name = action "castFromLocation" $ do
   card <- requireCard name mempty
 
   validate name $ matchLocation loc
@@ -153,7 +171,7 @@ resolve expectedName = do
 --     * See 'move' for possible alternate effects, depending on card
 --       attributes.
 resolveTop :: GameMonad ()
-resolveTop = do
+resolveTop = action "resolveTop" $ do
   s <- use stack
 
   case s of
@@ -183,7 +201,7 @@ resolveTop = do
 --
 --   * See 'spendMana' for additional effects.
 splice :: CardName -> ManaString -> CardName -> GameMonad ()
-splice target cost name = do
+splice target cost name = action "splice" $ do
   validate target $ matchAttribute arcane
   validate target (matchLocation (Active, Stack))
     `catchError` const (throwError $ target <> " not on stack")
@@ -258,7 +276,7 @@ transitionToForced newPhase = do
 --     * If card is entering play or changing controller, add 'summoned'
 --       attribute.
 move :: CardLocation -> CardLocation -> CardName -> GameMonad ()
-move from to name = do
+move from to name = action "move" $ do
   c <- requireCard name $ matchLocation from
 
   when (from == to) $
@@ -326,6 +344,138 @@ attackWith cs = do
       (matchName cn <> missingAttribute vigilance)
       tap
     gainAttribute attacking cn
+
+-- | Apply combat damage between an attacker and blockers, using a simple
+-- damage assignment algorithm. For more complex assignments, use 'damage'
+-- directly.
+--
+-- > combatDamage ["Spirit 1", "Spirit 2"] "Angel"
+--
+-- See 'damage' for other validations and effects.
+--
+-- [Validates]
+--
+--   * Attacker has attribute 'attacking'.
+--   * Attacker and blockers are in play.
+--   * Blockers have attribute 'creature'.
+--
+-- [Effects]
+--
+--   * Damage is dealt to blockers in order given, with the final blocker
+--     receiving any left over damage.
+--   * If no blockers, damage is dealt to opponent.
+--   * If attacker has 'trample', any remaining damage is dealt to opponent.
+combatDamage :: [CardName] -> CardName -> GameMonad ()
+combatDamage blockerNames attackerName = do
+  attacker <-
+    requireCard attackerName $ matchInPlay <> matchAttribute attacking
+  blockers <-
+    mapM
+      (\cn -> requireCard cn $ matchInPlay <> matchAttribute creature)
+      blockerNames
+
+  let power = view cardPower attacker
+
+  rem <- foldM (folder attacker) power blockers
+
+  if hasAttribute trample attacker || null blockers then
+    -- Assign leftover damage to opponent
+    damage (const rem) (targetPlayer Opponent) attackerName
+  else
+    -- Assign any leftover damage to final blocker
+    maybe
+      (return ())
+      (\x -> damage
+               (const rem)
+               (targetCard . view cardName $ x)
+               attackerName
+      )
+      (listToMaybe . reverse $ blockers)
+
+  where
+    folder attacker rem blocker = do
+      let blockerName      = view cardName blocker
+      let blockerPower     = view cardPower blocker
+      let blockerToughness = view cardToughness blocker
+      let attackPower = minimum [blockerToughness, rem]
+
+      damage
+        (const attackPower)
+        (targetCard blockerName)
+        attackerName
+
+      damage
+        (const blockerPower)
+        (targetCard attackerName)
+        blockerName
+
+      return $ rem - attackPower
+
+-- | Applies damage from a source to a target.
+--
+-- > damage (const 2) (targetPlayer Opponent) "Shock"
+--
+-- [Validates]
+--
+--   * Source exists.
+--   * Damage is not less than zero.
+--   * If targeting a card, target is in play and is either a creature or a
+--     planeswalker.
+--
+-- [Effects]
+--
+--   * Adds damage to the target.
+--   * If target is a planeswalker, remove loyalty counters instead.
+--   * If source has 'deathtouch' and target is a creature and damage is
+--     non-zero, add 'deathtouched'
+--     attribute to target.
+--   * If source has 'lifelink', controller of source gains life equal to
+--     damage dealt.
+--   * Note 'runStateBasedActions' handles actual destruction (if applicable)
+--     of creatures and planeswalkers.
+damage ::
+     (Card -> Int) -- ^ A function that returns the amount of damage to apply,
+                   -- given the source card.
+  -> Target
+  -> CardName
+  -> GameMonad ()
+damage f t source = action "damage" $ do
+  c <- requireCard source mempty
+
+  let dmg = f c
+
+  when (dmg < 0) $
+    throwError $ "damage must be positive, was " <> show dmg
+
+  damage' dmg t c
+
+  when (hasAttribute lifelink c) $
+    modifying (life . at (fst . view location $ c) . non 0) (+ dmg)
+
+  where
+    damage' dmg (TargetPlayer t) c = do
+      modifying
+        (life . at t . non 0)
+        (\x -> x - dmg)
+
+    damage' dmg (TargetCard tn) c = do
+      t <- requireCard tn $ matchInPlay <>
+             (matchAttribute creature `matchOr` matchAttribute planeswalker)
+
+      when (hasAttribute creature t) $ do
+        modifyCard tn cardDamage (+ dmg)
+
+        when (dmg > 0 && hasAttribute deathtouch c) $
+          gainAttribute deathtouched tn
+
+      when (hasAttribute planeswalker t) $ do
+        modifyCard tn cardLoyalty (\x -> x - dmg)
+
+destroy :: CardName -> GameMonad ()
+destroy targetName = do
+  validate targetName $ matchInPlay <> missingAttribute indestructible
+
+  moveTo Graveyard targetName
 
 -- | Exert a card. Works best when card has an associated effect that applies
 -- when 'exerted' attribute is present.
@@ -519,3 +669,67 @@ validateLife player n = do
       <> show current
       <> ", expected "
       <> show n
+
+-- | Pause running of state-based actions for the duration of the action,
+-- running them at the end.
+deferStateBasedActions :: GameMonad () -> GameMonad ()
+deferStateBasedActions m = do
+  local (set envSBAEnabled False) m
+  runStateBasedActions
+
+-- | Run state-based actions. These include:
+--
+--     * If a creature does not have 'indestructible', and has damage exceeding
+--       toughess or 'deathtouched' attribute, destroy it.
+--
+-- These are run implicitly at the end of each 'step', so it's not usually
+-- needed to call this explicitly. Even then, using 'deferStateBasedActions' is
+-- usually preferred.
+runStateBasedActions :: GameMonad ()
+runStateBasedActions = do
+  enabled <- view envSBAEnabled
+  -- TODO: Loop until no more actions performed
+  when enabled
+    $ local (set envSBAEnabled False)
+    $ do
+        forCards
+          (matchInPlay <> matchAttribute creature)
+          runDamageActions
+
+  -- TODO: Move token handling to SBA
+  --      forCards
+  --        (invert matchInPlay)
+  --        $ \cn -> do
+  --                   c <- requireCard cn mempty
+
+  --                   when (hasAttribute token c) $
+  --                     remove cn
+
+  where
+    runDamageActions cn = do
+      c <- requireCard cn mempty
+
+      let dmg = view cardDamage c
+      let toughness = view cardToughness c
+
+      unless (hasAttribute indestructible c) $
+        when (dmg >= toughness || hasAttribute deathtouched c) $
+          moveTo Graveyard cn
+
+-- | Define a high-level step in the proof. A proof typically consists on
+-- multiple steps. Each step is a human-readable description, then a definition
+-- of that step using actions. If a step fails, no subsequent steps will be
+-- run.  'runStateBasedActions' is implicitly called at the end of each step.
+-- Nested 'step' invocations execute the nested action but have no other
+-- effects - generally they should be avoided.
+step :: String -> GameMonad () -> GameMonad ()
+step desc m = deferStateBasedActions $ do
+  b <- get
+  let (e, b', _) = runMonad b m
+
+  tell [(desc, b')]
+  put b'
+
+  case e of
+    Left x -> throwError x
+    Right _ -> return ()

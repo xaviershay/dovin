@@ -62,11 +62,12 @@ solution = do
 
     gainAttribute "haste" "Rhizome Lurcher"
 
-  step "Attack with Lurcher and Assasin" $ do
+  step "Attack with Lurcher and Assasin, everyone blocks Assasin" $ do
     attackWith ["Rhizome Lurcher", "Ochran Assassin"]
+
     gainAttribute "blocked" "Ochran Assassin"
 
-    damagePlayer "Rhizome Lurcher"
+    combatDamage [] "Rhizome Lurcher"
 
     validateLife Opponent 0
 

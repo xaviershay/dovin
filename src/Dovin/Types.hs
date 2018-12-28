@@ -41,6 +41,14 @@ mkEffect enabled filter action = CardEffect
   , _effectAction = action
   }
 
+-- A target for a spell or ability.
+data Target =
+    TargetPlayer Player -- ^ Target a player, use 'targetPlayer' to construct.
+  | TargetCard CardName -- ^ Target a card, use 'targetCard' to construct.
+
+targetPlayer = TargetPlayer
+targetCard = TargetCard
+
 type CardLocation = (Player, Location)
 type CardAttributes = S.Set CardAttribute
 data CardStrength = CardStrength Int Int deriving (Eq)
@@ -103,12 +111,18 @@ data Board = Board
   , _phase :: Phase
   }
 
-type GameMonad a = (ExceptT String (ReaderT Card (StateT Board (WriterT [(String, Board)] Identity)))) a
+data Env = Env
+  { _envTemplate :: Card
+  , _envSBAEnabled :: Bool
+  }
+
+type GameMonad a = (ExceptT String (ReaderT Env (StateT Board (WriterT [(String, Board)] Identity)))) a
 type Formatter = Board -> String
 
 makeLenses ''Board
 makeLenses ''Card
 makeLenses ''CardEffect
+makeLenses ''Env
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location
@@ -150,6 +164,11 @@ instance Semigroup CardStrength where
 
 instance Monoid CardStrength where
   mempty = CardStrength 0 0
+
+emptyEnv = Env
+  { _envTemplate = emptyCard
+  , _envSBAEnabled = True
+  }
 
 mkStrength (p, t) = CardStrength p t
 emptyCard = mkCard "" (Active, Hand)
