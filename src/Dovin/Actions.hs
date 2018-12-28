@@ -696,44 +696,28 @@ runStateBasedActions = do
   -- TODO: Loop until no more actions performed
   when enabled
     $ local (set envSBAEnabled False)
-    $ do
-        forCards
-          (matchInPlay <> matchAttribute creature)
-          runDamageActions
+    $ forCards mempty $ \cn -> do
+        c <- requireCard cn mempty
 
-        forCards
-          (invert matchInPlay)
-          runTokenActions
+        when (applyMatcher (matchInPlay <> matchAttribute creature) c) $ do
+          let dmg = view cardDamage c
+          let toughness = view cardToughness c
 
-        forCards
-          (invert $
+          unless (hasAttribute indestructible c) $
+            when (dmg >= toughness || hasAttribute deathtouched c) $
+              moveTo Graveyard cn
+
+        when (applyMatcher (invert matchInPlay) c) $
+          when (hasAttribute token c) $
+            remove cn
+
+        let matchStack =
                 matchLocation (Active, Stack)
              <> matchLocation (Opponent, Stack)
-          )
-          runCopyActions
 
-  where
-    runTokenActions cn = do
-      c <- requireCard cn mempty
-
-      when (hasAttribute token c) $
-        remove cn
-
-    runCopyActions cn = do
-      c <- requireCard cn mempty
-
-      when (hasAttribute copy c) $
-        remove cn
-
-    runDamageActions cn = do
-      c <- requireCard cn mempty
-
-      let dmg = view cardDamage c
-      let toughness = view cardToughness c
-
-      unless (hasAttribute indestructible c) $
-        when (dmg >= toughness || hasAttribute deathtouched c) $
-          moveTo Graveyard cn
+        when (applyMatcher (invert matchStack) c) $
+          when (hasAttribute copy c) $
+            remove cn
 
 -- | Define a high-level step in the proof. A proof typically consists on
 -- multiple steps. Each step is a human-readable description, then a definition
