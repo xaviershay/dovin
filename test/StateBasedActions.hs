@@ -34,4 +34,11 @@ test_SBAs = testGroup "state-based actions"
            $ addArtifact "Treasure"
 
        validateRemoved "Treasure"
+   , prove "removes copies not on stack" $ do
+       withStateBasedActions $ do
+         withLocation (Active, Graveyard)
+           $ withAttribute copy
+           $ addArtifact "Shock"
+
+       validateRemoved "Shock"
   ]

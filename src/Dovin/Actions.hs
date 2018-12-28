@@ -259,13 +259,14 @@ transitionToForced newPhase = do
 --     * Destination does not match source.
 --     * If card has 'token' attribute, source is in play. (Removing token once
 --       they have left play is handled by 'runStateBasedActions'.)
+--     * If card has 'copy' attribute, source is the stack. (Removing token
+--       once they have left play is handled by 'runStateBasedActions'.)
 --
 -- [Effects]:
 --
 --     * Card moved to destination location.
 --     * If card is leaving play, remove all damage, counters, and gained
 --       attributes.
---     * If card has 'copy' attribute, remove from game instead.
 --     * If card has 'exileWhenLeaveStack' attribute, move to exile and remove
 --       'exileWhenLeaveStack' instead.
 --     * If card has 'undying', is moving from play to graveyard, and has no
@@ -288,6 +289,9 @@ move from to name = action "move" $ do
   when (hasAttribute token c && snd from /= Play) $
     throwError "cannot move token from non-play location"
 
+  when (hasAttribute copy c && snd from /= Stack) $
+    throwError "cannot move copy from non-stack location"
+
   when (snd from == Stack) $
     modifying stack (filter (/= name))
 
@@ -301,9 +305,7 @@ move from to name = action "move" $ do
 
   -- These conditionals are acting on the card state _before_ any of the above
   -- changes were applied.
-  if hasAttribute copy c then
-    remove name
-  else if hasAttribute exileWhenLeaveStack c then
+  if hasAttribute exileWhenLeaveStack c then
     do
       loseAttribute exileWhenLeaveStack name
       moveTo Exile name
@@ -683,6 +685,7 @@ withStateBasedActions m = do
 --     * If a creature does not have 'indestructible', and has damage exceeding
 --       toughess or 'deathtouched' attribute, destroy it.
 --     * If a card is a 'token' and is not in play, remove it.
+--     * If a card is a 'copy' and is not on the stack, remove it.
 --
 -- These are run implicitly at the end of each 'step', so it's not usually
 -- needed to call this explicitly. Even then, using 'withStateBasedActions' is
@@ -698,16 +701,28 @@ runStateBasedActions = do
           (matchInPlay <> matchAttribute creature)
           runDamageActions
 
-  -- TODO: Move token handling to SBA
         forCards
           (invert matchInPlay)
           runTokenActions
+
+        forCards
+          (invert $
+                matchLocation (Active, Stack)
+             <> matchLocation (Opponent, Stack)
+          )
+          runCopyActions
 
   where
     runTokenActions cn = do
       c <- requireCard cn mempty
 
       when (hasAttribute token c) $
+        remove cn
+
+    runCopyActions cn = do
+      c <- requireCard cn mempty
+
+      when (hasAttribute copy c) $
         remove cn
 
     runDamageActions cn = do

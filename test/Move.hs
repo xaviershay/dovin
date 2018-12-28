@@ -8,13 +8,6 @@ test_Move = testGroup "move/moveTo"
       move (Active, Hand) (Active, Exile) "Forest"
 
       validate "Forest" $ matchLocation (Active, Exile)
-  , prove "does not allow spell copies to move off the stack" $ do
-      withAttribute copy
-        $ withLocation (Active, Stack)
-        $ addInstant "Shock"
-
-      move (Active, Stack) (Active, Graveyard) "Shock"
-      validateRemoved "Shock"
   , prove "exiles jumpstart'ed cards" $ do
       withLocation (Active, Stack) $ addInstant "Chemister's Insight"
       gainAttribute exileWhenLeaveStack "Chemister's Insight"
@@ -98,4 +91,13 @@ test_Move = testGroup "move/moveTo"
           $ addArtifact "Treasure"
 
         move (Active, Graveyard) (Active, Play) "Treasure"
+  , refute
+      "cannot move copy from non-stack location"
+      "cannot move copy from non-stack location" $ do
+        withLocation (Active, Hand) $ addInstant "Shock"
+
+        cast "" "Shock"
+        copySpell "Shock" "Shock 1" >> resolveTop
+
+        move (Active, Graveyard) (Active, Play) "Shock 1"
   ]
