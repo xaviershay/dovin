@@ -132,7 +132,7 @@ attributes = attributeFormatter $ do
                   <> matchInPlay
                   <> matchController Active
                   )
-                <*> countManaPool
+                <*> countManaPool Active
     powerstones <- countCards matchPowerstones
     untapped    <- countCards $ matchPowerstones <> missingAttribute tapped
     return $ normal + (powerstones * untapped)

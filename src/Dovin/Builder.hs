@@ -21,6 +21,7 @@ module Dovin.Builder (
   -- * Fluid interface
   -- | These methods can be chained together to specify different properties of
   -- the card to be created.
+  , as
   , withAttribute
   , withAttributes
   , withEffect
@@ -74,6 +75,10 @@ addLands n name = withAttribute land $
 
 addSorcery :: CardName -> GameMonad ()
 addSorcery name = withAttribute sorcery $ addCard name
+
+-- | Perform action as the specified player.
+as :: Player -> GameMonad () -> GameMonad ()
+as player = local (set envActor player)
 
 -- | Add an attribute to the created card, as identified by a string.
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are

@@ -92,6 +92,6 @@ countCards :: CardMatcher -> GameMonad Int
 countCards matcher =
   length . filter (applyMatcher matcher) <$> allCards
 
-countManaPool :: GameMonad Int
-countManaPool =
-  length <$> use manaPool
+countManaPool :: Player -> GameMonad Int
+countManaPool p = do
+  length <$> use (manaPoolFor p)

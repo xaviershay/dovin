@@ -66,8 +66,7 @@ import Control.Lens
 action :: String -> GameMonad () -> GameMonad ()
 action name m = m
 
-
--- | Add mana to your mana pool.
+-- | Add mana to actor's mana pool.
 --
 -- > addMana "2RG"
 --
@@ -79,13 +78,18 @@ action name m = m
 --
 --   * Mana pool is increased.
 addMana :: ManaString -> GameMonad ()
-addMana amount =
+addMana amount = do
+  p <- view envActor
+
   modifying
-    manaPool
+    (manaPoolFor p)
     (parseMana amount <>)
 
--- | Casts a card from hand. See 'castFromLocation' for specification.
-cast = castFromLocation (Active, Hand)
+-- | Casts a card from actor's hand. See 'castFromLocation' for specification.
+cast :: ManaPool -> CardName -> GameMonad ()
+cast mana cn = do
+  actor <- view envActor
+  castFromLocation (actor, Hand) mana cn
 
 -- | Move a card to the stack, spending the specified mana. If not tracking
 -- mana, use the empty string to cast for no mana. Typically you will want to
@@ -113,7 +117,7 @@ castFromLocation loc mana name = action "castFromLocation" $ do
   validate name $ matchLocation loc
   unless (hasAttribute instant card) validateCanCastSorcery
 
-  modifyCard name location $ const (view cardOwner card, Stack)
+  modifyCard name (location . _2) $ const Stack
 
   card <- requireCard name mempty
 
@@ -203,10 +207,12 @@ resolveTop = action "resolveTop" $ do
 --   * See 'spendMana' for additional effects.
 splice :: CardName -> ManaString -> CardName -> GameMonad ()
 splice target cost name = action "splice" $ do
+  actor <- view envActor
+
   validate target $ matchAttribute arcane
-  validate target (matchLocation (Active, Stack))
+  validate target (matchLocation (actor, Stack))
     `catchError` const (throwError $ target <> " not on stack")
-  validate name (matchLocation (Active, Hand))
+  validate name (matchLocation (actor, Hand))
     `catchError` const (throwError $ name <> " not in hand")
   spendMana cost
 
@@ -315,7 +321,6 @@ move from to name = action "move" $ do
   else
     modifyCard name location (const to)
 
-
 -- | Start an attack with the given creatures.
 --
 -- > attackWith ["Fanatical Firebrand"]
@@ -361,18 +366,22 @@ attackWith cs = do
 --
 --   * Attacker has attribute 'attacking'.
 --   * Attacker and blockers are in play.
+--   * Attacker controlled by current actor.
 --   * Blockers have attribute 'creature'.
 --
 -- [Effects]
 --
 --   * Damage is dealt to blockers in order given, with the final blocker
 --     receiving any left over damage.
---   * If no blockers, damage is dealt to opponent.
---   * If attacker has 'trample', any remaining damage is dealt to opponent.
+--   * If no blockers, damage is dealt to opposing player.
+--   * If attacker has 'trample', any remaining damage is dealt to opposing
+--     player.
 combatDamage :: [CardName] -> CardName -> GameMonad ()
 combatDamage blockerNames attackerName = do
-  attacker <-
-    requireCard attackerName $ matchInPlay <> matchAttribute attacking
+  actor <- view envActor
+  attacker <- requireCard attackerName
+    $ matchInPlay <> matchAttribute attacking <> matchController actor
+
   blockers <-
     mapM
       (\cn -> requireCard cn $ matchInPlay <> matchAttribute creature)
@@ -384,7 +393,7 @@ combatDamage blockerNames attackerName = do
 
   if hasAttribute trample attacker || null blockers then
     -- Assign leftover damage to opponent
-    damage (const rem) (targetPlayer Opponent) attackerName
+    damage (const rem) (targetPlayer . opposing $ actor) attackerName
   else
     -- Assign any leftover damage to final blocker
     maybe
@@ -548,10 +557,11 @@ remove cn = do
 spendMana :: ManaString -> GameMonad ()
 spendMana amount =
   forM_ (parseMana amount) $ \mana -> do
-    pool <- use manaPool
+    actor <- view envActor
+    pool <- use $ manaPoolFor actor
     if mana == 'X' && (not . null $ pool) || mana `elem` pool then
       modifying
-        manaPool
+        (manaPoolFor actor)
         (deleteFirst (if mana == 'X' then const True else (==) mana))
     else
       throwError $ "Mana pool (" <> pool <> ") does not contain (" <> [mana] <> ")"

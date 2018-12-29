@@ -50,12 +50,15 @@ whenMatch name f action = do
 -- library monad.
 
 jumpstart mana discardName castName = do
+  actor <- view envActor
   spendMana mana
   discard discardName
-  castFromLocation (Active, Graveyard) "" castName
+  castFromLocation (actor, Graveyard) "" castName
   gainAttribute exileWhenLeaveStack castName
 
-discard = move (Active, Hand) (Active, Graveyard)
+discard cn = do
+  actor <- view envActor
+  move (actor, Hand) (actor, Graveyard) cn
 
 target targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute hexproof)
@@ -76,6 +79,9 @@ trigger targetName = do
 
 activate mana targetName = do
   card <- requireCard targetName mempty
+  actor <- view envActor
+
+  validate targetName $ matchController actor
 
   spendMana mana
 
@@ -86,7 +92,12 @@ destroy targetName = do
 
   removeFromPlay targetName
 
-sacrifice = removeFromPlay
+sacrifice cn = do
+  actor <- view envActor
+
+  validate cn $ matchController actor
+
+  removeFromPlay cn
 
 removeFromPlay cardName = do
   card <- requireCard cardName matchInPlay
@@ -190,12 +201,20 @@ loseLife player amount = gainLife player (-amount)
 setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
 
-returnToHand = move (Active, Graveyard) (Active, Hand)
-returnToPlay = move (Active, Graveyard) (Active, Play)
+returnToHand cn = do
+  actor <- view envActor
+  move (actor, Graveyard) (actor, Hand) cn
+
+returnToPlay cn = do
+  actor <- view envActor
+  move (actor, Graveyard) (actor, Play) cn
 
 activatePlaneswalker :: Int -> CardName -> GameMonad ()
 activatePlaneswalker loyalty cn = do
   c <- requireCard cn matchInPlay
+  actor <- view envActor
+
+  validate cn $ matchController actor
 
   if view cardLoyalty c - loyalty < 0 then
     throwError $ cn <> " does not have enough loyalty"

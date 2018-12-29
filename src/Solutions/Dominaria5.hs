@@ -86,7 +86,7 @@ attributes = attributeFormatter $ do
               <> missingAttribute "tapped"
               <> matchController Active
               )
-        <*> countManaPool
+        <*> countManaPool Active
 formatter 1 = boardFormatter
 formatter 3 = attributes
   <> cardFormatter

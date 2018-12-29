@@ -3,7 +3,7 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', makeLenses, over, view, _1)
+import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _Just, at, non)
 import Control.Monad.Reader (ReaderT)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
@@ -107,13 +107,14 @@ data Board = Board
   -- In theory, life could be just another counter. Need to think more about
   -- making that happen.
   , _life :: M.HashMap Player Int
-  , _manaPool :: ManaPool
+  , _manaPool :: M.HashMap Player ManaPool
   , _phase :: Phase
   }
 
 data Env = Env
   { _envTemplate :: Card
   , _envSBAEnabled :: Bool
+  , _envActor :: Player
   }
 
 type GameMonad a = (ExceptT String (ReaderT Env (StateT Board (WriterT [(String, Board)] Identity)))) a
@@ -148,6 +149,14 @@ cardToughness f parent = fmap
     setToughness t (CardStrength p _) = CardStrength p t
     toughness (CardStrength _ t) = t
 
+
+manaPoolFor p = manaPool . at p . non mempty
+
+-- I can't figure out the right type signature for manaPoolFor, so instead
+-- providing this function to make it inferrable.
+_manaPoolForTyping :: Board -> ManaPool
+_manaPoolForTyping = view (manaPoolFor Active)
+
 instance Show CardMatcher where
   show _ = "<matcher>"
 
@@ -168,6 +177,7 @@ instance Monoid CardStrength where
 emptyEnv = Env
   { _envTemplate = emptyCard
   , _envSBAEnabled = True
+  , _envActor = Active
   }
 
 mkStrength (p, t) = CardStrength p t
@@ -184,3 +194,7 @@ mkCard name location =
     , _cardEffects = mempty
     , _cardPlusOneCounters = 0
     }
+
+opposing :: Player -> Player
+opposing Active = Opponent
+opposing Opponent = Active

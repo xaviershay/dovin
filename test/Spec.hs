@@ -12,8 +12,14 @@ test_Test = testGroup "Actions"
         addMana "B"
         castFromLocation (Active, Hand) "B" "Zombie"
         validate "Zombie" $ matchLocation (Active, Stack)
-        validateBoardEquals manaPool mempty
-
+        validateBoardEquals (manaPoolFor Active) mempty
+    , prove "can cast as opponent" $ do
+        as Opponent $ do
+          withLocation (Opponent, Hand) $ addCreature (1, 1) "Zombie"
+          addMana "B"
+          castFromLocation (Opponent, Hand) "B" "Zombie"
+          validate "Zombie" $ matchLocation (Opponent, Stack)
+          validateBoardEquals (manaPoolFor Opponent) mempty
     , refute
         "requires card to be in hand"
         "Zombie does not match requirements: in location (Active,Hand)" $ do
@@ -26,7 +32,7 @@ test_Test = testGroup "Actions"
         addMana "B"
         castFromLocation (Active, Graveyard) "B" "Zombie"
         validate "Zombie" $ matchLocation (Active, Stack)
-        validateBoardEquals manaPool mempty
+        validateBoardEquals (manaPoolFor Active) mempty
 
     , refute
         "requires mana be available"
@@ -73,15 +79,15 @@ test_Test = testGroup "Actions"
     [ prove "removes colored mana from pool" $ do
         addMana "BBRRRWW"
         spendMana "RB"
-        validateBoardEquals manaPool "BRRWW"
+        validateBoardEquals (manaPoolFor Active) "BRRWW"
     , prove "removes colorless mana from pool" $ do
         addMana "RWB"
         spendMana "3"
-        validateBoardEquals manaPool mempty
+        validateBoardEquals (manaPoolFor Active) mempty
     , prove "removes colored mana before colorless" $ do
         addMana "RWB"
         spendMana "1R"
-        validateBoardEquals manaPool "W"
+        validateBoardEquals (manaPoolFor Active) "W"
     , refute
         "requires sufficient mana (colorless)"
         "Mana pool () does not contain (X)" $ do
@@ -100,7 +106,7 @@ test_Test = testGroup "Actions"
   , testGroup "addMana"
     [ prove "adds mana to pool" $ do
         addMana "2RG"
-        validateBoardEquals manaPool "GRXX"
+        validateBoardEquals (manaPool . at Active . _Just) "GRXX"
     ]
   , testGroup "tap"
     [ prove "taps card in play" $ do
@@ -134,7 +140,7 @@ test_Test = testGroup "Actions"
         tapForMana "G" "Forest"
 
         validate "Forest" $ matchAttribute tapped
-        validateBoardEquals manaPool "G"
+        validateBoardEquals (manaPoolFor Active) "G"
     ]
   , testGroup "transitionTo"
     [ prove "moves to new state" $ do
@@ -235,7 +241,21 @@ test_Test = testGroup "Actions"
 
         validate "Glacial Ray" $ matchLocation (Active, Hand)
         validateBoardEquals stack mempty
-        validateBoardEquals manaPool mempty
+        validateBoardEquals (manaPoolFor Active) mempty
+    , prove "can splice as opponent" $ do
+        withLocation (Opponent, Hand) $ do
+          addInstant "Glacial Ray"
+          withAttribute arcane $ addInstant "Lava Spike"
+
+        as Opponent $ do
+          addMana "RRR"
+          cast "R" "Lava Spike"
+          splice "Lava Spike" "1R" "Glacial Ray"
+          resolveTop
+
+          validate "Glacial Ray" $ matchLocation (Opponent, Hand)
+          validateBoardEquals stack mempty
+          validateBoardEquals (manaPoolFor Opponent) mempty
     , refute
       "requires arcane"
       "has attribute arcane" $ do

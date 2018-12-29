@@ -3,22 +3,19 @@ module Solutions.UltimateMasters where
 import Control.Lens (over)
 import Control.Monad
 
-import Dovin
+import Dovin.V2
 
 sacrificeToAltar mana name = do
   activate "" "Phrexian Altar"
   sacrifice name
   addMana mana
 
--- Proof-of-concept API for acting as opponent, doesn't actually do anything.
-as player m = m
-
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
     setLife Opponent 20
 
-    withLocation (Active, Hand) $ do
+    withLocation Hand $ do
       addInstant "Through the Breach"
       withAttribute arcane $ addInstant "Goryo's Vengeance"
       addSorcery "Reanimate"
@@ -26,7 +23,7 @@ solution = do
       addCreature (2, 5) "Stingerfling Spider"
       addCreature (15, 15) "Emrakul, the Aeons Torn"
 
-    withLocation (Active, Play) $ do
+    withLocation Play $ do
       addPlaneswalker 3 "Liliana of the Veil"
       addArtifact "Phrexian Altar"
       addArtifact "Engineered Explosives"
@@ -44,20 +41,21 @@ solution = do
             (pure . over cardStrength (mkStrength (1, 1) <>) . setAttribute undying)
         $ addCreature (5, 5) "Mikaeus, the Unhallowed"
 
-    withLocation (Opponent, Play) $ do
-      addLands 7 "Plains"
-      addLands 2 "Forest"
+    as Opponent $ do
+      withLocation Play $ do
+        addLands 7 "Plains"
+        addLands 2 "Forest"
 
-      addLand "Dark Depths"
+        addLand "Dark Depths"
 
-      withAttribute flying $ do
-        addCreature (4, 6) "Reya Dawnbringer"
-        addCreature (4, 3) "Sublime Archangel"
-        withAttribute legendary
-          $ addCreature (5, 5) "Sigarda, Host of Herons"
+        withAttribute flying $ do
+          addCreature (4, 6) "Reya Dawnbringer"
+          addCreature (4, 3) "Sublime Archangel"
+          withAttribute legendary
+            $ addCreature (5, 5) "Sigarda, Host of Herons"
 
-    withLocation (Opponent, Graveyard) $ do
-      addEnchantment "Bridge from Below"
+      withLocation Graveyard $ do
+        addEnchantment "Bridge from Below"
 
   step "Sac Vengevine and Reanimate with the created mana, exiling Bridge" $ do
     sacrificeToAltar "B" "Vengevine"
@@ -131,19 +129,25 @@ solution = do
       , "Stingerfling Spider"
       ]
 
-  step "Assume opponent activates Dark Depths to block Emrakul in response to Annihilator trigger" $ do
+  step "Assume opponent activates Dark Depths to block Emrakul in response to Annihilator trigger, then annihilates lands" $ do
     as Opponent $ do
-      forM_ [1..7] $ \n -> tap (numbered n "Plains")
-      forM_ [1..2] $ \n -> tap (numbered n "Forest")
-      withLocation (Opponent, Play)
+      forM_ [1..7] $ \n -> tapForMana "W" (numbered n "Plains")
+      forM_ [1..2] $ \n -> tapForMana "G" (numbered n "Forest")
+      activate "3" "Dark Depths"
+      activate "3" "Dark Depths"
+      activate "3" "Dark Depths"
+      sacrifice "Dark Depths"
+      withLocation Play
         $ withAttributes [indestructible, flying, token]
         $ addCreature (20, 20) "Marit Large"
+
+      forM_ [1..6] $ \n -> sacrifice (numbered n "Plains")
 
     gainAttribute "blocked" "Emrakul, the Aeons Torn"
 
   step "Deal damage. Emrakul returns with undying" $ do
     forCards
-      (matchLocation (Active, Play) <> matchAttribute "attacking" <> missingAttribute "blocked")
+      (matchLocation (Active, Play) <> matchAttribute attacking <> missingAttribute "blocked")
       (combatDamage [])
 
     fight "Emrakul, the Aeons Torn" "Marit Large"
@@ -173,7 +177,7 @@ manaAttribute = attributeFormatter $ attribute "mana" $
             <> missingAttribute "tapped"
             <> matchController Active
             )
-      <*> countManaPool
+      <*> countManaPool Active
 formatter 1 = boardFormatter
 formatter 3 = manaAttribute
   <> cardFormatter

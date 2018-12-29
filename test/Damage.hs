@@ -127,6 +127,12 @@ test_CombatDamage = testGroup "combatDamage"
       attackWith ["Angel"]
       combatDamage ["Spirit"] "Angel"
       validateLife Active 4
+  , prove "deals damage to opposing player of actor" $ do
+      as Opponent $ do
+        withLocation (Opponent, Play) $ addCreature (4, 4) "Angel"
+        attackWith ["Angel"]
+        combatDamage [] "Angel"
+        validateLife Active (-4)
   , refute
       "requires attacking creature"
       "has attribute attacking" $ do
@@ -145,4 +151,10 @@ test_CombatDamage = testGroup "combatDamage"
         withLocation (Opponent, Graveyard) $ addCreature (1, 1) "Spirit"
         gainAttribute attacking "Angel"
         combatDamage ["Spirit"] "Angel"
+  , refute
+      "requires control of attacking creature"
+      "has controller Opponent" $ do
+        withLocation (Active, Play) $ addCreature (4, 4) "Angel"
+        attackWith ["Angel"]
+        as Opponent $ combatDamage [] "Angel"
   ]
