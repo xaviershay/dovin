@@ -1,24 +1,25 @@
 module Solutions.Example where
 
-import Dovin
+import Dovin.V2
 
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
     setLife Opponent 3
 
-    withLocation (Active, Hand) $ addInstant "Plummet"
-    withLocation (Active, Play) $ do
+    withLocation Hand $ addInstant "Plummet"
+    withLocation Play $ do
       addLands 2 "Forest"
 
-    withLocation (Opponent, Play) $ do
-      withAttributes [flying, token] $ addCreature (4, 4) "Angel"
-      withAttributes [flying]
-        $ withEffect
-            matchInPlay
-            (matchOtherCreatures <> (const $ matchAttribute creature))
-            (pure . setAttribute hexproof)
-        $ addCreature (3, 4) "Shalai, Voice of Plenty"
+    as Opponent $ do
+      withLocation Play $ do
+        withAttributes [flying, token] $ addCreature (4, 4) "Angel"
+        withAttributes [flying]
+          $ withEffect
+              matchInPlay
+              (matchOtherCreatures <> (const $ matchAttribute creature))
+              (pure . setAttribute hexproof)
+          $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
   step "Plummet to destroy Shalai" $ do
     tapForMana "G" (numbered 1 "Forest")
@@ -27,7 +28,7 @@ solution = do
     resolve "Plummet"
     with "Shalai, Voice of Plenty" $ \enemy -> do
       target enemy
-      validate enemy $ matchAttribute flying
+      validate (matchAttribute flying) enemy
       destroy enemy
 
 formatter :: Int -> Formatter

@@ -21,14 +21,16 @@ them as you would in a real game of paper magic.
 
 I've only added actions "as needed" to solve problems, so the built-in
 functions are rather incomplete right now. It is straightforward to add more
-though. See `src/Dovin.hs` and `src/Dovin/Actions.hs` for available actions.
+though. See `src/Dovin/V2.hs` in conjuction with `src/Dovin/Actions.hs` for
+supported and tested actions, and `src/Dovin.hs` for untested experimental
+ones.
 
 ## Example
 
 ``` haskell
 module Solutions.Example where
 
-import Dovin
+import Dovin.V2
 
 main = run formatter solution
 
@@ -37,18 +39,19 @@ solution = do
   step "Initial state" $ do
     setLife Opponent 3
 
-    withLocation (Active, Hand) $ addInstant "Plummet"
-    withLocation (Active, Play) $ do
+    withLocation Hand $ addInstant "Plummet"
+    withLocation Play $ do
       addLands 2 "Forest"
 
-    withLocation (Opponent, Play) $ do
-      withAttributes [flying, token] $ addCreature (4, 4) "Angel"
-      withAttributes [flying]
-        $ withEffect
-            matchInPlay
-            (matchOtherCreatures <> (const $ matchAttribute creature))
-            (pure . setAttribute hexproof)
-        $ addCreature (3, 4) "Shalai, Voice of Plenty"
+    as Opponent $ do
+      withLocation Play $ do
+        withAttributes [flying, token] $ addCreature (4, 4) "Angel"
+        withAttributes [flying]
+          $ withEffect
+              matchInPlay
+              (matchOtherCreatures <> (const $ matchAttribute creature))
+              (pure . setAttribute hexproof)
+          $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
   step "Plummet to destroy Shalai" $ do
     tapForMana "G" (numbered 1 "Forest")
@@ -57,7 +60,7 @@ solution = do
     resolve "Plummet"
     with "Shalai, Voice of Plenty" $ \enemy -> do
       target enemy
-      validate enemy $ matchAttribute flying
+      validate (matchAttribute flying) enemy
       destroy enemy
 
 formatter :: Int -> Formatter
@@ -86,8 +89,28 @@ manaFormatter = attributeFormatter $ do
           opponent creatures:
             Angel (creature,flying,token) (4/4, 0)
 
+## Solutions Index
+
 See `src/Solutions` for more extensive usage (spoiler alert: these are
 solutions for published Possibility Storm puzzles!)
+
+* `src/Solutions/Dominaria5.hs` uses a planeswalker.
+* `src/Solutions/RivalsOfIxalan7.hs` uses `withEffect` to model `exert`
+  effects, and shows how to verify multiple blocking scenarios.
+* `src/Solutions/Core19_9.hs` has a fancy formatter to correctly track how much
+  mana is available when working with `Powerstone Shard`, as well as spell
+  tracking for `Aetherflux Reservoir`.
+* `src/Solutions/GuildsOfRavnicaPre2.hs` uses `forCards` to model undergrowth
+  for a `Rhizome Lurcher`.
+* `src/Solutions/GuildsOfRavnica1.hs` uses `mentor`.
+* `src/Solutions/GuildsOfRavnica3.hs` uses a sacrifice wrapper to repeatedly
+  create treasure tokens.
+* `src/Solutions/GuildsOfRavnica8.hs` shows using counters to correctly track
+  `Muldrotha, the Gravetide` usage.
+* `src/Solutions/GuildsOfRavnica9.hs` handles `storm`.
+* `src/Solutions/ExplorersOfIxalanContest.hs` handles some pretty weird damage
+  interactions.
+* `src/Solutions/UltimateMasters.hs` shows how to track opponent actions.
 
 ## Development
 
