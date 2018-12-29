@@ -94,23 +94,23 @@ manaFormatter = attributeFormatter $ do
 See `src/Solutions` for more extensive usage (spoiler alert: these are
 solutions for published Possibility Storm puzzles!)
 
-* `Dominaria5.hs` uses a planeswalker.
-* `RivalsOfIxalan7.hs` uses `withEffect` to model `exert`
+* `Dominaria5` uses a planeswalker.
+* `RivalsOfIxalan7` uses `withEffect` to model `exert`
   effects, and shows how to verify multiple blocking scenarios.
-* `Core19_9.hs` has a fancy formatter to correctly track how much
+* `Core19_9` has a fancy formatter to correctly track how much
   mana is available when working with `Powerstone Shard`, as well as spell
   tracking for `Aetherflux Reservoir`.
-* `GuildsOfRavnicaPre2.hs` uses `forCards` to model undergrowth
+* `GuildsOfRavnicaPre2` uses `forCards` to model undergrowth
   for a `Rhizome Lurcher`.
-* `GuildsOfRavnica1.hs` uses `mentor`.
-* `GuildsOfRavnica3.hs` uses a sacrifice wrapper to repeatedly
+* `GuildsOfRavnica1` uses `mentor`.
+* `GuildsOfRavnica3` uses a sacrifice wrapper to repeatedly
   create treasure tokens.
-* `GuildsOfRavnica8.hs` shows using counters to correctly track
+* `GuildsOfRavnica8` shows using counters to correctly track
   `Muldrotha, the Gravetide` usage.
-* `GuildsOfRavnica9.hs` handles `storm`.
-* `ExplorersOfIxalanContest.hs` handles some pretty weird damage
+* `GuildsOfRavnica9` handles `storm`.
+* `ExplorersOfIxalanContest` handles some pretty weird damage
   interactions.
-* `UltimateMasters.hs` shows how to track opponent actions.
+* `UltimateMasters` shows how to track opponent actions.
 
 ## Development
 
