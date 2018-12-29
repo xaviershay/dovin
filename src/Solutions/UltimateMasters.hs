@@ -88,7 +88,7 @@ solution = do
 
     with "Mikaeus, the Unhallowed" $ \cn -> do
       targetInLocation (Active, Graveyard) cn
-      validate cn $ matchAttribute legendary
+      validate (matchAttribute legendary) cn
       returnToPlay cn
       gainAttribute haste cn
 
@@ -99,7 +99,7 @@ solution = do
 
       trigger cn
       target "Sublime Archangel"
-      validate "Sublime Archangel" $ matchAttribute flying
+      validate (matchAttribute flying) "Sublime Archangel"
       destroy "Sublime Archangel"
 
   step "Liliana to force sac of Reya" $ do
@@ -169,7 +169,7 @@ solution = do
     returnToHand "Mikaeus, the Unhallowed"
     damage (const 6) (targetPlayer Opponent) "Vengeful Rebirth"
 
-    validateLife Opponent 0
+    validateLife 0 Opponent
 
 manaAttribute = attributeFormatter $ attribute "mana" $
   (+) <$> countCards
