@@ -94,20 +94,18 @@ cast mana cn = do
 -- | Move a card to the stack, spending the specified mana. If not tracking
 -- mana, use the empty string to cast for no mana. Typically you will want to
 -- 'resolve' after casting. For the common case of casting from hand, see
--- 'cast'.
+-- 'cast'. See 'spendMana' for additional mana validations and effects.
 --
--- > castFromLocation "1B" "Oathsworn Vampire"
+-- > castFromLocation "1B" "Oathsworn Vampire" >> resolveTop
 --
 --   [Validates]:
 --
 --     * Card exists in location.
---     * Mana is available.
 --     * If not an instant, see 'validateCanCastSorcery` for extra validations.
 --
 --   [Effects]:
 --
 --     * Card moved to top of stack.
---     * Mana removed from pool.
 --     * Counter 'storm' incremented if card has 'instant' or 'sorcery'
 --       attribute.
 castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
@@ -173,6 +171,7 @@ resolve expectedName = do
 --
 --     * If spell, move card to graveyard of owner.
 --     * If permanent, move card to play area of owner.
+--     * If trigger, remove card.
 --     * See 'move' for possible alternate effects, depending on card
 --       attributes.
 resolveTop :: GameMonad ()
@@ -186,6 +185,8 @@ resolveTop = action "resolveTop" $ do
 
       if hasAttribute instant c || hasAttribute sorcery c then
         moveTo Graveyard x
+      else if hasAttribute triggered c || hasAttribute activated c then
+        remove x
       else
         moveTo Play x
 

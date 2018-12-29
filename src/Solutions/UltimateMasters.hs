@@ -6,7 +6,7 @@ import Control.Monad
 import Dovin.V2
 
 sacrificeToAltar mana name = do
-  activate "" "Phrexian Altar"
+  activate "" "" "Phrexian Altar" >> resolveTop
   sacrifice name
   addMana mana
 
@@ -71,7 +71,7 @@ solution = do
     sacrificeToAltar "U" "Mikaeus, the Unhallowed"
 
   step "Engineered Explosives for Sigarda" $ do
-    activate "2" "Engineered Explosives"
+    activate "" "2" "Engineered Explosives" >> resolveTop
     destroy "Sigarda, Host of Herons"
 
   step "Goryo's Mikaeus with spliced Breach of Stingerfling, destroying Archangel" $ do
@@ -97,7 +97,7 @@ solution = do
       moveTo Play cn
       gainAttribute haste cn
 
-      trigger cn
+      trigger "Destroy creature with flying" cn >> resolveTop
       target "Sublime Archangel"
       validate (matchAttribute flying) "Sublime Archangel"
       destroy "Sublime Archangel"
@@ -106,7 +106,6 @@ solution = do
     activatePlaneswalker 1 "Liliana of the Veil"
     as Opponent $ do
       sacrifice "Reya Dawnbringer"
-
 
   step "Breach Emrakul" $ do
     tapForMana "B" "Swamp 3"
@@ -130,17 +129,21 @@ solution = do
       ]
 
   step "Assume opponent activates Dark Depths to block Emrakul in response to Annihilator trigger, then annihilates lands" $ do
+    trigger "Annihilator 6" "Emrakul, the Aeons Torn"
+
     as Opponent $ do
       forM_ [1..7] $ \n -> tapForMana "W" (numbered n "Plains")
       forM_ [1..2] $ \n -> tapForMana "G" (numbered n "Forest")
-      activate "3" "Dark Depths"
-      activate "3" "Dark Depths"
-      activate "3" "Dark Depths"
+      activate "" "3" "Dark Depths" >> resolveTop
+      activate "" "3" "Dark Depths" >> resolveTop
+      activate "" "3" "Dark Depths" >> resolveTop
       sacrifice "Dark Depths"
       withLocation Play
         $ withAttributes [indestructible, flying, token]
         $ addCreature (20, 20) "Marit Large"
 
+    resolve "Annihilator 6"
+    as Opponent $
       forM_ [1..6] $ \n -> sacrifice (numbered n "Plains")
 
     gainAttribute "blocked" "Emrakul, the Aeons Torn"

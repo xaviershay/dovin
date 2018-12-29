@@ -10,6 +10,8 @@ import Dovin.Types
 numbered :: Int -> CardName -> CardName
 numbered n name = name <> " " <> show n
 
+activated :: CardAttribute
+activated = "activated"
 arcane :: CardAttribute
 arcane = "arcane"
 attacking :: CardAttribute
@@ -68,5 +70,7 @@ token :: CardAttribute
 token = "token"
 trample :: CardAttribute
 trample = "trample"
+triggered :: CardAttribute
+triggered = "triggered"
 vigilance :: CardAttribute
 vigilance = "vigilance"

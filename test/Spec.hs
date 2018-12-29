@@ -188,46 +188,6 @@ test_Test = testGroup "Actions"
           withLocation (Active, Graveyard) $ addLand "Forest"
           untap "Forest"
     ]
-  , testGroup "resolveTop"
-    [ prove "resolves top spell from stack" $ do
-        withLocation (Active, Hand) $ addInstant "Shock"
-        cast "" "Shock" >> resolveTop
-
-        validate "Shock" $ matchLocation (Active, Graveyard)
-        validateBoardEquals stack mempty
-    , prove "resolves top permanent of stack" $ do
-        withLocation (Active, Hand) $ addArtifact "Mox Opal"
-        cast "" "Mox Opal" >> resolveTop
-
-        validate "Mox Opal" $ matchLocation (Active, Play)
-        validateBoardEquals stack mempty
-    , refute
-        "requires non-empty stack"
-        "stack is empty" $ do
-          resolveTop
-    ]
-  , testGroup "resolve"
-    [ prove "resolves top card of stack" $ do
-        withLocation (Active, Hand) $ addInstant "Shock"
-        cast "" "Shock" >> resolve "Shock"
-
-        validate "Shock" $ matchLocation (Active, Graveyard)
-        validateBoardEquals stack mempty
-    , refute
-        "requires top card to match provided"
-        "unexpected top of stack: expected Shock 1, got Shock 2" $ do
-          withLocation (Active, Hand) $ addInstant "Shock 1"
-          withLocation (Active, Hand) $ addInstant "Shock 2"
-          cast "" "Shock 1"
-          cast "" "Shock 2"
-          resolve "Shock 1"
-    , refute
-        "requires non-empty stack"
-        "stack is empty" $ do
-          withLocation (Active, Hand) $ addInstant "Shock"
-          resolve "Shock"
-    ]
-
   , testGroup "splice"
     [ prove "splices on to an arcane spell" $ do
         withLocation (Active, Hand) $ do

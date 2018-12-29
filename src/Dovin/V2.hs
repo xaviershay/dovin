@@ -4,19 +4,90 @@
 --     player.
 --   * Flips argument order for `validate` functions to be consistent with rest
 --     of API.
---   * TODO: `activate` and `trigger` use the stack.
+--   * `activate` and `trigger` use the stack.
 module Dovin.V2
-  ( withLocation
+  ( activate
+  , trigger
+  , withLocation
   , validate
   , validateLife
   , module Dovin
   )
   where
 
-import Dovin hiding (withLocation, validate, validateLife)
+import Dovin hiding (withLocation, validate, validateLife, activate, trigger)
 import qualified Dovin
 import Dovin.Prelude
 import Control.Monad.Reader (local)
+
+-- | Activate an ability of a permanent. See 'spendMana' for additional mana
+-- validations and effects. Typically you will want to `resolve` after
+-- activating.
+--
+-- > activate "Create Soldier" "3W" "Dawn of Hope" >> resolveTop
+--
+-- [Validates]
+--
+--   * Card is in play or graveyard.
+--   * Card is cotrolled by actor.
+--
+-- [Effects]
+--
+--   * A card with 'activated' is added to stack.
+activate :: CardName -> ManaPool -> CardName -> GameMonad ()
+activate stackName mana targetName = do
+  actor <- view envActor
+  card <-
+    requireCard
+      targetName
+      (  matchController actor
+      <> labelMatch "in play or graveyard" (
+           matchLocation (actor, Play)
+           `matchOr`
+           matchLocation (actor, Graveyard)
+         )
+      )
+
+  spendMana mana
+
+  withLocation Stack $ withAttribute activated $ addCard stackName
+
+  modifying
+    stack
+    ((:) stackName)
+
+-- | Triggers an effect of a permanent.  Typically you will want to `resolve`
+-- after triggering.
+--
+-- > activate "Draw Card" "Dawn of Hope" >> resolveTop
+--
+-- [Validates]
+--
+--   * Card is in play or graveyard.
+--   * Card is cotrolled by actor.
+--
+-- [Effects]
+--
+--   * A card with 'triggered' is added to stack.
+trigger :: CardName -> CardName -> GameMonad ()
+trigger triggerName sourceName = do
+  actor <- view envActor
+  card <-
+    requireCard
+      sourceName
+      (  matchController actor
+      <> labelMatch "in play or graveyard" (
+           matchLocation (actor, Play)
+           `matchOr`
+           matchLocation (actor, Graveyard)
+         )
+      )
+
+  withLocation Stack $ withAttribute triggered $ addCard triggerName
+
+  modifying
+    stack
+    ((:) triggerName)
 
 withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do
