@@ -5,7 +5,8 @@ import Control.Monad.Writer (Writer, execWriter, tell)
 
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
-import Data.List (intercalate, sort, nub)
+import Data.List (intercalate, sort, sortBy, nub)
+import Data.Ord (comparing)
 
 import Dovin.Helpers
 import Dovin.Monad
@@ -32,52 +33,67 @@ attributeFormatter m =
           let Right value = execMonad board m in
           (label, value)
 
+stackFormatter :: Formatter
+stackFormatter board =
+  let matchingCs = map lookupCard $ view stack board in
+
+  "\n      Stack:\n" <> formatCards matchingCs
+
+  where
+    lookupCard cn =
+      let Right value = execMonad board (requireCard cn mempty) in value
+
+
 cardFormatter :: String -> CardMatcher -> Formatter
 cardFormatter title matcher board =
-  let matchingCs = filter (applyMatcher matcher) cs in
+  let matchingCs = sortBy (comparing $ view cardName) . filter (applyMatcher matcher) $ cs in
 
-    "\n      " <> title <> ":\n" <> (intercalate "\n" . sort $ map (("      " <>) . formatCard) matchingCs)
+    "\n      " <> title <> ":\n" <> formatCards matchingCs
 
   where
     cs = let Right value = execMonad board allCards in value
 
-    formatCard c =
-      "  " <> view cardName c <>
-      " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
-      <> if hasAttribute "creature" c then
-           " ("
-             <> show (view cardPower c)
-             <> "/"
-             <> show (view cardToughness c)
-             <> (let n = view cardPlusOneCounters c in
-                   if n > 0 then
-                      ", +" <> show n <> "/+" <> show n
-                  else
-                    mempty)
-             <> (if view cardDamage c > 0 then
-                  ", " <> show (view cardDamage c)
-                else
-                  mempty)
-             <> ")"
-         else if hasAttribute "planeswalker" c then
-           " ("
-             <> show (view cardLoyalty c)
-             <> ")"
-         else
-          ""
+formatCards = intercalate "\n" . map (("      " <>) . formatCard)
+
+formatCard c =
+  "  " <> view cardName c <>
+  " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
+  <> if hasAttribute "creature" c then
+       " ("
+         <> show (view cardPower c)
+         <> "/"
+         <> show (view cardToughness c)
+         <> (let n = view cardPlusOneCounters c in
+               if n > 0 then
+                  ", +" <> show n <> "/+" <> show n
+              else
+                mempty)
+         <> (if view cardDamage c > 0 then
+              ", " <> show (view cardDamage c)
+            else
+              mempty)
+         <> ")"
+     else if hasAttribute "planeswalker" c then
+       " ("
+         <> show (view cardLoyalty c)
+         <> ")"
+     else
+      ""
 
 boardFormatter :: Formatter
 boardFormatter board =
   let allLocations = nub . sort . map (view location) $ cs in
 
   let formatters = map
-                     (\l -> cardFormatter (show l) (matchLocation l))
+                     formatLocation
                      allLocations in
 
   mconcat formatters board
 
   where
     cs = let Right value = execMonad board allCards in value
+    formatLocation (Active, Stack) = stackFormatter
+    formatLocation l = cardFormatter (show l) (matchLocation l)
 
 attribute :: Show a => String -> GameMonad a -> FormatMonad ()
 attribute label m = tell [(label, show <$> m)]
