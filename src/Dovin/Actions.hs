@@ -13,6 +13,8 @@ module Dovin.Actions (
   -- * Casting
   , cast
   , castFromLocation
+  , flashback
+  , jumpstart
   , resolve
   , resolveTop
   , splice
@@ -21,6 +23,7 @@ module Dovin.Actions (
   , attackWith
   , combatDamage
   , damage
+  , discard
   , exert
   , moveTo
   , transitionTo
@@ -133,6 +136,57 @@ castFromLocation loc mana name = action "castFromLocation" $ do
   modifying
     stack
     ((:) name)
+
+-- | Cast a card from the active player's graveyard, exiling it when it leaves
+-- the stack. See 'castFromLocation' for extra validations and effects.
+--
+-- > flashback "R" "Shock"
+--
+-- Does not validate whether the card actually has a flashback cost. If
+-- important, use a wrapper function in your solution:
+--
+-- @
+-- flashbackSnapped mana castName = do
+--   validate (matchAttribute "snapcastered") castName
+--   flashback mana castName
+-- @
+--
+-- [Validates]
+--
+--   * Card is in active player's graveyard.
+--
+-- [Effects]
+--
+--   * Card gains 'exileWhenLeaveStack'.
+flashback :: ManaPool -> CardName -> GameMonad ()
+flashback mana castName = do
+  actor <- view envActor
+  spendMana mana
+  castFromLocation (actor, Graveyard) "" castName
+  gainAttribute exileWhenLeaveStack castName
+
+-- | Cast a card from the active player's graveyard, discarding a card in
+-- addition to its mana cost, exiling it when it leaves the stack. See
+-- 'castFromLocation' for extra validations and effects.
+--
+-- > jumpstart "R" "Mountain" "Shock"
+--
+-- [Validates]
+--
+--   * Card is in active player's graveyard.
+--   * Discard target is in active player's hand.
+--
+-- [Effects]
+--
+--   * Card gains 'exileWhenLeaveStack'.
+--   * Discard target moved to graveyard.
+jumpstart :: ManaPool -> CardName -> CardName -> GameMonad ()
+jumpstart mana discardName castName = do
+  actor <- view envActor
+  spendMana mana
+  discard discardName
+  castFromLocation (actor, Graveyard) "" castName
+  gainAttribute exileWhenLeaveStack castName
 
 -- | Resolves a card on the stack.
 --
@@ -488,11 +542,21 @@ damage f t source = action "damage" $ do
       when (hasAttribute planeswalker t) $ do
         modifyCard tn cardLoyalty (\x -> x - dmg)
 
-destroy :: CardName -> GameMonad ()
-destroy targetName = do
-  validate targetName $ matchInPlay <> missingAttribute indestructible
-
-  moveTo Graveyard targetName
+-- | Discard a card from the active player's hand.
+--
+-- > discard "Mountain"
+--
+-- [Validates]
+--
+--   * Card exists in active player's hand.
+--
+-- [Effects]
+--
+--   * Card moved to graveyard.
+discard :: CardName -> GameMonad ()
+discard cn = do
+  actor <- view envActor
+  move (actor, Hand) (actor, Graveyard) cn
 
 -- | Exert a card. Works best when card has an associated effect that applies
 -- when 'exerted' attribute is present.

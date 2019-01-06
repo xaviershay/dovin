@@ -49,17 +49,6 @@ whenMatch name f action = do
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
 
-jumpstart mana discardName castName = do
-  actor <- view envActor
-  spendMana mana
-  discard discardName
-  castFromLocation (actor, Graveyard) "" castName
-  gainAttribute exileWhenLeaveStack castName
-
-discard cn = do
-  actor <- view envActor
-  move (actor, Hand) (actor, Graveyard) cn
-
 target targetName = do
   card <- requireCard targetName (matchInPlay <> missingAttribute hexproof)
 

@@ -354,13 +354,6 @@ flashbackSnapped mana castName = do
   flashback mana castName
 
 -- TODO: Promote this to Dovin.Actions
-flashback mana castName = do
-  actor <- view envActor
-  spendMana mana
-  castFromLocation (actor, Graveyard) "" castName
-  gainAttribute exileWhenLeaveStack castName
-
--- TODO: Promote this to Dovin.Actions
 counter :: CardName -> GameMonad ()
 counter expectedName = do
   s <- use stack
