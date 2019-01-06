@@ -700,7 +700,7 @@ withStateBasedActions m = do
 --     * If a creature does not have 'indestructible', and has damage exceeding
 --       toughess or 'deathtouched' attribute, destroy it.
 --     * If a card is a 'token' and is not in play, remove it.
---     * If a card is a 'copy' and is not on the stack, remove it. (TODO: Better tests for this, was broken.)
+--     * If a card is a 'copy' and is not on the stack, remove it.
 --
 -- These are run implicitly at the end of each 'step', so it's not usually
 -- needed to call this explicitly. Even then, using 'withStateBasedActions' is
