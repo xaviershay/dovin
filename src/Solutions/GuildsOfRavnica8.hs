@@ -71,8 +71,8 @@ solution = do
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
     castWithMuldrotha "land" "" "Detection Tower"
     castWithMuldrotha "artifact" "" "Mox Amber"
-    tapForMana "X" "Detection Tower"
-    tapForMana "X" "Mox Amber"
+    tapForMana "1" "Detection Tower"
+    tapForMana "1" "Mox Amber"
     castWithMuldrotha "creature" "2" "Diamond Mare"
 
   step "March of the Drowned on Vicious Conquistador" $ do

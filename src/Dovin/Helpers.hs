@@ -11,6 +11,8 @@ import qualified Data.Set as S
 import Data.Char (isDigit)
 import Control.Lens (_1, _2, ASetter, both, _Just)
 
+import Text.Parsec
+
 applyMatcherWithDesc :: CardMatcher -> Card -> Either String ()
 applyMatcherWithDesc (CardMatcher d f) c =
   if f c then
@@ -20,9 +22,20 @@ applyMatcherWithDesc (CardMatcher d f) c =
 
 hasAttribute attr = S.member attr . view cardAttributes
 
+manaSpec = mconcat <$> many (colorless <|> colored)
+  where
+    colorless = do
+      n <- read <$> many1 digit
+
+      return $ replicate n 'X'
+    colored = many1 (oneOf "RUGBW")
+
 parseMana :: String -> ManaPool
 -- sort puts the Xs at the back
-parseMana pool = sort $ concatMap (\char -> if isDigit char then replicate (read [char]) 'X' else [char]) pool
+parseMana pool =
+  case parse manaSpec "mana" pool of
+    Left err -> mempty
+    Right x -> sort x
 
 requireCard :: CardName -> CardMatcher -> GameMonad Card
 requireCard name f = do

@@ -32,6 +32,7 @@ dependencies:
   - lens
   - mtl
   - unordered-containers
+  - parsec
 
 library:
   source-dirs: src

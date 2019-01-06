@@ -84,6 +84,11 @@ test_Test = testGroup "Actions"
         addMana "RWB"
         spendMana "3"
         validateBoardEquals (manaPoolFor Active) mempty
+    , prove "removes multiple digits for colorless mana from pool" $ do
+        addMana "9"
+        addMana "9"
+        spendMana "15"
+        validateBoardEquals (manaPoolFor Active) "XXX"
     , prove "removes colored mana before colorless" $ do
         addMana "RWB"
         spendMana "1R"
@@ -107,6 +112,9 @@ test_Test = testGroup "Actions"
     [ prove "adds mana to pool" $ do
         addMana "2RG"
         validateBoardEquals (manaPool . at Active . _Just) "GRXX"
+    , prove "adds mana with multiple digits to pool" $ do
+        addMana "10"
+        validateBoardEquals (manaPool . at Active . _Just) (replicate 10 'X')
     ]
   , testGroup "tap"
     [ prove "taps card in play" $ do
