@@ -101,7 +101,8 @@ cast mana cn = do
 --   [Validates]:
 --
 --     * Card exists in location.
---     * If not an instant, see 'validateCanCastSorcery` for extra validations.
+--     * If not an instant or has flash, see 'validateCanCastSorcery` for extra
+--       validations.
 --
 --   [Effects]:
 --
@@ -113,7 +114,9 @@ castFromLocation loc mana name = action "castFromLocation" $ do
   card <- requireCard name mempty
 
   validate name $ matchLocation loc
-  unless (hasAttribute instant card) validateCanCastSorcery
+  unless
+    (hasAttribute instant card || hasAttribute flash card)
+    validateCanCastSorcery
 
   modifyCard name (location . _2) $ const Stack
 
@@ -697,7 +700,7 @@ withStateBasedActions m = do
 --     * If a creature does not have 'indestructible', and has damage exceeding
 --       toughess or 'deathtouched' attribute, destroy it.
 --     * If a card is a 'token' and is not in play, remove it.
---     * If a card is a 'copy' and is not on the stack, remove it.
+--     * If a card is a 'copy' and is not on the stack, remove it. (TODO: Better tests for this, was broken.)
 --
 -- These are run implicitly at the end of each 'step', so it's not usually
 -- needed to call this explicitly. Even then, using 'withStateBasedActions' is
@@ -738,8 +741,8 @@ runStateBasedActions = do
             remove cn >> incrementCounter
 
         let matchStack =
-                matchLocation (Active, Stack)
-             <> matchLocation (Opponent, Stack)
+                       matchLocation (Active, Stack)
+             `matchOr` matchLocation (Opponent, Stack)
 
         when (applyMatcher (invert matchStack) c) $
           when (hasAttribute copy c) $

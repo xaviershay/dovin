@@ -116,7 +116,7 @@ exile cardName = do
 copySpell targetName newName = do
   card <- requireCard targetName mempty
 
-  let newCard = setAttribute "copy" . set cardName newName $ card
+  let newCard = setAttribute copy . set cardName newName $ card
 
   modifying
     cards

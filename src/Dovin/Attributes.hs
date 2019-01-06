@@ -38,6 +38,8 @@ exileWhenLeaveStack :: CardAttribute
 exileWhenLeaveStack = "exile-when-leave-stack"
 firststrike :: CardAttribute
 firststrike = "firststrike"
+flash :: CardAttribute
+flash = "flash"
 flying :: CardAttribute
 flying = "flying"
 haste :: CardAttribute
