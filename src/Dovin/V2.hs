@@ -8,16 +8,27 @@
 module Dovin.V2
   ( activate
   , trigger
-  , withLocation
   , validate
-  , validateLife
-  , module Dovin.V1
+  , module Dovin.Dump
+  , module Dovin.Actions
+  , module Dovin.Attributes
+  , module Dovin.Builder
+  , module Dovin.Formatting
+  , module Dovin.Helpers
+  , module Dovin.Types
   )
   where
 
-import Dovin.V1 hiding (withLocation, validate, validateLife, activate, trigger)
+import Dovin.Actions
 import qualified Dovin.V1
 import Dovin.Prelude
+import Dovin.Dump hiding (activate, trigger)
+import Dovin.Attributes
+import Dovin.Builder
+import Dovin.Formatting
+import Dovin.Helpers
+import Dovin.Monad
+import Dovin.Types
 import Control.Monad.Reader (local)
 
 -- | Activate an ability of a permanent. See 'spendMana' for additional mana
@@ -89,28 +100,3 @@ trigger triggerName sourceName = do
     stack
     ((:) triggerName)
 
-withLocation :: Location -> GameMonad () -> GameMonad ()
-withLocation loc m = do
-  p <- view envActor
-
-  local (set (envTemplate . cardLocation) (p, loc)) m
-
--- | Validate that a card matches a matcher.
---
--- > validate (matchAttribute "pirate") "Angrath's Marauders"
---
--- [Validates]
---
---     * Card matches matcher.
-validate :: CardMatcher -> CardName -> GameMonad ()
-validate = flip Dovin.V1.validate
-
--- | Validates a player has a specific life total.
---
--- > validateLife 0 Opponent
---
--- [Validates]
---
---     * Player life equals amount.
-validateLife :: Int -> Player -> GameMonad ()
-validateLife = flip Dovin.V1.validateLife

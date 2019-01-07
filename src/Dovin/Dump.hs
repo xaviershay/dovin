@@ -1,13 +1,5 @@
 -- Dumping ground for things that haven't been thought through or tested yet.
-module Dovin.Dump
-  ( module Dovin.Dump
-  , module Dovin.Actions
-  , module Dovin.Attributes
-  , module Dovin.Builder
-  , module Dovin.Formatting
-  , module Dovin.Helpers
-  , module Dovin.Types
-  ) where
+module Dovin.Dump where
 
 import Control.Arrow (second)
 import Control.Lens
@@ -71,7 +63,7 @@ activate mana targetName = do
   card <- requireCard targetName mempty
   actor <- view envActor
 
-  validate targetName $ matchController actor
+  validate (matchController actor) targetName
 
   spendMana mana
 
@@ -85,7 +77,7 @@ destroy targetName = do
 sacrifice cn = do
   actor <- view envActor
 
-  validate cn $ matchController actor
+  validate (matchController actor) cn
 
   removeFromPlay cn
 
@@ -204,7 +196,7 @@ activatePlaneswalker loyalty cn = do
   c <- requireCard cn matchInPlay
   actor <- view envActor
 
-  validate cn $ matchController actor
+  validate (matchController actor) cn
 
   if view cardLoyalty c - loyalty < 0 then
     throwError $ cn <> " does not have enough loyalty"

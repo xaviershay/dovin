@@ -1,7 +1,7 @@
 {-|
 Functions for adding new cards to the board.
 
-> withLocation (Active, Hand) $ do
+> withLocation Hand $ do
 >   withAttributes ["angel", token] $ addCreature (4, 4) "Angel"
 -}
 module Dovin.Builder (
@@ -94,10 +94,6 @@ withAttributes attrs =
   local (over (envTemplate . cardAttributes) f
        . over (envTemplate . cardDefaultAttributes) f)
 
--- | Set the location of the created card.
-withLocation :: CardLocation -> GameMonad () -> GameMonad ()
-withLocation loc = local (set (envTemplate . cardLocation) loc)
-
 -- | Add an effect to the created card.
 withEffect ::
   CardMatcher -- ^ A matcher that must apply to this card for this affect to
@@ -109,6 +105,12 @@ withEffect ::
  -> GameMonad ()
 withEffect applyCondition filter action =
   local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
+
+withLocation :: Location -> GameMonad () -> GameMonad ()
+withLocation loc m = do
+  p <- view envActor
+
+  local (set (envTemplate . cardLocation) (p, loc)) m
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

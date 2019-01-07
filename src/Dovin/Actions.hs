@@ -122,7 +122,7 @@ castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
 castFromLocation loc mana name = action "castFromLocation" $ do
   card <- requireCard name mempty
 
-  validate name $ matchLocation loc
+  validate (matchLocation loc) name
   unless
     (hasAttribute instant card || hasAttribute flash card)
     validateCanCastSorcery
@@ -273,10 +273,10 @@ splice :: CardName -> ManaString -> CardName -> GameMonad ()
 splice target cost name = action "splice" $ do
   actor <- view envActor
 
-  validate target $ matchAttribute arcane
-  validate target (matchLocation (actor, Stack))
+  validate (matchAttribute arcane) target
+  validate (matchLocation (actor, Stack)) target
     `catchError` const (throwError $ target <> " not on stack")
-  validate name (matchLocation (actor, Hand))
+  validate (matchLocation (actor, Hand)) name
     `catchError` const (throwError $ name <> " not in hand")
   spendMana cost
 
@@ -587,7 +587,7 @@ discard cn = do
 --   * Card gains 'exerted' attribute.
 exert :: CardName -> GameMonad ()
 exert cn = do
-  validate cn $ matchAttribute tapped
+  validate (matchAttribute tapped) cn
   gainAttribute exerted cn
 
 -- | Move card to location with same controller.
@@ -659,7 +659,7 @@ spendMana amount =
 --   * Card gains tapped attribute.
 tap :: CardName -> GameMonad ()
 tap name = do
-  validate name $ matchInPlay <> missingAttribute tapped
+  validate (matchInPlay <> missingAttribute tapped) name
 
   gainAttribute tapped name
 
@@ -675,20 +675,19 @@ tap name = do
 --   * Card loses tapped attribute.
 untap :: CardName -> GameMonad ()
 untap name = do
-  validate name $ matchInPlay <> matchAttribute tapped
+  validate (matchInPlay <> matchAttribute tapped) name
 
   loseAttribute tapped name
 
-
 -- | Validate that a card matches a matcher.
 --
--- > validate "Angrath's Marauders" $ matchAttribute "pirate"
+-- > validate (matchAttribute "pirate") "Angrath's Marauders"
 --
 -- [Validates]
 --
 --     * Card matches matcher.
-validate :: CardName -> CardMatcher -> GameMonad ()
-validate targetName reqs = do
+validate :: CardMatcher -> CardName -> GameMonad ()
+validate reqs targetName = do
   _ <- requireCard targetName reqs
   return ()
 
@@ -742,13 +741,13 @@ validateCanCastSorcery = do
 
 -- | Validates a player has a specific life total.
 --
--- > validateLife Opponent 0
+-- > validateLife 0 Opponent
 --
 -- [Validates]
 --
 --     * Player life equals amount.
-validateLife :: Player -> Int -> GameMonad ()
-validateLife player n = do
+validateLife :: Int -> Player -> GameMonad ()
+validateLife n player = do
   current <- use (life . at player . non 0)
 
   when (current /= n) $
