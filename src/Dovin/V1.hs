@@ -1,5 +1,5 @@
 module Dovin.V1
-  ( module Dovin
+  ( module Dovin.Dump
   ) where
 
-import Dovin
+import Dovin.Dump

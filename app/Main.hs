@@ -1,7 +1,7 @@
 module Main where
 
 import Control.Monad (forM_)
-import Dovin
+import Dovin.V2
 
 import qualified Solutions
 import Solutions.Channel
@@ -9,7 +9,6 @@ import Solutions.Channel
 main :: IO ()
 main = run formatter solution
 --main = runAll
-
 
 runAll =
   forM_ Solutions.all $ \(name, solution, formatter) ->

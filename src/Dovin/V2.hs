@@ -11,12 +11,12 @@ module Dovin.V2
   , withLocation
   , validate
   , validateLife
-  , module Dovin
+  , module Dovin.V1
   )
   where
 
-import Dovin hiding (withLocation, validate, validateLife, activate, trigger)
-import qualified Dovin
+import Dovin.V1 hiding (withLocation, validate, validateLife, activate, trigger)
+import qualified Dovin.V1
 import Dovin.Prelude
 import Control.Monad.Reader (local)
 
@@ -103,7 +103,7 @@ withLocation loc m = do
 --
 --     * Card matches matcher.
 validate :: CardMatcher -> CardName -> GameMonad ()
-validate = flip Dovin.validate
+validate = flip Dovin.V1.validate
 
 -- | Validates a player has a specific life total.
 --
@@ -113,4 +113,4 @@ validate = flip Dovin.validate
 --
 --     * Player life equals amount.
 validateLife :: Int -> Player -> GameMonad ()
-validateLife = flip Dovin.validateLife
+validateLife = flip Dovin.V1.validateLife

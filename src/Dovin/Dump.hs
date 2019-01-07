@@ -1,5 +1,6 @@
-module Dovin
-  ( module Dovin
+-- Dumping ground for things that haven't been thought through or tested yet.
+module Dovin.Dump
+  ( module Dovin.Dump
   , module Dovin.Actions
   , module Dovin.Attributes
   , module Dovin.Builder
