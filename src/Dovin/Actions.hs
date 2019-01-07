@@ -13,6 +13,7 @@ module Dovin.Actions (
   -- * Casting
   , cast
   , castFromLocation
+  , counter
   , flashback
   , jumpstart
   , resolve
@@ -62,6 +63,7 @@ import Dovin.Monad
 
 import qualified Data.HashMap.Strict as M
 import Data.Maybe (listToMaybe)
+import qualified Data.List
 
 import Control.Arrow (second)
 import Control.Monad.Reader (local)
@@ -145,6 +147,32 @@ castFromLocation loc mana name = action "castFromLocation" $ do
   modifying
     stack
     ((:) name)
+
+-- | Remove a spell from the stack.
+--
+-- > counter "Shock"
+--
+-- [Validates]
+--
+--   * Card is on stack.
+--   * Card is not a triggered or activated ability.
+--
+-- [Effects]
+--
+--   * Card is moved to graveyard. (See 'move' for alternate effects.)
+counter :: CardName -> GameMonad ()
+counter expectedName = do
+  actor <- view envActor
+  c <- requireCard expectedName $
+            labelMatch "on stack" (matchLocation (actor, Stack))
+         <> invert (          matchAttribute triggered
+                    `matchOr` matchAttribute activated)
+
+  moveTo Graveyard expectedName
+
+  modifying
+    stack
+    (Data.List.delete expectedName)
 
 -- | Cast a card from actor's graveyard, exiling it when it leaves
 -- the stack. See 'castFromLocation' for further specification.

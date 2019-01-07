@@ -353,23 +353,3 @@ flashbackSnapped mana castName = do
   validate (matchAttribute snapped) castName
   flashback mana castName
 
--- TODO: Promote this to Dovin.Actions
-counter :: CardName -> GameMonad ()
-counter expectedName = do
-  s <- use stack
-
-  case s of
-    [] -> throwError $ "stack is empty, expecting " <> expectedName
-    ss -> do
-      actor <- view envActor
-      c <- requireCard expectedName $
-                matchLocation (actor, Stack)
-             <> invert (          matchAttribute triggered
-                        `matchOr` matchAttribute activated)
-
-      moveTo Graveyard expectedName
-
-      modifying
-        stack
-        (delete expectedName)
-
