@@ -1,7 +1,7 @@
 module Main where
 
 import Control.Monad (forM_)
-import Dovin.V2
+import Dovin
 
 import qualified Solutions
 import Solutions.Channel

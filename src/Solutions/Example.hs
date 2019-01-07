@@ -1,6 +1,6 @@
 module Solutions.Example where
 
-import Dovin.V2
+import Dovin
 
 solution :: GameMonad ()
 solution = do
