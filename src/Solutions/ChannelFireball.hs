@@ -1,4 +1,4 @@
-module Solutions.Channel where
+module Solutions.ChannelFireball where
 
 import Dovin.V2
 import Dovin.Prelude

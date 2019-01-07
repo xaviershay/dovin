@@ -111,6 +111,7 @@ solutions for published Possibility Storm puzzles!)
 * `ExplorersOfIxalanContest` handles some pretty weird damage
   interactions.
 * `UltimateMasters` shows how to track opponent actions.
+* `ChannelFireball` automatically calculates High Tide mana.
 
 ## Development
 

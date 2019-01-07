@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -ex
+
+stack sdist --pvp-bounds=both
+stack upload . --no-signature

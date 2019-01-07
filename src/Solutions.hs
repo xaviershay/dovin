@@ -1,5 +1,5 @@
 module Solutions where
-import qualified Solutions.Channel
+import qualified Solutions.ChannelFireball
 import qualified Solutions.Core19_9
 import qualified Solutions.Dominaria5
 import qualified Solutions.Example
@@ -13,7 +13,7 @@ import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
 
 all = [
-  ("Channel", Solutions.Channel.solution, Solutions.Channel.formatter),
+  ("ChannelFireball", Solutions.ChannelFireball.solution, Solutions.ChannelFireball.formatter),
   ("Core19_9", Solutions.Core19_9.solution, Solutions.Core19_9.formatter),
   ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter),
   ("Example", Solutions.Example.solution, Solutions.Example.formatter),
