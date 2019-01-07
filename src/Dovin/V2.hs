@@ -1,4 +1,4 @@
--- V2 makes the following changes:
+-- V2 makes the following changes from V1:
 --
 --   * withLocation now only takes a Location, using the current actor for
 --     player.

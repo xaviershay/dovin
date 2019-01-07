@@ -9,6 +9,8 @@ module Dovin.V1
   , validate
   , validateLife
   , withLocation
+  , activate
+  , trigger
   ) where
 
 import Dovin.Dump
@@ -22,7 +24,7 @@ import Dovin.Monad
 import Dovin.Types
 
 import Control.Monad.Reader (local)
-import Control.Lens (set)
+import Control.Lens (set, view)
 
 -- | Validate that a card matches a matcher.
 --
@@ -47,3 +49,21 @@ validateLife = flip Dovin.Actions.validateLife
 -- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
 withLocation loc = local (set (envTemplate . cardLocation) loc)
+
+activate mana targetName = do
+  card <- requireCard targetName mempty
+  actor <- view envActor
+
+  validate targetName $ matchController actor
+
+  spendMana mana
+
+  return ()
+
+trigger targetName = do
+  -- TODO: Technically some cards can trigger from other zones, figure out best
+  -- way to represent.
+  card <- requireCard targetName matchInPlay
+
+  return ()
+

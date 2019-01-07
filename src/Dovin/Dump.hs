@@ -52,23 +52,6 @@ targetInLocation zone targetName = do
 
   return ()
 
-trigger targetName = do
-  -- TODO: Technically some cards can trigger from other zones, figure out best
-  -- way to represent.
-  card <- requireCard targetName matchInPlay
-
-  return ()
-
-activate mana targetName = do
-  card <- requireCard targetName mempty
-  actor <- view envActor
-
-  validate (matchController actor) targetName
-
-  spendMana mana
-
-  return ()
-
 destroy targetName = do
   _ <- requireCard targetName (matchInPlay <> missingAttribute indestructible)
 
