@@ -1,10 +1,12 @@
--- V2 makes the following changes from V1:
---
---   * withLocation now only takes a Location, using the current actor for
---     player.
---   * Flips argument order for `validate` functions to be consistent with rest
---     of API.
---   * `activate` and `trigger` use the stack.
+{-|
+V2 makes the following changes from V1:
+
+* withLocation now only takes a Location, using the current actor for
+  player.
+* Flips argument order for `validate` functions to be consistent with rest
+  of API.
+* `activate` and `trigger` use the stack.
+-}
 module Dovin.V2
   ( module Dovin.Dump
   , module Dovin.Actions
