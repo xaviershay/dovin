@@ -89,6 +89,12 @@ addMana amount = do
     (parseMana amount <>)
 
 -- | Casts a card from actor's hand. See 'castFromLocation' for specification.
+--
+-- > cast "R" "Shock"
+--
+-- [Validates]:
+--
+--   * Card exists in hand.
 cast :: ManaPool -> CardName -> GameMonad ()
 cast mana cn = do
   actor <- view envActor
@@ -101,17 +107,17 @@ cast mana cn = do
 --
 -- > castFromLocation "1B" "Oathsworn Vampire" >> resolveTop
 --
---   [Validates]:
+-- [Validates]:
 --
---     * Card exists in location.
---     * If not an instant or has flash, see 'validateCanCastSorcery` for extra
---       validations.
+--   * Card exists in location.
+--   * If not an instant or has flash, see 'validateCanCastSorcery` for extra
+--     validations.
 --
---   [Effects]:
+-- [Effects]:
 --
---     * Card moved to top of stack.
---     * Counter 'storm' incremented if card has 'instant' or 'sorcery'
---       attribute.
+--   * Card moved to top of stack.
+--   * Counter 'storm' incremented if card has 'instant' or 'sorcery'
+--     attribute.
 castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
 castFromLocation loc mana name = action "castFromLocation" $ do
   card <- requireCard name mempty
@@ -137,8 +143,8 @@ castFromLocation loc mana name = action "castFromLocation" $ do
     stack
     ((:) name)
 
--- | Cast a card from the active player's graveyard, exiling it when it leaves
--- the stack. See 'castFromLocation' for extra validations and effects.
+-- | Cast a card from actor's graveyard, exiling it when it leaves
+-- the stack. See 'castFromLocation' for further specification.
 --
 -- > flashback "R" "Shock"
 --
@@ -153,7 +159,7 @@ castFromLocation loc mana name = action "castFromLocation" $ do
 --
 -- [Validates]
 --
---   * Card is in active player's graveyard.
+--   * Card is in actor's graveyard.
 --
 -- [Effects]
 --
@@ -165,21 +171,21 @@ flashback mana castName = do
   castFromLocation (actor, Graveyard) "" castName
   gainAttribute exileWhenLeaveStack castName
 
--- | Cast a card from the active player's graveyard, discarding a card in
+-- | Cast a card from active player's graveyard, discarding a card in
 -- addition to its mana cost, exiling it when it leaves the stack. See
--- 'castFromLocation' for extra validations and effects.
+-- 'castFromLocation' for further specification.
 --
 -- > jumpstart "R" "Mountain" "Shock"
 --
 -- [Validates]
 --
---   * Card is in active player's graveyard.
---   * Discard target is in active player's hand.
+--   * Card is in actor's graveyard.
+--   * Discard card is in actor's hand.
 --
 -- [Effects]
 --
 --   * Card gains 'exileWhenLeaveStack'.
---   * Discard target moved to graveyard.
+--   * Discard card moved to graveyard.
 jumpstart :: ManaPool -> CardName -> CardName -> GameMonad ()
 jumpstart mana discardName castName = do
   actor <- view envActor
