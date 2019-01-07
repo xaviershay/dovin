@@ -34,15 +34,18 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
 import Dovin.Attributes
-import Dovin.Actions
+--import Dovin.Actions
 import Dovin.Prelude
 import Dovin.Types
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
-  template <- view envTemplate
-  validateRemoved name
-  modifying cards (M.insert name (BaseCard $ set cardName name template))
+  card <- use $ cards . at name
+  case card of
+    Just _ -> throwError $ "Card should be removed: " <> name
+    Nothing -> do
+      template <- view envTemplate
+      modifying cards (M.insert name (BaseCard $ set cardName name template))
 
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name

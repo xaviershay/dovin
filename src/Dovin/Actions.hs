@@ -20,6 +20,7 @@ module Dovin.Actions (
   , splice
   , tapForMana
   -- * Uncategorized
+  , activate
   , attackWith
   , combatDamage
   , damage
@@ -28,6 +29,7 @@ module Dovin.Actions (
   , moveTo
   , transitionTo
   , transitionToForced
+  , trigger
   -- * Validations
   , validate
   , validateCanCastSorcery
@@ -55,6 +57,7 @@ import           Dovin.Attributes
 import           Dovin.Helpers
 import           Dovin.Prelude
 import           Dovin.Types
+import           Dovin.Builder
 import Dovin.Monad
 
 import qualified Data.HashMap.Strict as M
@@ -318,6 +321,39 @@ transitionToForced newPhase = do
   assign manaPool mempty
   assign phase newPhase
 
+-- | Triggers an effect of a permanent. Typically you will want to `resolve`
+-- after triggering.
+--
+-- > activate "Draw Card" "Dawn of Hope" >> resolveTop
+--
+-- [Validates]
+--
+--   * Card is in play or graveyard.
+--   * Card is cotrolled by actor.
+--
+-- [Effects]
+--
+--   * A card with 'triggered' is added to stack.
+trigger :: CardName -> CardName -> GameMonad ()
+trigger triggerName sourceName = do
+  actor <- view envActor
+  card <-
+    requireCard
+      sourceName
+      (  matchController actor
+      <> labelMatch "in play or graveyard" (
+           matchLocation (actor, Play)
+           `matchOr`
+           matchLocation (actor, Graveyard)
+         )
+      )
+
+  withLocation Stack $ withAttribute triggered $ addCard triggerName
+
+  modifying
+    stack
+    ((:) triggerName)
+
 
 -- | Move a card from one location to another.
 --
@@ -384,6 +420,42 @@ move from to name = action "move" $ do
     modifyCard name cardPlusOneCounters (+ 1)
   else
     modifyCard name location (const to)
+
+-- | Activate an ability of a permanent. See 'spendMana' for additional mana
+-- validations and effects. Typically you will want to `resolve` after
+-- activating.
+--
+-- > activate "Create Soldier" "3W" "Dawn of Hope" >> resolveTop
+--
+-- [Validates]
+--
+--   * Card is in play or graveyard.
+--   * Card is cotrolled by actor.
+--
+-- [Effects]
+--
+--   * A card with 'activated' is added to stack.
+activate :: CardName -> ManaPool -> CardName -> GameMonad ()
+activate stackName mana targetName = do
+  actor <- view envActor
+  card <-
+    requireCard
+      targetName
+      (  matchController actor
+      <> labelMatch "in play or graveyard" (
+           matchLocation (actor, Play)
+           `matchOr`
+           matchLocation (actor, Graveyard)
+         )
+      )
+
+  spendMana mana
+
+  withLocation Stack $ withAttribute activated $ addCard stackName
+
+  modifying
+    stack
+    ((:) stackName)
 
 -- | Start an attack with the given creatures.
 --
