@@ -18,18 +18,6 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
--- CORE TYPES
---
-emptyBoard = Board
-               { _cards = mempty
-               , _counters = mempty
-               , _stack = mempty
-               , _life = mempty
-               , _manaPool = mempty
-               , _phase = FirstMain
-               }
-
-
 whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
 whenMatch name f action = do
   match <- requireCard name f >> pure True `catchError` const (pure False)

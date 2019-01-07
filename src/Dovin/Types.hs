@@ -198,3 +198,13 @@ mkCard name location =
 opposing :: Player -> Player
 opposing Active = Opponent
 opposing Opponent = Active
+
+emptyBoard = Board
+               { _cards = mempty
+               , _counters = mempty
+               , _stack = mempty
+               , _life = mempty
+               , _manaPool = mempty
+               , _phase = FirstMain
+               }
+
