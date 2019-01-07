@@ -2,7 +2,7 @@ module Solutions.GuildsOfRavnica3 where
 
 import Control.Monad
 
-import Dovin
+import Dovin.V1
 
 -- This solution re-uses the "Treasure" card to avoid having to track a counter
 -- for each new one created. This has the downside of requiring explicit

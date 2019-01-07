@@ -1,6 +1,6 @@
 module Solutions.GuildsOfRavnicaPre2 where
 
-import Dovin
+import Dovin.V1
 
 solution :: GameMonad ()
 solution = do

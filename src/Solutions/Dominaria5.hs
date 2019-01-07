@@ -1,6 +1,6 @@
 module Solutions.Dominaria5 where
 
-import Dovin
+import Dovin.V1
 import Dovin.Prelude
 
 solution :: GameMonad ()

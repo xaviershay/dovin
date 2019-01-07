@@ -3,7 +3,7 @@
 module TestPrelude
   ( module Test.Tasty
   , module Test.Tasty.HUnit
-  , module Dovin
+  , module Dovin.V1
   , module Control.Lens
   , module Control.Monad
   , prove
@@ -14,7 +14,7 @@ module TestPrelude
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Dovin
+import Dovin.V1
 import Dovin.Monad
 
 import Data.List (isInfixOf)

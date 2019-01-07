@@ -1,6 +1,6 @@
 module Solutions.ExplorersOfIxalanContest where
 
-import Dovin
+import Dovin.V1
 import Dovin.Prelude
 
 -- This solution is not optimal, 130 damage is possible.

@@ -3,7 +3,7 @@ module Solutions.GuildsOfRavnica9 where
 import Control.Lens
 import Control.Monad
 
-import Dovin
+import Dovin.V1
 
 solution :: GameMonad ()
 solution = do

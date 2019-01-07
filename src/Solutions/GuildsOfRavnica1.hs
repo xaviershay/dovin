@@ -2,7 +2,7 @@ module Solutions.GuildsOfRavnica1 where
 
 import Control.Monad (forM_)
 
-import Dovin
+import Dovin.V1
 
 -- http://www.possibilitystorm.com/083-guilds-of-ravnica-puzzle-1/
 solution :: GameMonad ()

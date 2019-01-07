@@ -1,6 +1,6 @@
 module Solutions.Core19_9 where
 
-import Dovin
+import Dovin.V1
 import Dovin.Prelude
 
 spellCount = "spell-count"

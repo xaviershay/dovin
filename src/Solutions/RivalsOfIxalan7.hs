@@ -1,7 +1,7 @@
 module Solutions.RivalsOfIxalan7 where
 
 import Dovin.Prelude
-import Dovin
+import Dovin.V1
 
 blocked = "blocked"
 

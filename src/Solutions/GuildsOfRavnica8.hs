@@ -4,7 +4,7 @@ import Control.Monad.Except (throwError, when)
 import Control.Lens
 import qualified Data.Set as S
 
-import Dovin
+import Dovin.V1
 
 -- http://www.possibilitystorm.com/089-guilds-of-ravnica-season-puzzle-7-2/
 solution :: GameMonad ()
