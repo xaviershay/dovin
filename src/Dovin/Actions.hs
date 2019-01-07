@@ -245,7 +245,7 @@ resolveTop = action "resolveTop" $ do
   s <- use stack
 
   case s of
-    []     -> throwError $ "stack is empty"
+    []     -> throwError "stack is empty"
     (x:xs) -> do
       c <- requireCard x mempty
 
@@ -480,7 +480,7 @@ attackWith cs = do
     c <- requireCard cn
            (matchInPlay
              <> matchAttribute "creature"
-             <> ( labelMatch ("does not have summoning sickness") $
+             <> labelMatch "does not have summoning sickness" (
                     matchAttribute haste
                     `matchOr`
                     missingAttribute summoned
@@ -602,7 +602,7 @@ damage f t source = action "damage" $ do
     modifying (life . at (fst . view location $ c) . non 0) (+ dmg)
 
   where
-    damage' dmg (TargetPlayer t) c = do
+    damage' dmg (TargetPlayer t) c =
       modifying
         (life . at t . non 0)
         (\x -> x - dmg)
@@ -617,7 +617,7 @@ damage f t source = action "damage" $ do
         when (dmg > 0 && hasAttribute deathtouch c) $
           gainAttribute deathtouched tn
 
-      when (hasAttribute planeswalker t) $ do
+      when (hasAttribute planeswalker t) $
         modifyCard tn cardLoyalty (\x -> x - dmg)
 
 -- | Discard a card from the active player's hand.
@@ -853,9 +853,8 @@ withStateBasedActions m = do
 runStateBasedActions :: GameMonad ()
 runStateBasedActions = do
   enabled <- view envSBAEnabled
-  when enabled
-    $ local (set envSBAEnabled False)
-    $ runStateBasedActions'
+  when enabled $
+    local (set envSBAEnabled False) runStateBasedActions'
 
   where
     sbaCounter :: Control.Lens.Lens' Board Int

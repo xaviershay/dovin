@@ -3,4 +3,4 @@
 set -ex
 
 stack test --fast
-hlint src/Dovin.hs src/Dovin/*.hs
+bin/lint

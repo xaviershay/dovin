@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec hlint src/Dovin.hs src/Dovin/*.hs
