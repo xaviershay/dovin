@@ -21,7 +21,7 @@ data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
 type ManaPool = String
 type ManaString = String
 -- TODO: Stack shouldn't be in here because there is only one of them
-data Location = Hand | Graveyard | Play | Stack | Exile
+data Location = Hand | Graveyard | Play | Stack | Exile | Deck
   deriving (Show, Eq, Ord)
 
 data CardEffect = CardEffect

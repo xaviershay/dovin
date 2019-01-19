@@ -352,7 +352,7 @@ transitionToForced newPhase = do
 -- | Triggers an effect of a permanent. Typically you will want to `resolve`
 -- after triggering.
 --
--- > activate "Draw Card" "Dawn of Hope" >> resolveTop
+-- > trigger "Draw Card" "Dawn of Hope" >> resolveTop
 --
 -- [Validates]
 --
