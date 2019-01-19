@@ -109,6 +109,7 @@ data Board = Board
   , _life :: M.HashMap Player Int
   , _manaPool :: M.HashMap Player ManaPool
   , _phase :: Phase
+  , _currentStep :: StepIdentifier
   }
 
 data Env = Env
@@ -117,8 +118,14 @@ data Env = Env
   , _envActor :: Player
   }
 
-type GameMonad a = (ExceptT String (ReaderT Env (StateT Board (WriterT [(String, Board)] Identity)))) a
+type StepIdentifier = Int
+type Step = (StepIdentifier, String, Board)
+
+type GameMonad a
+   = (ExceptT String (ReaderT Env (StateT Board (WriterT [Step] Identity)))) a
 type Formatter = Board -> String
+
+incrementStep s = s + 1
 
 makeLenses ''Board
 makeLenses ''Card
@@ -206,5 +213,6 @@ emptyBoard = Board
                , _life = mempty
                , _manaPool = mempty
                , _phase = FirstMain
+               , _currentStep = 0
                }
 

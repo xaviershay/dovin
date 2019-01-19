@@ -193,7 +193,7 @@ run :: (Int -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
-  forM_ (zip log [1..]) $ \((step, board), n) -> do
+  forM_ log $ \(n, step, board) -> do
     putStr $ show n <> ". "
     putStr step
     putStrLn (formatter n board)

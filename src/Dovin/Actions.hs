@@ -932,9 +932,10 @@ step :: String -> GameMonad () -> GameMonad ()
 step desc m = withStateBasedActions $ do
   b <- get
   let (e, b', _) = runMonad b m
+  let b'' = over currentStep incrementStep b'
 
-  tell [(desc, b')]
-  put b'
+  tell [(view currentStep b'', desc, b'')]
+  put b''
 
   case e of
     Left x -> throwError x
