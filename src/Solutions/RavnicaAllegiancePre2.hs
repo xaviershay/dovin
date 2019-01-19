@@ -128,14 +128,14 @@ solution = do
     combatDamage [] "Mausoleum Harpy"
     validateLife 0 Opponent
 
-formatter 1 = attributes <> boardFormatter
-formatter 5 = attributes <>
-  cardFormatter
-    "attacking creatures"
-    (matchLocation (Active, Play)
-    <> matchAttribute attacking
-    )
-formatter _ = attributes
+formatter step = attributes <> case view stepNumber step of
+  1 -> boardFormatter
+  5 -> cardFormatter
+        "attacking creatures"
+        (matchLocation (Active, Play)
+        <> matchAttribute attacking
+        )
+  _ -> mempty
 
 attributes = attributeFormatter $ do
   attribute "life" $ countLife Opponent

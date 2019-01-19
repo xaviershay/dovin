@@ -1,5 +1,5 @@
 import Control.Arrow
-import Control.Monad (filterM)
+import Control.Monad (filterM, forM)
 import Data.Char
 import Data.List
 import Data.Ord
@@ -25,10 +25,25 @@ toModuleName x = intercalate "." . ("Solutions":) . splitDirectories . dropExten
 
 writeAllSolutions :: IO ()
 writeAllSolutions = do
-  modules <- map toModuleName <$> getFilesRecursive "src/Solutions"
-  let header = "module Solutions where"
+  let baseDir = "src/Solutions"
 
-  let imports = unlines . map ("import qualified " <>) $ modules
+  files <- getFilesRecursive baseDir
+
+  let header = unlines
+                 [ "module Solutions where"
+                 , "import Control.Lens (view)"
+                 , "import Dovin.Types (stepNumber)"
+                 ]
+
+  modules <- forM files $ \filename -> do
+    contents <- readFile $ baseDir </> filename
+
+    let v2 = not $ "Dovin.V1" `isInfixOf` contents
+
+    return (toModuleName filename, v2)
+
+  let imports = unlines . map (("import qualified " <>) . fst) $ modules
+
 
   let array = "all = [\n  " <> (intercalate ",\n  " . map formatSolution $ modules) <> "\n  ]"
 
@@ -36,10 +51,13 @@ writeAllSolutions = do
   rewriteFileEx normal "src/Solutions.hs" contents
 
   where
-    formatSolution m = "("
+    formatSolution (m, v2) = "("
       <> show (drop (length "Solutions.") m) <> ", "
       <> m <> ".solution, "
-      <> m <> ".formatter)"
+      <> (if v2
+           then m <> ".formatter"
+           else m <> ".formatter . view stepNumber")
+      <> ")"
 
 -- All these functions copy+pasted from hspec-discover
 getFilesRecursive :: FilePath -> IO [FilePath]

@@ -31,10 +31,11 @@ solution = do
       validate (matchAttribute flying) enemy
       destroy enemy
 
-formatter :: Int -> Formatter
-formatter 2 = manaFormatter
-  <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
-formatter _ = boardFormatter
+formatter :: Step -> Formatter
+formatter step = case view stepNumber step of
+  1 -> manaFormatter
+    <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
+  _ -> boardFormatter
 
 manaFormatter = attributeFormatter $ do
   attribute "availble mana" $

@@ -1,6 +1,6 @@
 module Solutions.UltimateMasters where
 
-import Control.Lens (over)
+import Control.Lens (over, view)
 import Control.Monad
 
 import Dovin.V2
@@ -181,44 +181,47 @@ manaAttribute = attributeFormatter $ attribute "mana" $
             <> matchController Active
             )
       <*> countManaPool Active
-formatter 1 = boardFormatter
-formatter 3 = manaAttribute
+
+formatter = oldFormatter . view stepNumber
+
+oldFormatter 1 = boardFormatter
+oldFormatter 3 = manaAttribute
   <> cardFormatter
        "creatures"
        (matchLocation (Active, Play) <> matchAttribute creature)
   <> cardFormatter
        "graveyard"
        (matchLocation (Active, Graveyard) <> matchAttribute creature)
-formatter 4 = manaAttribute
+oldFormatter 4 = manaAttribute
   <> cardFormatter
        "remaining creatures"
        (matchLocation (Opponent, Play) <> matchAttribute creature)
-formatter 5 = manaAttribute
+oldFormatter 5 = manaAttribute
   <> cardFormatter
        "remaining creatures"
        (matchLocation (Opponent, Play) <> matchAttribute creature)
-formatter 6 = manaAttribute
+oldFormatter 6 = manaAttribute
   <> cardFormatter
        "remaining creatures"
        (matchLocation (Opponent, Play) <> matchAttribute creature)
-formatter 8 =
+oldFormatter 8 =
   cardFormatter
     "creatures"
     (matchLocation (Active, Play) <> matchAttribute creature)
-formatter 9 =
+oldFormatter 9 =
   cardFormatter
     "unblocked creatures"
     (matchLocation (Active, Play)
     <> matchAttribute creature
     <> invert (matchAttribute "blocked")
     )
-formatter 10 =
+oldFormatter 10 =
      attributeFormatter (attribute "life" (countLife Opponent))
   <> cardFormatter
        "creatures"
        (matchLocation (Active, Play) <> matchAttribute creature)
-formatter 11 = manaAttribute
+oldFormatter 11 = manaAttribute
   <> attributeFormatter (attribute "life" (countLife Opponent))
-formatter 12 = manaAttribute
+oldFormatter 12 = manaAttribute
   <> attributeFormatter (attribute "life" (countLife Opponent))
-formatter _ = manaAttribute
+oldFormatter _ = manaAttribute

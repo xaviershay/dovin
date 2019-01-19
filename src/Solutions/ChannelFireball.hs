@@ -269,49 +269,49 @@ attributes = attributeFormatter $ do
 
 playExLandFormatter = cardFormatter "Play (ex. Land)"
   (matchLocation (Active, Play) <> invert (matchAttribute land))
-formatter 1 = attributes <> boardFormatter
-formatter 3 = attributes
-  <> cardFormatter "Play" (matchLocation (Active, Play))
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 6 = attributes <> stackFormatter
-formatter 7 = attributes <> stackFormatter
-formatter 8 = attributes <> stackFormatter
-  <> cardFormatter "Play" (matchLocation (Active, Play))
-formatter 9 = attributes <> stackFormatter
-formatter 10 = attributes <> stackFormatter
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 11 = attributes
-  <> cardFormatter "Play" (matchLocation (Active, Play))
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 13 = attributes <> stackFormatter
-formatter 14 = attributes <> stackFormatter
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 15 = attributes <> stackFormatter
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 16 = attributes
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> cardFormatter "Play" (matchLocation (Active, Play))
-formatter 17 = attributes
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> playExLandFormatter
-formatter 18 = attributes
-  <> playExLandFormatter
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 19 = attributes
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> playExLandFormatter
-formatter 21 = attributeFormatter (attribute "opponent" $ countLife Opponent) <> attributes
-formatter 22 = attributes
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> playExLandFormatter
-  <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
-formatter 23 = attributes
-  <> cardFormatter "Hand" (matchLocation (Active, Hand))
-  <> playExLandFormatter
-formatter 25 = attributeFormatter (attribute "opponent" $ countLife Opponent) <> attributes
-formatter _ = attributes
+formatter step = attributes <> case view stepNumber step of
+  1 -> boardFormatter
+  3 -> cardFormatter "Play" (matchLocation (Active, Play))
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  6 -> stackFormatter
+  7 -> stackFormatter
+  8 -> stackFormatter
+    <> cardFormatter "Play" (matchLocation (Active, Play))
+  9 -> stackFormatter
+  10 -> stackFormatter
+    <> cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  11  ->
+       cardFormatter "Play" (matchLocation (Active, Play))
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  13 -> stackFormatter
+  14 -> stackFormatter
+    <> cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  15 -> stackFormatter
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  16 ->
+       cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> cardFormatter "Play" (matchLocation (Active, Play))
+  17 ->
+       cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> playExLandFormatter
+  18 ->
+       playExLandFormatter
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  19 ->
+       cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> playExLandFormatter
+  21 -> attributeFormatter (attribute "opponent" $ countLife Opponent)
+  22 ->
+       cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> playExLandFormatter
+    <> cardFormatter "Graveyard" (matchLocation (Active, Graveyard))
+  23 ->
+      cardFormatter "Hand" (matchLocation (Active, Hand))
+    <> playExLandFormatter
+  25 -> attributeFormatter (attribute "opponent" $ countLife Opponent)
+  _ -> mempty
 
 spellCounter :: Lens' Board Int
 spellCounter = counters . at "spell-count" . non 0

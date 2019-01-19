@@ -193,7 +193,7 @@ fork options = do
 
 with x f = f x
 
-run :: (Int -> Formatter) -> GameMonad () -> IO ()
+run :: (Step -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
@@ -209,13 +209,9 @@ run formatter solution = do
       Nothing -> return ()
 
     forM_ steps $ \step -> do
-      let
-        n = view stepNumber step
-        state = view stepState step
-
-      putStr $ show n <> ". "
+      putStr $ show (view stepNumber step) <> ". "
       putStr $ view stepLabel step
-      putStrLn (formatter n state)
+      putStrLn . formatter step . view stepState $ step
 
   putStrLn ""
   case e of

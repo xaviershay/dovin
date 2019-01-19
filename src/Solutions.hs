@@ -1,4 +1,7 @@
 module Solutions where
+import Control.Lens (view)
+import Dovin.Types (stepNumber)
+
 import qualified Solutions.ChannelFireball
 import qualified Solutions.Core19_9
 import qualified Solutions.Dominaria5
@@ -9,20 +12,22 @@ import qualified Solutions.GuildsOfRavnica3
 import qualified Solutions.GuildsOfRavnica8
 import qualified Solutions.GuildsOfRavnica9
 import qualified Solutions.GuildsOfRavnicaPre2
+import qualified Solutions.RavnicaAllegiancePre2
 import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
 
 all = [
   ("ChannelFireball", Solutions.ChannelFireball.solution, Solutions.ChannelFireball.formatter),
-  ("Core19_9", Solutions.Core19_9.solution, Solutions.Core19_9.formatter),
-  ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter),
+  ("Core19_9", Solutions.Core19_9.solution, Solutions.Core19_9.formatter . view stepNumber),
+  ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter . view stepNumber),
   ("Example", Solutions.Example.solution, Solutions.Example.formatter),
-  ("ExplorersOfIxalanContest", Solutions.ExplorersOfIxalanContest.solution, Solutions.ExplorersOfIxalanContest.formatter),
-  ("GuildsOfRavnica1", Solutions.GuildsOfRavnica1.solution, Solutions.GuildsOfRavnica1.formatter),
-  ("GuildsOfRavnica3", Solutions.GuildsOfRavnica3.solution, Solutions.GuildsOfRavnica3.formatter),
-  ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter),
-  ("GuildsOfRavnica9", Solutions.GuildsOfRavnica9.solution, Solutions.GuildsOfRavnica9.formatter),
-  ("GuildsOfRavnicaPre2", Solutions.GuildsOfRavnicaPre2.solution, Solutions.GuildsOfRavnicaPre2.formatter),
-  ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter),
+  ("ExplorersOfIxalanContest", Solutions.ExplorersOfIxalanContest.solution, Solutions.ExplorersOfIxalanContest.formatter . view stepNumber),
+  ("GuildsOfRavnica1", Solutions.GuildsOfRavnica1.solution, Solutions.GuildsOfRavnica1.formatter . view stepNumber),
+  ("GuildsOfRavnica3", Solutions.GuildsOfRavnica3.solution, Solutions.GuildsOfRavnica3.formatter . view stepNumber),
+  ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter . view stepNumber),
+  ("GuildsOfRavnica9", Solutions.GuildsOfRavnica9.solution, Solutions.GuildsOfRavnica9.formatter . view stepNumber),
+  ("GuildsOfRavnicaPre2", Solutions.GuildsOfRavnicaPre2.solution, Solutions.GuildsOfRavnicaPre2.formatter . view stepNumber),
+  ("RavnicaAllegiancePre2", Solutions.RavnicaAllegiancePre2.solution, Solutions.RavnicaAllegiancePre2.formatter),
+  ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter . view stepNumber),
   ("UltimateMasters", Solutions.UltimateMasters.solution, Solutions.UltimateMasters.formatter)
   ]

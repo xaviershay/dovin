@@ -7,6 +7,8 @@ V2 makes the following changes from V1:
   of API.
 * `activate` and `trigger` use the stack.
 * Fork has a saner API and reports properly.
+* `formatter` now takes a 'Step' rather than an 'Int'. 'view' is re-exported
+  since it will virtually always be required for normal formatters.
 -}
 module Dovin.V2
   ( module Dovin.Dump
@@ -16,6 +18,7 @@ module Dovin.V2
   , module Dovin.Formatting
   , module Dovin.Helpers
   , module Dovin.Types
+  , view
   )
   where
 
@@ -29,4 +32,4 @@ import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
-import Control.Monad.Reader (local)
+import Control.Lens (view)
