@@ -494,6 +494,7 @@ activate stackName mana targetName = do
 --   * Cards are in play.
 --   * Cards have 'creature' attribute.
 --   * Cards either have 'haste' or are missing 'summoned'.
+--   * Cards do not have 'defender'.
 --
 -- [Effects]
 --
@@ -508,6 +509,7 @@ attackWith cs = do
     c <- requireCard cn
            (matchInPlay
              <> matchAttribute "creature"
+             <> missingAttribute "defender"
              <> labelMatch "does not have summoning sickness" (
                     matchAttribute haste
                     `matchOr`

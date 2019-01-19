@@ -145,5 +145,4 @@ attributes = attributeFormatter $ do
   attribute "harpy" $
     view cardStrength <$> requireCard "Mausoleum Harpy" mempty
 
-defender = "defender"
 blocked = "blocked"

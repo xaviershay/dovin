@@ -28,6 +28,8 @@ deathtouch :: CardAttribute
 deathtouch = "deathtouch"
 deathtouched :: CardAttribute
 deathtouched = "deathtouched"
+defender :: CardAttribute
+defender = "defender"
 doublestrike :: CardAttribute
 doublestrike = "doublestrike"
 enchantment :: CardAttribute

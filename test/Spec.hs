@@ -280,6 +280,13 @@ test_Test = testGroup "Actions"
             withAttributes [summoned] $ addCreature (1, 1) "Bat"
 
           attackWith ["Bat"]
+    , refute
+        "prevents defenders from attacking"
+        "not has attribute defender" $ do
+          withLocation (Active, Play) $ do
+            withAttributes [defender] $ addCreature (1, 1) "Wall"
+
+          attackWith ["Wall"]
     , prove "allows hasty creatures to attack" $ do
         withLocation (Active, Play) $ do
           withAttributes [haste, summoned] $ addCreature (1, 1) "Bat"
