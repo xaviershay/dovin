@@ -93,42 +93,40 @@ solution = do
       , "Growth-Chamber Guardian 2"
       ]
 
-  fork
-    [ step "Opponent blocks all on ground, first-strike damage pumps harpy" $ do
-        step "First-strike damage" $ do
-          combatDamage ["Goring Ceratops"] "Piston-Fist Cyclops"
-          combatDamage ["Goblin Chainwhirler 1"] "Growth-Chamber Guardian 1"
-          combatDamage ["Goblin Chainwhirler 2"] "Growth-Chamber Guardian 2"
+  fork "Opponent doesn't block one ground attacker, damage is lethal" $ do
+    step "First-strike damage" $ do
+      combatDamage ["Goring Ceratops"] "Piston-Fist Cyclops"
+      combatDamage ["Goblin Chainwhirler 1"] "Growth-Chamber Guardian 1"
 
-        step "Death triggers for harpy" $ do
-          trigger "Cyclops" "Mausoleum Harpy"
-          trigger "Guardian 1" "Mausoleum Harpy"
-          trigger "Guardian 2" "Mausoleum Harpy"
+    step "Death triggers for harpy" $ do
+      trigger "Cyclops" "Mausoleum Harpy"
+      trigger "Guardian 1" "Mausoleum Harpy"
 
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+      resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+      resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
 
-        step "Regular damage" $ do
-          combatDamage [] "Mausoleum Harpy"
-          validateLife 0 Opponent
-    , step "Opponent doesn't block, damage is lethal" $ do
-        step "First-strike damage" $ do
-          combatDamage ["Goring Ceratops"] "Piston-Fist Cyclops"
-          combatDamage ["Goblin Chainwhirler 1"] "Growth-Chamber Guardian 1"
+    step "Regular damage" $ do
+      combatDamage [] "Mausoleum Harpy"
+      combatDamage [] "Growth-Chamber Guardian 2"
+      validateLife (-2) Opponent
 
-        step "Death triggers for harpy" $ do
-          trigger "Cyclops" "Mausoleum Harpy"
-          trigger "Guardian 1" "Mausoleum Harpy"
+  step "First-strike damage" $ do
+    combatDamage ["Goring Ceratops"] "Piston-Fist Cyclops"
+    combatDamage ["Goblin Chainwhirler 1"] "Growth-Chamber Guardian 1"
+    combatDamage ["Goblin Chainwhirler 2"] "Growth-Chamber Guardian 2"
 
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+  step "Death triggers for harpy" $ do
+    trigger "Cyclops" "Mausoleum Harpy"
+    trigger "Guardian 1" "Mausoleum Harpy"
+    trigger "Guardian 2" "Mausoleum Harpy"
 
-        step "Regular damage" $ do
-          combatDamage [] "Mausoleum Harpy"
-          combatDamage [] "Growth-Chamber Guardian 2"
-          validateLife (-2) Opponent
-    ]
+    resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+    resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+    resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+
+  step "Regular damage" $ do
+    combatDamage [] "Mausoleum Harpy"
+    validateLife 0 Opponent
 
 formatter 1 = attributes <> boardFormatter
 formatter 5 = attributes <>
@@ -140,7 +138,7 @@ formatter 5 = attributes <>
 formatter _ = attributes
 
 attributes = attributeFormatter $ do
-  attribute "life" $ countLife Active
+  attribute "life" $ countLife Opponent
   attribute "mana" $ countCards $ matchAttribute land <> missingAttribute tapped
   attribute "harpy" $
     view cardStrength <$> requireCard "Mausoleum Harpy" mempty

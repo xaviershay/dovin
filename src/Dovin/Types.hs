@@ -3,7 +3,7 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _Just, at, non)
+import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _2, _Just, at, non)
 import Control.Monad.Reader (ReaderT)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
@@ -118,19 +118,37 @@ data Env = Env
   , _envActor :: Player
   }
 
-type StepIdentifier = Int
-type Step = (StepIdentifier, String, Board)
+type StepIdentifier = (Maybe String, Int)
+data Step = Step
+  { _stepId :: StepIdentifier
+  , _stepLabel :: String
+  , _stepState :: Board
+  }
 
 type GameMonad a
    = (ExceptT String (ReaderT Env (StateT Board (WriterT [Step] Identity)))) a
 type Formatter = Board -> String
 
-incrementStep s = s + 1
+incrementStep :: StepIdentifier -> StepIdentifier
+incrementStep (f, s) = (f, s + 1)
 
 makeLenses ''Board
 makeLenses ''Card
 makeLenses ''CardEffect
 makeLenses ''Env
+makeLenses ''Step
+
+stepFork :: Control.Lens.Lens' Step (Maybe String)
+stepFork = stepId . _1
+
+stepNumber :: Control.Lens.Lens' Step Int
+stepNumber = stepId . _2
+
+mkStep id label state = Step
+  { _stepId = id
+  , _stepLabel = label
+  , _stepState = state
+  }
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location
@@ -213,6 +231,6 @@ emptyBoard = Board
                , _life = mempty
                , _manaPool = mempty
                , _phase = FirstMain
-               , _currentStep = 0
+               , _currentStep = (Nothing, 0)
                }
 

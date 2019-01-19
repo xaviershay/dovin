@@ -6,6 +6,7 @@ V2 makes the following changes from V1:
 * Flips argument order for `validate` functions to be consistent with rest
   of API.
 * `activate` and `trigger` use the stack.
+* Fork has a saner API and reports properly.
 -}
 module Dovin.V2
   ( module Dovin.Dump
@@ -21,7 +22,7 @@ module Dovin.V2
 import Dovin.Actions
 import qualified Dovin.V1
 import Dovin.Prelude
-import Dovin.Dump hiding (activate, trigger)
+import Dovin.Dump hiding (activate, trigger, fork)
 import Dovin.Attributes
 import Dovin.Builder
 import Dovin.Formatting

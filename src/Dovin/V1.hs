@@ -14,7 +14,7 @@ module Dovin.V1
   ) where
 
 import Dovin.Dump
-import Dovin.Actions hiding (validate, validateLife, activate, trigger)
+import Dovin.Actions hiding (validate, validateLife, activate, trigger, fork)
 import qualified Dovin.Actions
 import Dovin.Attributes
 import Dovin.Builder hiding (withLocation)

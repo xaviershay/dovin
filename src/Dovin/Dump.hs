@@ -9,6 +9,10 @@ import Control.Monad.Writer
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import System.Exit
+import Data.List (groupBy, sort, sortBy)
+import Data.Ord (comparing)
+import Data.Function (on)
+import Debug.Trace
 
 import Dovin.Actions
 import Dovin.Attributes
@@ -181,11 +185,11 @@ activatePlaneswalker loyalty cn = do
 fork :: [GameMonad ()] -> GameMonad ()
 fork options = do
   b <- get
+  let cs = view currentStep b
 
   forM_ options $ \m -> do
     m
-    put b
-
+    put $ set currentStep cs b
 
 with x f = f x
 
@@ -193,10 +197,25 @@ run :: (Int -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution
 
-  forM_ log $ \(n, step, board) -> do
-    putStr $ show n <> ". "
-    putStr step
-    putStrLn (formatter n board)
+  let groupedSteps =
+        groupBy ((==) `on` view stepFork) . sortBy (comparing $ view stepId ) $ log
+
+  forM_ groupedSteps $ \steps -> do
+    case view stepFork $ head steps of
+      Just l -> do
+        putStrLn ""
+        putStrLn $ "=== ALTERNATIVE: " <> l
+        putStrLn ""
+      Nothing -> return ()
+
+    forM_ steps $ \step -> do
+      let
+        n = view stepNumber step
+        state = view stepState step
+
+      putStr $ show n <> ". "
+      putStr $ view stepLabel step
+      putStrLn (formatter n state)
 
   putStrLn ""
   case e of

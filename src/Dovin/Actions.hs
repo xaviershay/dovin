@@ -10,6 +10,7 @@ applied.
 -}
 module Dovin.Actions (
   step
+  , fork
   -- * Casting
   , cast
   , castFromLocation
@@ -934,9 +935,24 @@ step desc m = withStateBasedActions $ do
   let (e, b', _) = runMonad b m
   let b'' = over currentStep incrementStep b'
 
-  tell [(view currentStep b'', desc, b'')]
+  tell [mkStep (view currentStep b'') desc b'']
   put b''
 
   case e of
     Left x -> throwError x
     Right _ -> return ()
+
+-- | Branch off a labeled alternative line. Steps inside the fork will be
+-- reported at the end of the main line output.
+fork :: String -> GameMonad () -> GameMonad ()
+fork label m = do
+  b <- get
+  modifying
+    (currentStep . _1)
+    (f label)
+  m
+  put b
+
+  where
+    f label Nothing = Just label
+    f label (Just existing) = Just $ existing <> " - " <> label
