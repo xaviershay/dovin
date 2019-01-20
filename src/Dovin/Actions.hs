@@ -20,6 +20,8 @@ module Dovin.Actions (
   , resolveTop
   , splice
   , tapForMana
+  , target
+  , targetInLocation
   -- * Uncategorized
   , activate
   , attackWith
@@ -448,6 +450,23 @@ move from to name = action "move" $ do
     modifyCard name cardPlusOneCounters (+ 1)
   else
     modifyCard name location (const to)
+
+-- | Target a permanent.
+--
+-- [Validates]
+--
+--   * Card is in play.
+--   * Card does not have 'hexproof'.
+target :: CardName -> GameMonad ()
+target = validate (matchInPlay <> missingAttribute hexproof)
+
+-- | Target a card in a non-play location.
+--
+-- [Validates]
+--
+--   * Card is in zone.
+targetInLocation :: CardLocation -> CardName -> GameMonad ()
+targetInLocation zone = validate (matchLocation zone)
 
 -- | Activate an ability of a permanent. See 'spendMana' for additional mana
 -- validations and effects. Typically you will want to `resolve` after
