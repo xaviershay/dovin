@@ -27,6 +27,7 @@ module Dovin.Actions (
   , attackWith
   , combatDamage
   , damage
+  , destroy
   , discard
   , exert
   , moveTo
@@ -668,6 +669,22 @@ damage f t source = action "damage" $ do
 
       when (hasAttribute planeswalker t) $
         modifyCard tn cardLoyalty (\x -> x - dmg)
+
+
+-- | Destroy a permanent.
+--
+-- [Validates]
+-- 
+--   * Card is in play.
+--   * Card is not 'indestructible'
+--
+-- [Effects]
+--
+--   * Card is moved to graveyard. See 'move' for possible alternate effects.
+destroy :: CardName -> GameMonad ()
+destroy targetName = do
+  validate (matchInPlay <> missingAttribute indestructible) targetName
+  moveTo Graveyard targetName
 
 -- | Discard a card from the active player's hand.
 --
