@@ -6,10 +6,14 @@ test_Target = testGroup "target"
   [ prove "targets a card in play" $ do
       withLocation Play $ addArtifact "Mox"
       target "Mox"
+  , prove "targets own card with hexproof" $ do
+      withLocation Play $ withAttribute hexproof $ addArtifact "Mox"
+      target "Mox"
   , refute
-      "cannot target hexproof"
+      "cannot target hexproof of opponent"
       "not has attribute hexproof" $ do
-        withLocation Play $ withAttribute hexproof $ addArtifact "Mox"
+        as Opponent $ do
+          withLocation Play $ withAttribute hexproof $ addArtifact "Mox"
         target "Mox"
   , refute
       "requires in play"

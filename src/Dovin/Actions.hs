@@ -457,9 +457,16 @@ move from to name = action "move" $ do
 -- [Validates]
 --
 --   * Card is in play.
---   * Card does not have 'hexproof'.
+--   * If card belongs to opponent, does not have 'hexproof'.
 target :: CardName -> GameMonad ()
-target = validate (matchInPlay <> missingAttribute hexproof)
+target name = do
+  actor <- view envActor
+  card  <- requireCard name matchInPlay
+
+  let controller = view (cardLocation . _1) card
+
+  unless (actor == controller) $
+    validate (missingAttribute hexproof) name
 
 -- | Target a card in a non-play location.
 --
