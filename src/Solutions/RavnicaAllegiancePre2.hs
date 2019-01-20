@@ -42,7 +42,7 @@ solution = do
     trigger "Haste" "Rhythm of the Wild 1"
     trigger "+1/+1" "Rhythm of the Wild 2"
     resolveTop
-    modifyStrength (1, 1) "Growth-Chamber Guardian 1"
+    modifyCard "Growth-Chamber Guardian 1" cardPlusOneCounters (+ 1)
     trigger "Search" "Growth-Chamber Guardian 1"
 
     resolveTop
@@ -59,7 +59,7 @@ solution = do
     trigger "Haste" "Rhythm of the Wild 1"
     trigger "+1/+1" "Rhythm of the Wild 2"
     resolveTop
-    modifyStrength (1, 1) "Growth-Chamber Guardian 2"
+    modifyCard "Growth-Chamber Guardian 2" cardPlusOneCounters (+ 1)
     trigger "Search" "Growth-Chamber Guardian 1"
     resolveTop
 
@@ -78,8 +78,7 @@ solution = do
     trigger "Make Dragon" "Dragon Egg"
     trigger "+1/+1" "Mausoleum Harpy"
 
-    resolveTop
-    modifyStrength (1, 1) "Mausoleum Harpy"
+    resolveHarpyTrigger
 
     resolveTop
     withLocation Play $ do
@@ -105,9 +104,9 @@ solution = do
           trigger "Guardian 1" "Mausoleum Harpy"
           trigger "Guardian 2" "Mausoleum Harpy"
 
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+          resolveHarpyTrigger
+          resolveHarpyTrigger
+          resolveHarpyTrigger
 
         step "Regular damage" $ do
           combatDamage [] "Mausoleum Harpy"
@@ -121,8 +120,8 @@ solution = do
           trigger "Cyclops" "Mausoleum Harpy"
           trigger "Guardian 1" "Mausoleum Harpy"
 
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
-          resolveTop >> modifyStrength (1, 1) "Mausoleum Harpy"
+          resolveHarpyTrigger
+          resolveHarpyTrigger
 
         step "Regular damage" $ do
           combatDamage [] "Mausoleum Harpy"
@@ -138,6 +137,10 @@ formatter 5 = attributes <>
     <> matchAttribute attacking
     )
 formatter _ = attributes
+
+resolveHarpyTrigger = do
+  resolveTop
+  modifyCard "Mausoleum Harpy" cardPlusOneCounters (+ 1)
 
 attributes = attributeFormatter $ do
   attribute "life" $ countLife Active
