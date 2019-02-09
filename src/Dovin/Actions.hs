@@ -668,6 +668,7 @@ damage f t source = action "damage" $ do
       t <- requireCard tn $ matchInPlay <>
              (matchAttribute creature `matchOr` matchAttribute planeswalker)
 
+      target tn
       when (hasAttribute creature t) $ do
         modifyCard tn cardDamage (+ dmg)
 
