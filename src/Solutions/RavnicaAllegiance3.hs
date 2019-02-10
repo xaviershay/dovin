@@ -98,14 +98,14 @@ solution = do
     gainAttribute indestructible "Pitiless Pontiff"
     gainAttribute deathtouch "Pitiless Pontiff"
     
-  step "Apply combat damage" $ do
+  step "Apply combat damage, doesn't matter what Humongulus blocks, can't kill them" $ do
     combatDamage [] "Grand Warlord Radha"
     combatDamage [] "Judith, the Scourge Diva"
     combatDamage [] "Pitiless Pontiff"
     combatDamage [] "Teysa Karlov"
     combatDamage ["Humongulus"] "Elenda, the Dusk Rose"
 
-  step "Sacrifice Radha, ping Rakdos and opponent (ignore Elenda triggers)" $ do
+  step "Sacrifice Radha, ping opponent (ignore Elenda triggers, irrelevant)" $ do
     activate "Indestructible" "1" "Pitiless Pontiff"
     sacrifice "Grand Warlord Radha"
 
