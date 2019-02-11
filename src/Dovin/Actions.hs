@@ -21,11 +21,14 @@ module Dovin.Actions (
   , resolveTop
   , splice
   , tapForMana
+  , target
+  , targetInLocation
   -- * Uncategorized
   , activate
   , attackWith
   , combatDamage
   , damage
+  , destroy
   , discard
   , exert
   , moveTo
@@ -450,6 +453,30 @@ move from to name = action "move" $ do
   else
     modifyCard name location (const to)
 
+-- | Target a permanent.
+--
+-- [Validates]
+--
+--   * Card is in play.
+--   * If card belongs to opponent, does not have 'hexproof'.
+target :: CardName -> GameMonad ()
+target name = do
+  actor <- view envActor
+  card  <- requireCard name matchInPlay
+
+  let controller = view (cardLocation . _1) card
+
+  unless (actor == controller) $
+    validate (missingAttribute hexproof) name
+
+-- | Target a card in a non-play location.
+--
+-- [Validates]
+--
+--   * Card is in zone.
+targetInLocation :: CardLocation -> CardName -> GameMonad ()
+targetInLocation zone = validate (matchLocation zone)
+
 -- | Activate an ability of a permanent. See 'spendMana' for additional mana
 -- validations and effects. Typically you will want to `resolve` after
 -- activating.
@@ -642,6 +669,7 @@ damage f t source = action "damage" $ do
       t <- requireCard tn $ matchInPlay <>
              (matchAttribute creature `matchOr` matchAttribute planeswalker)
 
+      target tn
       when (hasAttribute creature t) $ do
         modifyCard tn cardDamage (+ dmg)
 
@@ -650,6 +678,22 @@ damage f t source = action "damage" $ do
 
       when (hasAttribute planeswalker t) $
         modifyCard tn cardLoyalty (\x -> x - dmg)
+
+
+-- | Destroy a permanent.
+--
+-- [Validates]
+-- 
+--   * Card is in play.
+--   * Card is not 'indestructible'
+--
+-- [Effects]
+--
+--   * Card is moved to graveyard. See 'move' for possible alternate effects.
+destroy :: CardName -> GameMonad ()
+destroy targetName = do
+  validate (matchInPlay <> missingAttribute indestructible) targetName
+  moveTo Graveyard targetName
 
 -- | Discard a card from the active player's hand.
 --

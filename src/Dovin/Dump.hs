@@ -34,21 +34,6 @@ whenMatch name f action = do
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
 
-target targetName = do
-  card <- requireCard targetName (matchInPlay <> missingAttribute hexproof)
-
-  return ()
-
-targetInLocation zone targetName = do
-  card <- requireCard targetName (matchLocation zone)
-
-  return ()
-
-destroy targetName = do
-  _ <- requireCard targetName (matchInPlay <> missingAttribute indestructible)
-
-  removeFromPlay targetName
-
 sacrifice cn = do
   actor <- view envActor
 

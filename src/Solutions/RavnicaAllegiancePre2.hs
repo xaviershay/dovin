@@ -42,7 +42,7 @@ solution = do
     trigger "Haste" "Rhythm of the Wild 1"
     trigger "+1/+1" "Rhythm of the Wild 2"
     resolveTop
-    modifyStrength (1, 1) "Growth-Chamber Guardian 1"
+    modifyCard "Growth-Chamber Guardian 1" cardPlusOneCounters (+ 1)
     trigger "Search" "Growth-Chamber Guardian 1"
 
     resolveTop
@@ -59,7 +59,7 @@ solution = do
     trigger "Haste" "Rhythm of the Wild 1"
     trigger "+1/+1" "Rhythm of the Wild 2"
     resolveTop
-    modifyStrength (1, 1) "Growth-Chamber Guardian 2"
+    modifyCard "Growth-Chamber Guardian 2" cardPlusOneCounters (+ 1)
     trigger "Search" "Growth-Chamber Guardian 1"
     resolveTop
 
@@ -78,8 +78,7 @@ solution = do
     trigger "Make Dragon" "Dragon Egg"
     trigger "+1/+1" "Mausoleum Harpy"
 
-    resolveTop
-    modifyStrength (1, 1) "Mausoleum Harpy"
+    resolveHarpyTrigger
 
     resolveTop
     withLocation Play $ do
@@ -136,6 +135,10 @@ formatter step = attributes <> case view stepNumber step of
         <> matchAttribute attacking
         )
   _ -> mempty
+
+resolveHarpyTrigger = do
+  resolveTop
+  modifyCard "Mausoleum Harpy" cardPlusOneCounters (+ 1)
 
 attributes = attributeFormatter $ do
   attribute "life" $ countLife Opponent
