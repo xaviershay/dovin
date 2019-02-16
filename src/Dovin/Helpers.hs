@@ -91,10 +91,17 @@ allCards = do
   mapM applyEffects bases
 
 modifyCard :: CardName -> ASetter Card Card a b -> (a -> b) -> GameMonad ()
-modifyCard name lens f =
+modifyCard name lens f = do
   modifying
     (cards . at name . _Just)
     (\(BaseCard c) -> BaseCard $ over lens f c)
+
+  card <- requireCard name mempty
+
+  -- This isn't a SBA, it needs to be post-condition here to make sure no funny
+  -- business is happening.
+  when (view cardPlusOneCounters card < 0) $
+    throwError "Cannot reduce +1/+1 counters to less than 0"
 
 -- CARD MATCHERS
 --

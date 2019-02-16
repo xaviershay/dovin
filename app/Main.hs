@@ -4,7 +4,7 @@ import Control.Monad (forM_)
 import Dovin
 
 import qualified Solutions
-import Solutions.RavnicaAllegiance3
+import Solutions.RavnicaAllegiance4
 
 main :: IO ()
 main = run formatter solution
