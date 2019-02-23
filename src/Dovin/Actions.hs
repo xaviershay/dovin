@@ -800,13 +800,22 @@ spendMana amount =
 --
 --   * Card is in play.
 --   * Card is not tapped.
+--   * If creature, is not summoned or has haste.
 --
 -- [Effects]:
 --
 --   * Card gains tapped attribute.
 tap :: CardName -> GameMonad ()
 tap name = do
-  validate (matchInPlay <> missingAttribute tapped) name
+  c <- requireCard name (matchInPlay <> missingAttribute tapped)
+
+  when (applyMatcher (matchAttribute creature) c) $ do
+    validate (labelMatch "does not have summoning sickness" (
+                    matchAttribute haste
+                    `matchOr`
+                    missingAttribute summoned
+             )) name
+
 
   gainAttribute tapped name
 

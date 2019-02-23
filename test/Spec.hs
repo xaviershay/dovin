@@ -116,32 +116,6 @@ test_Test = testGroup "Actions"
         addMana "10"
         validateBoardEquals (manaPool . at Active . _Just) (replicate 10 'X')
     ]
-  , testGroup "tap"
-    [ prove "taps card in play" $ do
-        withLocation (Active, Play) $ addLand "Forest"
-        tap "Forest"
-
-        validate "Forest" $ matchAttribute tapped
-    , prove "taps card in opponent's play" $ do
-        withLocation (Active, Play) $ addLand "Forest"
-        tap "Forest"
-
-        validate "Forest" $ matchAttribute tapped
-    , refute
-        "requires card exists"
-        "Card does not exist: Forest" $ do
-          tap "Forest"
-    , refute
-        "requires untapped"
-        "not has attribute tapped" $ do
-          withAttribute tapped $ withLocation (Active, Play) $ addLand "Forest"
-          tap "Forest"
-    , refute
-        "requires in play"
-        "in play" $ do
-          withLocation (Active, Graveyard) $ addLand "Forest"
-          tap "Forest"
-    ]
   , testGroup "tapForMana"
     [ prove "taps card and adds mana to pool" $ do
         withLocation (Active, Play) $ addLand "Forest"
