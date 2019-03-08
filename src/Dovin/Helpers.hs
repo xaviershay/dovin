@@ -103,6 +103,9 @@ modifyCardDeprecated name lens f = do
   when (view cardPlusOneCounters card < 0) $
     throwError "Cannot reduce +1/+1 counters to less than 0"
 
+modifyCard :: ASetter Card Card a b -> (a -> b) -> CardName -> GameMonad ()
+modifyCard lens f name = modifyCardDeprecated name lens f
+
 -- CARD MATCHERS
 --
 -- Matchers are used for both filtering sets of cards, and also for verifying
