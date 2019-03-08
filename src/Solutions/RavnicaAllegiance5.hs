@@ -90,7 +90,7 @@ solution = do
     cast "1G" "Wildgrowth Walker" >> resolveTop
 
     trigger "Explore" "Path of Discovery" >> resolveTop
-    modifyCard "Wildgrowth Walker" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Wildgrowth Walker" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
     gainLife Active 3
     trigger "Untap" "Famished Paladin" >> resolveTop
@@ -106,7 +106,7 @@ solution = do
     trigger "Explore Brachwalker" "Merfolk Branchwalker"
 
     resolveTop
-    modifyCard "Merfolk Branchwalker" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Merfolk Branchwalker" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
     gainLife Active 3
     trigger "Untap" "Famished Paladin" >> resolveTop
@@ -115,7 +115,7 @@ solution = do
     tapWithFreyalise "G" "Famished Paladin"
 
     resolveTop
-    modifyCard "Merfolk Branchwalker" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Merfolk Branchwalker" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
     gainLife Active 3
     trigger "Untap" "Famished Paladin" >> resolveTop
@@ -130,7 +130,7 @@ solution = do
     trigger "Explore Path" "Path of Discovery"
 
     resolveTop
-    modifyCard "Tenth District Veteran" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Tenth District Veteran" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
     gainLife Active 3
     trigger "Untap" "Famished Paladin" >> resolveTop

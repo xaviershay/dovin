@@ -67,7 +67,7 @@ solution = do
 
     forCards (attackers <> matchAttribute defender) $ \cn -> do
       -- Fake Arcades effect, it shouldn't actually change their power.
-      modifyCard cn cardStrength (\(CardStrength p t) -> CardStrength t t)
+      modifyCardDeprecated cn cardStrength (\(CardStrength p t) -> CardStrength t t)
 
     -- Defenders can't block, per Goblin Locksmith
     validate (matchAttribute defender) "Gyre Engineer 3"

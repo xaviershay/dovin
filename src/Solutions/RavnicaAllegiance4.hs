@@ -39,7 +39,7 @@ solution = do
     gainAttribute haste "Incubation Druid"
 
     resolve "+1/+1"
-    modifyCard "Incubation Druid" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Incubation Druid" cardPlusOneCounters (+ 1)
 
   step "Cast Zhur-Taa, double Riot and bonus +1/+1 for 3 total" $ do
     tapForMana "G" "Stomping Ground 3"
@@ -52,13 +52,13 @@ solution = do
     trigger "Zhur-Taa Riot" "Zhur-Taa Goblin"
 
     resolve "Zhur-Taa Riot"
-    modifyCard "Zhur-Taa Goblin" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Zhur-Taa Goblin" cardPlusOneCounters (+ 1)
 
     resolve "Rhythm Riot"
-    modifyCard "Zhur-Taa Goblin" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Zhur-Taa Goblin" cardPlusOneCounters (+ 1)
 
     resolve "+1/+1"
-    modifyCard "Zhur-Taa Goblin" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Zhur-Taa Goblin" cardPlusOneCounters (+ 1)
 
   step "Tap Druid for 3 mana, add to lands to cast Lizrog" $ do
     tap "Incubation Druid" -- TODO: Check if this checks for haste?
@@ -77,14 +77,14 @@ solution = do
     gainAttribute haste "Galloping Lizrog"
 
     resolve "+1/+1"
-    modifyCard "Galloping Lizrog" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Galloping Lizrog" cardPlusOneCounters (+ 1)
 
     resolve "+1/+1 swap"
-    modifyCard "Galloping Lizrog" cardPlusOneCounters (\x -> x - 1)
-    modifyCard "Zhur-Taa Goblin" cardPlusOneCounters (\x -> x - 3)
-    modifyCard "Incubation Druid" cardPlusOneCounters (\x -> x - 1)
+    modifyCardDeprecated "Galloping Lizrog" cardPlusOneCounters (\x -> x - 1)
+    modifyCardDeprecated "Zhur-Taa Goblin" cardPlusOneCounters (\x -> x - 3)
+    modifyCardDeprecated "Incubation Druid" cardPlusOneCounters (\x -> x - 1)
 
-    modifyCard "Galloping Lizrog" cardPlusOneCounters (+ (5 * 2))
+    modifyCardDeprecated "Galloping Lizrog" cardPlusOneCounters (+ (5 * 2))
 
   step "Attacking with Lizrog, unblockable from Herald" $ do
     validate matchInPlay "Herald of Secret Streams"

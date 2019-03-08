@@ -42,7 +42,7 @@ solution = do
     trigger "Haste" "Rhythm of the Wild 1"
     trigger "+1/+1" "Rhythm of the Wild 2"
     resolveTop
-    modifyCard "Growth-Chamber Guardian 1" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Growth-Chamber Guardian 1" cardPlusOneCounters (+ 1)
     trigger "Search" "Growth-Chamber Guardian 1"
 
     resolveTop
@@ -59,7 +59,7 @@ solution = do
     trigger "Haste" "Rhythm of the Wild 1"
     trigger "+1/+1" "Rhythm of the Wild 2"
     resolveTop
-    modifyCard "Growth-Chamber Guardian 2" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Growth-Chamber Guardian 2" cardPlusOneCounters (+ 1)
     trigger "Search" "Growth-Chamber Guardian 1"
     resolveTop
 
@@ -138,7 +138,7 @@ formatter step = attributes <> case view stepNumber step of
 
 resolveHarpyTrigger = do
   resolveTop
-  modifyCard "Mausoleum Harpy" cardPlusOneCounters (+ 1)
+  modifyCardDeprecated "Mausoleum Harpy" cardPlusOneCounters (+ 1)
 
 attributes = attributeFormatter $ do
   attribute "life" $ countLife Opponent

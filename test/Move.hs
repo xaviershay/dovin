@@ -51,7 +51,7 @@ test_Move = testGroup "move/moveTo"
         matchLocation (Active, Graveyard) <> matchPlusOneCounters 0
   , prove "removes damage when leaving play" $ do
       withLocation (Active, Play) $ addCreature (1, 1) "Zombie"
-      modifyCard "Zombie" cardDamage (const 1)
+      modifyCardDeprecated "Zombie" cardDamage (const 1)
 
       moveTo Graveyard "Zombie"
 

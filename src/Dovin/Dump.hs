@@ -82,13 +82,13 @@ resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do
   c <- requireCard cn (matchAttribute "creature")
 
-  modifyCard cn cardStrength (const $ mkStrength desired)
+  modifyCardDeprecated cn cardStrength (const $ mkStrength desired)
 
 modifyStrength :: (Int, Int) -> CardName -> GameMonad ()
 modifyStrength (x, y) cn = do
   _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
 
-  modifyCard cn cardStrength (CardStrength x y <>)
+  modifyCardDeprecated cn cardStrength (CardStrength x y <>)
 
   -- Fetch card again to get new strength
   c <- requireCard cn mempty
@@ -120,7 +120,7 @@ fight x y = do
     fight' cx cy = do
 
       let xdmg = max 0 $ view cardPower cx
-      modifyCard (view cardName cy) cardDamage (+ xdmg)
+      modifyCardDeprecated (view cardName cy) cardDamage (+ xdmg)
       cy' <- requireCard (view cardName cy) mempty
 
       when (hasAttribute "lifelink" cx) $
@@ -161,7 +161,7 @@ activatePlaneswalker loyalty cn = do
   if view cardLoyalty c - loyalty < 0 then
     throwError $ cn <> " does not have enough loyalty"
   else
-    modifyCard cn cardLoyalty (+ loyalty)
+    modifyCardDeprecated cn cardLoyalty (+ loyalty)
 
 
 -- HIGH LEVEL FUNCTIONS

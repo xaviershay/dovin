@@ -136,7 +136,7 @@ castFromLocation loc mana name = action "castFromLocation" $ do
     (hasAttribute instant card || hasAttribute flash card)
     validateCanCastSorcery
 
-  modifyCard name (location . _2) $ const Stack
+  modifyCardDeprecated name (location . _2) $ const Stack
 
   card <- requireCard name mempty
 
@@ -438,9 +438,9 @@ move from to name = action "move" $ do
     gainAttribute summoned name
 
   when (snd from == Play && snd to /= Play) $ do
-    modifyCard name cardPlusOneCounters (const 0)
-    modifyCard name cardDamage (const 0)
-    modifyCard name cardAttributes (const $ view cardDefaultAttributes c)
+    modifyCardDeprecated name cardPlusOneCounters (const 0)
+    modifyCardDeprecated name cardDamage (const 0)
+    modifyCardDeprecated name cardAttributes (const $ view cardDefaultAttributes c)
 
   -- These conditionals are acting on the card state _before_ any of the above
   -- changes were applied.
@@ -449,9 +449,9 @@ move from to name = action "move" $ do
       loseAttribute exileWhenLeaveStack name
       moveTo Exile name
   else if snd from == Play && snd to == Graveyard && view cardPlusOneCounters c == 0 && hasAttribute undying c then
-    modifyCard name cardPlusOneCounters (+ 1)
+    modifyCardDeprecated name cardPlusOneCounters (+ 1)
   else
-    modifyCard name location (const to)
+    modifyCardDeprecated name location (const to)
 
 -- | Target a permanent.
 --
@@ -671,13 +671,13 @@ damage f t source = action "damage" $ do
 
       target tn
       when (hasAttribute creature t) $ do
-        modifyCard tn cardDamage (+ dmg)
+        modifyCardDeprecated tn cardDamage (+ dmg)
 
         when (dmg > 0 && hasAttribute deathtouch c) $
           gainAttribute deathtouched tn
 
       when (hasAttribute planeswalker t) $
-        modifyCard tn cardLoyalty (\x -> x - dmg)
+        modifyCardDeprecated tn cardLoyalty (\x -> x - dmg)
 
 
 -- | Destroy a permanent.

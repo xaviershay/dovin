@@ -90,8 +90,8 @@ allCards = do
 
   mapM applyEffects bases
 
-modifyCard :: CardName -> ASetter Card Card a b -> (a -> b) -> GameMonad ()
-modifyCard name lens f = do
+modifyCardDeprecated :: CardName -> ASetter Card Card a b -> (a -> b) -> GameMonad ()
+modifyCardDeprecated name lens f = do
   modifying
     (cards . at name . _Just)
     (\(BaseCard c) -> BaseCard $ over lens f c)
@@ -166,7 +166,7 @@ applyMatcher matcher c =
 loseAttribute attr cn = do
   c <- requireCard cn mempty
 
-  modifyCard cn id (removeAttribute attr)
+  modifyCardDeprecated cn id (removeAttribute attr)
 
 removeAttribute :: CardAttribute -> Card -> Card
 removeAttribute attr = over cardAttributes (S.delete attr)
@@ -174,7 +174,7 @@ removeAttribute attr = over cardAttributes (S.delete attr)
 gainAttribute attr cn = do
   c <- requireCard cn mempty
 
-  modifyCard cn id (setAttribute attr)
+  modifyCardDeprecated cn id (setAttribute attr)
 
 setAttribute :: CardAttribute -> Card -> Card
 setAttribute attr = over cardAttributes (S.insert attr)

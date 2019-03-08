@@ -70,7 +70,7 @@ solution = do
     cast "G" "Status // Statue" >> resolveTop
     with "Judith, the Scourge Diva" $ \cn -> do
       gainAttribute deathtouch cn
-      modifyCard cn cardPlusOneCounters (+ 1)
+      modifyCardDeprecated cn cardPlusOneCounters (+ 1)
 
   step "Sacrifice Knight to make Pontiff indestructible, ping Shalai and Rakdos with Judith" $ do
     activate "Indestructible" "1" "Pitiless Pontiff"
@@ -90,9 +90,9 @@ solution = do
     damage (const 1) (targetCard "Rakdos, the Showstopper") "Judith, the Scourge Diva"
 
     resolveTop
-    modifyCard "Elenda, the Dusk Rose" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Elenda, the Dusk Rose" cardPlusOneCounters (+ 1)
     resolveTop
-    modifyCard "Elenda, the Dusk Rose" cardPlusOneCounters (+ 1)
+    modifyCardDeprecated "Elenda, the Dusk Rose" cardPlusOneCounters (+ 1)
 
     resolve "Indestructible"
     gainAttribute indestructible "Pitiless Pontiff"
