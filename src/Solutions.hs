@@ -15,6 +15,7 @@ import qualified Solutions.GuildsOfRavnicaPre2
 import qualified Solutions.RavnicaAllegiance3
 import qualified Solutions.RavnicaAllegiance4
 import qualified Solutions.RavnicaAllegiance5
+import qualified Solutions.RavnicaAllegiance7
 import qualified Solutions.RavnicaAllegiancePre2
 import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
@@ -33,6 +34,7 @@ all = [
   ("RavnicaAllegiance3", Solutions.RavnicaAllegiance3.solution, Solutions.RavnicaAllegiance3.formatter),
   ("RavnicaAllegiance4", Solutions.RavnicaAllegiance4.solution, Solutions.RavnicaAllegiance4.formatter),
   ("RavnicaAllegiance5", Solutions.RavnicaAllegiance5.solution, Solutions.RavnicaAllegiance5.formatter),
+  ("RavnicaAllegiance7", Solutions.RavnicaAllegiance7.solution, Solutions.RavnicaAllegiance7.formatter),
   ("RavnicaAllegiancePre2", Solutions.RavnicaAllegiancePre2.solution, Solutions.RavnicaAllegiancePre2.formatter),
   ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter . view stepNumber),
   ("UltimateMasters", Solutions.UltimateMasters.solution, Solutions.UltimateMasters.formatter)
