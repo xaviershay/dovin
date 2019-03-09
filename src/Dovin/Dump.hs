@@ -28,11 +28,6 @@ import Dovin.Types
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
 
-removeFromPlay cardName = do
-  card <- requireCard cardName matchInPlay
-
-  moveTo Graveyard cardName
-
 exile cardName = do
   card <- requireCard cardName mempty
 
