@@ -64,16 +64,6 @@ triggerMentor sourceName targetName = do
   modifyStrength (1, 1) targetName
 
 
-fight :: CardName -> CardName -> GameMonad ()
-fight x y = do
-  cx <- requireCard x (matchInPlay <> matchAttribute creature)
-  cy <- requireCard y (matchInPlay <> matchAttribute creature)
-
-  fight' x y
-  fight' y x
-
-  where
-    fight' src dst = damage (view cardPower) (targetCard dst) src
 
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =

@@ -32,6 +32,7 @@ module Dovin.Actions (
   , discard
   , exert
   , exile
+  , fight
   , moveTo
   , sacrifice
   , transitionTo
@@ -766,6 +767,30 @@ exert cn = do
 -- See `moveTo` for validations and effects.
 exile :: CardName -> GameMonad ()
 exile = moveTo Exile
+
+-- | Have one card fight another (each deals damage to the other).
+--
+-- [Validates]
+--
+--   * Card is in play.
+--   * Card is a creature.
+--
+-- [Effects]
+--
+--   * Each card has damage dealt to it equal to the other's power. A creature
+--     fighting itself will take twice its power in damage.
+--   * Note 'runStateBasedActions' handles actual destruction (if applicable)
+--     of creatures.
+fight :: CardName -> CardName -> GameMonad ()
+fight x y = do
+  validate (matchInPlay <> matchAttribute creature) x
+  validate (matchInPlay <> matchAttribute creature) y
+
+  fight' x y
+  fight' y x
+
+  where
+    fight' src dst = damage (view cardPower) (targetCard dst) src
 
 -- | Move card to location with same controller.
 --
