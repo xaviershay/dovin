@@ -22,14 +22,6 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
--- ACTIONS
---
--- These correspond to things you can do in Magic. They progress the state
--- machine while verifying applicable properties. They all run inside the
--- library monad.
-
-
-
 resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do
   c <- requireCard cn (matchAttribute "creature")
@@ -51,8 +43,6 @@ triggerMentor sourceName targetName = do
 
   modifyStrength (1, 1) targetName
 
-
-
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
   modifying
@@ -64,8 +54,3 @@ loseLife player amount = gainLife player (-amount)
 
 setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
-
-
--- HIGH LEVEL FUNCTIONS
---
-
