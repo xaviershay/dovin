@@ -2,6 +2,7 @@ module Solutions.GuildsOfRavnica9 where
 
 import Control.Lens
 import Control.Monad
+import Control.Monad.Except (throwError)
 
 import Dovin.V1
 
@@ -200,3 +201,14 @@ formatter _ = attributeFormatter $ do
   attribute "adeliz" $
     view cardStrength <$> requireCard "Adeliz, the Cinder Wind" mempty
   attribute "enemies" $ countCards (matchLocation (Opponent, Play))
+
+triggerStorm :: (Int -> GameMonad ()) -> GameMonad ()
+triggerStorm action = do
+  maybeStorm <- use $ counters . at "storm"
+
+  case maybeStorm of
+    Nothing -> throwError "No counter in state: storm"
+    Just c -> forM [1..c-1] $ \n -> action n
+
+  return ()
+

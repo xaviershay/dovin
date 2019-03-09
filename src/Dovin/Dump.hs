@@ -42,16 +42,6 @@ copySpell targetName newName = do
     stack
     ((:) newName)
 
-triggerStorm :: (Int -> GameMonad ()) -> GameMonad ()
-triggerStorm action = do
-  maybeStorm <- use $ counters . at "storm"
-
-  case maybeStorm of
-    Nothing -> throwError "No counter in state: storm"
-    Just c -> forM [1..c-1] $ \n -> action n
-
-  return ()
-
 resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do
   c <- requireCard cn (matchAttribute "creature")
