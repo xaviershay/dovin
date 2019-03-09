@@ -31,6 +31,7 @@ module Dovin.Actions (
   , destroy
   , discard
   , exert
+  , exile
   , moveTo
   , sacrifice
   , transitionTo
@@ -757,6 +758,14 @@ exert :: CardName -> GameMonad ()
 exert cn = do
   validate (matchAttribute tapped) cn
   gainAttribute exerted cn
+
+-- | Move a card to the Exile zone.
+--
+-- > exile "Bridge from Below"
+--
+-- See `moveTo` for validations and effects.
+exile :: CardName -> GameMonad ()
+exile = moveTo Exile
 
 -- | Move card to location with same controller.
 --

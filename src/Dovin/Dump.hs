@@ -28,14 +28,6 @@ import Dovin.Types
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
 
-exile cardName = do
-  card <- requireCard cardName mempty
-
-  if hasAttribute "token" card then
-    remove cardName
-  else
-    let loc = view location card in
-      move loc (second (const Exile) loc) cardName
 
 copySpell targetName newName = do
   card <- requireCard targetName mempty
