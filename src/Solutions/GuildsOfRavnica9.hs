@@ -17,8 +17,9 @@ solution = do
         action name
         trigger "Thousand-Year Storm"
         triggerStorm $
-          \n -> copySpell name
+          \n -> copySpell
                   (numbered (n + 1) (zipWith const name (drop 2 name)))
+                  name
 
         trigger "Adeliz, the Cinder Wind"
         modifyStrength (1, 1) "Adeliz, the Cinder Wind"
@@ -115,8 +116,8 @@ solution = do
     withTriggers (cast "G") "Plummet 1"
 
     -- From double doublecast earlier
-    copySpell "Plummet 1" "Plummet 4"
-    copySpell "Plummet 1" "Plummet 5"
+    copySpell "Plummet 4" "Plummet 1"
+    copySpell "Plummet 5" "Plummet 1"
 
     resolve "Plummet 5"
     with "Lyra Dawnbringer" $ \enemy -> do

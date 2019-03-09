@@ -73,7 +73,7 @@ solution = do
     withTriggers (cast "1U") "Snap"
     target "Beamsplitter Mage"
     trigger "Copied Snap" "Beamsplitter Mage" >> resolveTop
-    copySpell "Snap" "Snap Copy (Snapcaster Mage)"
+    copySpell "Snap Copy (Snapcaster Mage)" "Snap"
     target "Snapcaster Mage"
 
   step "Counter Walking Ballista with Rewind, untapping Steam Vents" $ do
@@ -127,7 +127,7 @@ solution = do
     withTriggers (flashbackSnapped "1U") "Snap"
     target "Beamsplitter Mage"
     trigger "Copied Snap" "Beamsplitter Mage" >> resolveTop
-    copySpell "Snap" "Snap Copy (Snapcaster Mage)"
+    copySpell "Snap Copy (Snapcaster Mage)" "Snap"
     target "Snapcaster Mage"
 
   step "Resolve Snap copy, returning Snapcaster, untap Breeding Pools" $ do

@@ -29,7 +29,7 @@ import Dovin.Types
 -- library monad.
 
 
-copySpell targetName newName = do
+copySpell newName targetName = do
   card <- requireCard targetName mempty
 
   let newCard = setAttribute copy . set cardName newName $ card

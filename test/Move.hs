@@ -97,7 +97,7 @@ test_Move = testGroup "move/moveTo"
         withLocation (Active, Hand) $ addInstant "Shock"
 
         cast "" "Shock"
-        copySpell "Shock" "Shock 1" >> resolveTop
+        copySpell "Shock 1" "Shock" >> resolveTop
 
         move (Active, Graveyard) (Active, Play) "Shock 1"
   ]
