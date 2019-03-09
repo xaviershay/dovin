@@ -29,18 +29,6 @@ import Dovin.Types
 -- library monad.
 
 
-copySpell newName targetName = do
-  card <- requireCard targetName mempty
-
-  let newCard = setAttribute copy . set cardName newName $ card
-
-  modifying
-    cards
-    (M.insert newName $ BaseCard newCard)
-
-  modifying
-    stack
-    ((:) newName)
 
 resetStrength :: CardName -> (Int, Int) -> GameMonad ()
 resetStrength cn desired = do

@@ -28,6 +28,7 @@ module Dovin.Actions (
   , activatePlaneswalker
   , attackWith
   , combatDamage
+  , copySpell
   , damage
   , destroy
   , discard
@@ -674,6 +675,33 @@ combatDamage blockerNames attackerName = do
 
       return $ rem - attackPower
 
+-- | Copy a spell on the stack, adding it to top of stack.
+--
+-- > copySpell "Snap Copy" "Snap"
+--
+-- [Validates]
+--
+--   * Card is on stack.
+--
+-- [Effects]
+--
+--   * New card is on top of stack.
+copySpell newName targetName = do
+  card <- requireCard targetName (labelMatch "on stack" $
+                      matchLocation (Active, Stack)
+            `matchOr` matchLocation (Opponent, Stack)
+          )
+
+  let newCard = setAttribute copy . set cardName newName $ card
+
+  modifying
+    cards
+    (M.insert newName $ BaseCard newCard)
+
+  modifying
+    stack
+    ((:) newName)
+
 -- | Applies damage from a source to a target.
 --
 -- > damage (const 2) (targetPlayer Opponent) "Shock"
@@ -739,7 +767,7 @@ damage f t source = action "damage" $ do
 -- | Destroy a permanent.
 --
 -- [Validates]
--- 
+--
 --   * Card is in play.
 --   * Card is not 'indestructible'
 --
