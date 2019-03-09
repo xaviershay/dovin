@@ -22,24 +22,11 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
-whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
-whenMatch name f action = do
-  match <- requireCard name f >> pure True `catchError` const (pure False)
-
-  when match action
-
 -- ACTIONS
 --
 -- These correspond to things you can do in Magic. They progress the state
 -- machine while verifying applicable properties. They all run inside the
 -- library monad.
-
-sacrifice cn = do
-  actor <- view envActor
-
-  validate (matchController actor) cn
-
-  removeFromPlay cn
 
 removeFromPlay cardName = do
   card <- requireCard cardName matchInPlay

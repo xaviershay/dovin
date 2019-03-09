@@ -1,6 +1,7 @@
 module Solutions.GuildsOfRavnica3 where
 
 import Control.Monad
+import Control.Monad.Except (catchError)
 
 import Dovin.V1
 
@@ -139,5 +140,11 @@ solution = do
         combatDamage blockers "Undercity Necrolisk"
         validateLife Opponent 0
     ]
+
+whenMatch :: CardName -> CardMatcher -> GameMonad () -> GameMonad ()
+whenMatch name f action = do
+  match <- requireCard name f >> pure True `catchError` const (pure False)
+
+  when match action
 
 formatter _ = boardFormatter

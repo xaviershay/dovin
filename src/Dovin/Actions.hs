@@ -32,6 +32,7 @@ module Dovin.Actions (
   , discard
   , exert
   , moveTo
+  , sacrifice
   , transitionTo
   , transitionToForced
   , trigger
@@ -289,6 +290,26 @@ resolveTop = action "resolveTop" $ do
         moveTo Play x
 
       assign stack xs
+
+-- | Sacrifice a permanent.
+--
+-- > sacrifice "Soldier"
+--
+-- [Validates]
+--
+--   * Permanent controlled by current actor.
+--   * Permanent is in play.
+--
+-- [Effects]
+--
+--   * Card is moved to graveyard. See 'move' for possible alternate effects.
+sacrifice :: CardName -> GameMonad ()
+sacrifice cn = do
+  actor <- view envActor
+
+  validate (matchController actor <> matchInPlay) cn
+
+  moveTo Graveyard cn
 
 -- | Splices a spell on to a previously cast arcane spell.
 --
