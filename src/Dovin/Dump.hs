@@ -81,4 +81,3 @@ setLife p n = assign (life . at p) (Just n)
 -- HIGH LEVEL FUNCTIONS
 --
 
-with x f = f x

@@ -39,6 +39,7 @@ module Dovin.Actions (
   , transitionTo
   , transitionToForced
   , trigger
+  , with
   -- * Validations
   , validate
   , validateCanCastSorcery
@@ -410,6 +411,11 @@ trigger triggerName sourceName = do
     stack
     ((:) triggerName)
 
+-- | Helper function to provide a scoped let.
+--
+-- > with "Angel" $ \cn -> target cn >> destroy cn
+with :: CardName -> (CardName -> GameMonad ()) -> GameMonad ()
+with x f = f x
 
 -- | Move a card from one location to another.
 --
