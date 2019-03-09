@@ -77,11 +77,6 @@ modifyStrength (x, y) cn = do
 
   modifyCardDeprecated cn cardStrength (CardStrength x y <>)
 
-  -- Fetch card again to get new strength
-  c <- requireCard cn mempty
-
-  when (view cardToughness c <= 0) $ removeFromPlay cn
-
 -- TODO: Better name (resolveMentor?), check source has mentor attribute
 triggerMentor sourceName targetName = do
   source <- requireCard sourceName $ matchAttribute attacking
