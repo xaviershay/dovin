@@ -69,26 +69,11 @@ fight x y = do
   cx <- requireCard x (matchInPlay <> matchAttribute creature)
   cy <- requireCard y (matchInPlay <> matchAttribute creature)
 
-  target x
-  target y
-
-  fight' cx cy
-  unless (cx == cy) $ fight' cy cx
+  fight' x y
+  fight' y x
 
   where
-    fight' cx cy = do
-
-      let xdmg = max 0 $ view cardPower cx
-      modifyCardDeprecated (view cardName cy) cardDamage (+ xdmg)
-      cy' <- requireCard (view cardName cy) mempty
-
-      when (hasAttribute "lifelink" cx) $
-        do
-          let owner = fst . view location $ cx
-          modifying (life . at owner . non 0) (+ xdmg)
-
-      when (view cardDamage cy' >= view cardToughness cy' || (xdmg > 0 && hasAttribute "deathtouch" cx )) $
-        destroy (view cardName cy)
+    fight' src dst = damage (view cardPower) (targetCard dst) src
 
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =

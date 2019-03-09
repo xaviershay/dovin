@@ -664,9 +664,9 @@ combatDamage blockerNames attackerName = do
 --     of creatures and planeswalkers.
 damage ::
      (Card -> Int) -- ^ A function that returns the amount of damage to apply,
-                   -- given the source card.
-  -> Target
-  -> CardName
+                   --   given the source card.
+  -> Target        -- ^ Target to apply damage to
+  -> CardName      -- ^ Source card
   -> GameMonad ()
 damage f t source = action "damage" $ do
   c <- requireCard source mempty

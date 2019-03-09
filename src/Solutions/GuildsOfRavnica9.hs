@@ -98,7 +98,8 @@ solution = do
       (gainAttribute deathtouch)
 
     with "Shalai, Voice of Plenty" $ \enemy -> do
-      fight "Adeliz, the Cinder Wind" enemy
+      withStateBasedActions $
+        fight "Adeliz, the Cinder Wind" enemy
       validate enemy $ matchLocation (Opponent, Graveyard)
 
   step "Cast Doublecast" $ do
@@ -139,7 +140,7 @@ solution = do
     withTriggers (cast "UU") "Quasiduplicate 1"
 
     with ("Merfolk Mistbinder 2") $ \enemy -> do
-      forM_ [1..4] $ \n -> do
+      withStateBasedActions $ forM_ [1..4] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve $ numbered (5 - n) "Quasiduplicate"
         addArcherCopy tokenName
@@ -153,7 +154,7 @@ solution = do
     withTriggers (jumpstart "UU" "Waterknot") "Quasiduplicate 1"
 
     with (numbered 1 "Merfolk Mistbinder") $ \enemy -> do
-      forM_ [1..2] $ \n -> do
+      withStateBasedActions $ forM_ [1..2] $ \n -> do
         let tokenName = ("Afzocan Archer " <> show n)
         resolve $ numbered (6 - n) "Quasiduplicate"
         addArcherCopy tokenName
@@ -162,7 +163,7 @@ solution = do
       validate enemy $ matchLocation (Opponent, Graveyard)
 
     with "Kopala, Warden of Waves" $ \enemy -> do
-      forM_ [3..4] $ \n -> do
+      withStateBasedActions $ forM_ [3..4] $ \n -> do
         let tokenName = numbered n "Afzocan Archer"
         resolve $ numbered (6 - n) "Quasiduplicate"
         addArcherCopy tokenName
