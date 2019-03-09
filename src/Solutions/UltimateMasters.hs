@@ -64,7 +64,7 @@ solution = do
 
     cast "B" "Reanimate" >> resolveTop
     targetInLocation (Active, Graveyard) "Vengevine"
-    returnToPlay "Vengevine"
+    moveTo Play "Vengevine"
 
   step "Sac Vengevine (undying) then Mikaeus for mana" $ do
     sacrificeToAltar "U" "Vengevine"
@@ -89,7 +89,7 @@ solution = do
     with "Mikaeus, the Unhallowed" $ \cn -> do
       targetInLocation (Active, Graveyard) cn
       validate (matchAttribute legendary) cn
-      returnToPlay cn
+      moveTo Play cn
       gainAttribute haste cn
 
     with "Stingerfling Spider" $ \cn -> do
@@ -169,7 +169,7 @@ solution = do
     cast "4GR" "Vengeful Rebirth" >> resolveTop
 
     targetInLocation (Active, Graveyard) "Mikaeus, the Unhallowed"
-    returnToHand "Mikaeus, the Unhallowed"
+    moveTo Hand "Mikaeus, the Unhallowed"
     damage (const 6) (targetPlayer Opponent) "Vengeful Rebirth"
 
     validateLife 0 Opponent

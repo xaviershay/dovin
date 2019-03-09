@@ -77,14 +77,6 @@ loseLife player amount = gainLife player (-amount)
 setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
 
-returnToHand cn = do
-  actor <- view envActor
-  move (actor, Graveyard) (actor, Hand) cn
-
-returnToPlay cn = do
-  actor <- view envActor
-  move (actor, Graveyard) (actor, Play) cn
-
 activatePlaneswalker :: Int -> CardName -> GameMonad ()
 activatePlaneswalker loyalty cn = do
   c <- requireCard cn matchInPlay

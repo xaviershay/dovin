@@ -79,7 +79,7 @@ solution = do
     tapForMana "B" "Memorial to Folly 1"
     withTriggers (cast "B") "March of the Drowned"
     resolve "March of the Drowned"
-    returnToHand "Vicious Conquistador"
+    moveTo Hand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
     tapForMana "B" "Memorial to Folly 2"
@@ -106,8 +106,8 @@ solution = do
     resolve "Gruesome Menagerie"
     targetInLocation (Active, Graveyard) "Vicious Conquistador"
     targetInLocation (Active, Graveyard) "Sailor of Means"
-    returnToPlay "Vicious Conquistador"
-    returnToPlay "Sailor of Means"
+    moveTo Play "Vicious Conquistador"
+    moveTo Play "Sailor of Means"
     withLocation (Active, Play)
       $ withAttribute token
       $ addArtifact "Treasure"
@@ -127,7 +127,7 @@ solution = do
     withTriggers (cast "BB") "Find"
     resolve "Find"
     targetInLocation (Active, Graveyard) "Vicious Conquistador"
-    returnToHand "Vicious Conquistador"
+    moveTo Hand "Vicious Conquistador"
 
   step "Vicious Conquistador" $ do
     tapForMana "B" "Treasure"

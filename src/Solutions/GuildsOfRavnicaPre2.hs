@@ -43,7 +43,7 @@ solution = do
     sacrifice "Whisper Agent"
     sacrifice "Whisper, Blood Liturgist"
 
-    returnToPlay "Torch Courier"
+    moveTo Play "Torch Courier"
 
   step "Play Rhizome Lurcher, haste with Torch Courier" $ do
     tapForMana "G" "Woodland Cemetery 3"
