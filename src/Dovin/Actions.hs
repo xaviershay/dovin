@@ -25,6 +25,7 @@ module Dovin.Actions (
   , targetInLocation
   -- * Uncategorized
   , activate
+  , activatePlaneswalker
   , attackWith
   , combatDamage
   , damage
@@ -509,7 +510,7 @@ targetInLocation zone = validate (matchLocation zone)
 -- [Validates]
 --
 --   * Card is in play or graveyard.
---   * Card is cotrolled by actor.
+--   * Card is controlled by actor.
 --
 -- [Effects]
 --
@@ -535,6 +536,32 @@ activate stackName mana targetName = do
   modifying
     stack
     ((:) stackName)
+
+-- | Activate a loyalty ability of a planeswalker. Typically you will want to
+-- `resolve` after activating.
+--
+-- > activatePlaneswalker2 "Get a card" (-1) "Karn, Scion of Urza" >> resolveTop
+--
+-- [Validates]
+--
+--   * Card is in play.
+--   * Card has enough loyalty.
+--
+-- [Effects]
+--
+--   * Card loyalty is adjusted.
+--
+-- See `activate` for additional validations and effects.
+activatePlaneswalker :: CardName -> Int -> CardName -> GameMonad ()
+activatePlaneswalker stackName loyalty targetName = do
+  c <- requireCard targetName matchInPlay
+
+  if view cardLoyalty c + loyalty < 0 then
+    throwError $ targetName <> " does not have enough loyalty"
+  else
+    do
+      modifyCard cardLoyalty (+ loyalty) targetName
+      activate stackName "" targetName
 
 -- | Start an attack with the given creatures.
 --

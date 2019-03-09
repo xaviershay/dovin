@@ -79,7 +79,7 @@ solution = do
     withLocation Play $ withAttribute token $ addArtifact "Treasure"
 
   step "Untap with Jace" $ do
-    activatePlaneswalker 1 "Jace, Ingenious Mind-Mage"
+    activatePlaneswalker "" 1 "Jace, Ingenious Mind-Mage" >> resolveTop
 
     forCards (matchController Active <> matchInPlay <> matchAttributes [creature, tapped]) untap
 

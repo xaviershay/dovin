@@ -77,18 +77,6 @@ loseLife player amount = gainLife player (-amount)
 setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
 
-activatePlaneswalker :: Int -> CardName -> GameMonad ()
-activatePlaneswalker loyalty cn = do
-  c <- requireCard cn matchInPlay
-  actor <- view envActor
-
-  validate (matchController actor) cn
-
-  if view cardLoyalty c - loyalty < 0 then
-    throwError $ cn <> " does not have enough loyalty"
-  else
-    modifyCardDeprecated cn cardLoyalty (+ loyalty)
-
 
 -- HIGH LEVEL FUNCTIONS
 --

@@ -30,7 +30,7 @@ solution = do
       addCreature (5, 5) "Bonded Horncrest"
 
   step "Activate Karn to return Mutiny" $ do
-    activatePlaneswalker (-1) "Karn, Scion of Urza 1"
+    activatePlaneswalker "Get card" (-1) "Karn, Scion of Urza 1" >> resolveTop
     moveTo Hand "Mutiny"
 
   step "Cast Mutiny, using Horncrest to destroy a Responder" $ do
@@ -49,7 +49,7 @@ solution = do
     moveTo Graveyard "Karn, Scion of Urza 1"
 
   step "Activate Karn to return Fatal Push" $ do
-    activatePlaneswalker (-1) "Karn, Scion of Urza 2"
+    activatePlaneswalker "Get card" (-1) "Karn, Scion of Urza 2" >> resolveTop
     moveTo Hand "Fatal Push"
 
   step "Cast Fatal Push destroying remaining Responder with Revolt from first Karn" $ do

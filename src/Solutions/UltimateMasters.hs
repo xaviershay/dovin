@@ -103,7 +103,7 @@ solution = do
       destroy "Sublime Archangel"
 
   step "Liliana to force sac of Reya" $ do
-    activatePlaneswalker 1 "Liliana of the Veil"
+    activatePlaneswalker "" 1 "Liliana of the Veil" >> resolveTop
     as Opponent $ do
       sacrifice "Reya Dawnbringer"
 
