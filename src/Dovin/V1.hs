@@ -6,7 +6,6 @@ module Dovin.V1
   , module Dovin.Formatting
   , module Dovin.Helpers
   , module Dovin.Types
-  , fork
   , validate
   , validateLife
   , withLocation
@@ -24,9 +23,7 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
-import Control.Monad (forM_)
 import Control.Monad.Reader (local)
-import Control.Monad.State (get, put)
 import Control.Lens (set, view)
 
 -- | Validate that a card matches a matcher.
@@ -70,11 +67,3 @@ trigger targetName = do
 
   return ()
 
-fork :: [GameMonad ()] -> GameMonad ()
-fork options = do
-  b <- get
-  let cs = view currentStep b
-
-  forM_ options $ \m -> do
-    m
-    put $ set currentStep cs b

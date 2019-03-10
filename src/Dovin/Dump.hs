@@ -54,3 +54,41 @@ loseLife player amount = gainLife player (-amount)
 
 setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
+
+fork :: [GameMonad ()] -> GameMonad ()
+fork options = do
+  b <- get
+  let cs = view currentStep b
+
+  forM_ options $ \m -> do
+    m
+    put $ set currentStep cs b
+
+run :: (Step -> Formatter) -> GameMonad () -> IO ()
+run formatter solution = do
+  let (e, _, log) = runMonad emptyBoard solution
+
+  let groupedSteps =
+        groupBy ((==) `on` view stepFork) . sortBy (comparing $ view stepId ) $ log
+
+  forM_ groupedSteps $ \steps -> do
+    case view stepFork $ head steps of
+      Just l -> do
+        putStrLn ""
+        putStrLn $ "=== ALTERNATIVE: " <> l
+        putStrLn ""
+      Nothing -> return ()
+
+    forM_ steps $ \step -> do
+      putStr $ show (view stepNumber step) <> ". "
+      putStr $ view stepLabel step
+      putStrLn . formatter step . view stepState $ step
+
+  putStrLn ""
+  case e of
+    Left x -> do
+      putStrLn "ERROR:"
+      putStrLn x
+      putStrLn ""
+      System.Exit.exitFailure
+    Right _ -> return ()
