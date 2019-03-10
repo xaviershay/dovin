@@ -78,6 +78,7 @@ data Card = Card
   , _cardDefaultAttributes :: CardAttributes
   , _cardAttributes :: CardAttributes
   , _cardStrength :: CardStrength
+  , _cardStrengthModifier :: CardStrength
   , _cardDamage :: Int
   , _cardLoyalty :: Int
   , _cardEffects :: [CardEffect]
@@ -214,6 +215,7 @@ mkCard name location =
     , _cardDefaultAttributes = mempty
     , _cardAttributes = mempty
     , _cardStrength = mempty
+    , _cardStrengthModifier = mempty
     , _cardDamage = 0
     , _cardLoyalty = 0
     , _cardEffects = mempty

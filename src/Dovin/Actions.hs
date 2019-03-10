@@ -35,6 +35,7 @@ module Dovin.Actions (
   , exert
   , exile
   , fight
+  , modifyStrength
   , moveTo
   , sacrifice
   , transitionTo
@@ -469,9 +470,10 @@ move from to name = action "move" $ do
     gainAttribute summoned name
 
   when (snd from == Play && snd to /= Play) $ do
-    modifyCardDeprecated name cardPlusOneCounters (const 0)
-    modifyCardDeprecated name cardDamage (const 0)
-    modifyCardDeprecated name cardAttributes (const $ view cardDefaultAttributes c)
+    modifyCard cardPlusOneCounters (const 0) name
+    modifyCard cardDamage (const 0) name
+    modifyCard cardAttributes (const $ view cardDefaultAttributes c) name
+    modifyCard cardStrengthModifier (const mempty) name
 
   -- These conditionals are acting on the card state _before_ any of the above
   -- changes were applied.
@@ -804,7 +806,7 @@ discard cn = do
 -- >       (    matchLocation . view cardLocation
 -- >         <> const (matchAttribute creature)
 -- >       )
--- >       (pure . over cardStrength (mkStrength (1, 1) <>))
+-- >       (pure . over cardStrengthModifier (mkStrength (1, 1) <>))
 -- >   $ addCreature (2, 2) "Tah-Crop Elite"
 -- > attackWith ["Tah-Crop Elite"]
 -- > exert "Tah-Crop Elite"
@@ -852,6 +854,25 @@ fight x y = do
 
   where
     fight' src dst = damage (view cardPower) (targetCard dst) src
+
+-- | Modify the strength of a card in play. It will be reset to base when the
+-- card leaves play.
+--
+-- > modifyStrength (-2, -2) "Soldier"
+--
+-- [Validates]
+--
+--   * Card is in play.
+--   * Card is a creature.
+--
+-- [Effects]
+--
+--   * Changes the strength modifier for the card.
+modifyStrength :: (Int, Int) -> CardName -> GameMonad ()
+modifyStrength strength cn = do
+  _ <- requireCard cn (matchInPlay <> matchAttribute creature)
+
+  modifyCard cardStrengthModifier (mkStrength strength <>) cn
 
 -- | Move card to location with same controller.
 --

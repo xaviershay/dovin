@@ -22,18 +22,6 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
-resetStrength :: CardName -> (Int, Int) -> GameMonad ()
-resetStrength cn desired = do
-  c <- requireCard cn (matchAttribute "creature")
-
-  modifyCardDeprecated cn cardStrength (const $ mkStrength desired)
-
-modifyStrength :: (Int, Int) -> CardName -> GameMonad ()
-modifyStrength (x, y) cn = do
-  _ <- requireCard cn (matchInPlay <> matchAttribute "creature")
-
-  modifyCardDeprecated cn cardStrength (CardStrength x y <>)
-
 -- TODO: Better name (resolveMentor?), check source has mentor attribute
 triggerMentor sourceName targetName = do
   source <- requireCard sourceName $ matchAttribute attacking

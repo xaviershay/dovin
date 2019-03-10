@@ -23,7 +23,7 @@ solution = do
             (    matchLocation . view cardLocation
               <> const (matchAttribute creature)
             )
-            (pure . over cardStrength (mkStrength (1, 1) <>))
+            (pure . over cardStrengthModifier (mkStrength (1, 1) <>))
         $ addCreature (2, 2) "Tah-Crop Elite"
 
     withLocation (Active, Hand) $ do
@@ -64,7 +64,7 @@ solution = do
     trigger "Tilonalli's Skinshifter"
     target "Tah-Crop Elite"
     validate "Tah-Crop Elite" $ matchAttribute attacking
-    resetStrength "Tilonalli's Skinshifter" (2, 2)
+    copyAttributes "Tah-Crop Elite" "Tilonalli's Skinshifter"
     gainAttribute flying "Tilonalli's Skinshifter"
 
   fork
@@ -132,3 +132,15 @@ formatter 6 = attributes <>
     <> (missingAttribute blocked `matchOr` matchAttribute trample)
     )
 formatter _ = attributes
+
+copyAttributes :: CardName -> CardName -> GameMonad ()
+copyAttributes from to = do
+  toCard <- requireCard to (matchAttribute creature)
+
+  -- Can't use requireCard because need access to the base strength
+  maybeCard <- use $ cards . at from
+
+  case maybeCard of
+    Nothing -> throwError $ "Card does not exist: " <> from
+    Just (BaseCard card) -> do
+      modifyCard cardStrength (const $ view cardStrength card) to

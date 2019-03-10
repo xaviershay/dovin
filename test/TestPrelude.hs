@@ -9,6 +9,7 @@ module TestPrelude
   , prove
   , refute
   , validateBoardEquals
+  , throwError
   ) where
 
 import Test.Tasty
@@ -22,7 +23,6 @@ import Data.List (isInfixOf)
 import Control.Monad
 import Control.Lens
 import Control.Monad.Except
-
 
 prove name m = testCase name $
   case runMonad emptyBoard m of
@@ -39,4 +39,3 @@ validateBoardEquals lens expected = do
 
   unless (x == expected) $
     throwError ("want: " <> show expected <> ", got: " <> show x)
-

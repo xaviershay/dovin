@@ -75,7 +75,9 @@ applyEffects (BaseCard card) = do
                           . replicate (view cardPlusOneCounters card')
                           . mkStrength $ (1, 1)
 
-  return $ over cardStrength (counterModifier <>) card'
+  let strengthModifier = view cardStrengthModifier card'
+
+  return $ over cardStrength ((strengthModifier <> counterModifier) <>) card'
 
   where
     applyEffect2 :: Card -> CardEffect -> GameMonad Card

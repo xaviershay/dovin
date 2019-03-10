@@ -91,9 +91,7 @@ solution = do
     withTriggers (cast "B") "Dead Weight"
     target "Vicious Conquistador"
     resolve "Dead Weight"
-    withStateBasedActions $
-      modifyStrength (-2, -2) "Vicious Conquistador"
-    resetStrength "Vicious Conquistador" (1, 2)
+    modifyStrength (-2, -2) "Vicious Conquistador"
     moveTo Graveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
@@ -116,9 +114,7 @@ solution = do
     tapForMana "B" "Overgrown Tomb 2"
     withTriggers (castWithMuldrotha "enchantment" "B") "Dead Weight"
     target "Vicious Conquistador"
-    withStateBasedActions $
-      modifyStrength (-2, -2) "Vicious Conquistador"
-    resetStrength "Vicious Conquistador" (1, 2)
+    modifyStrength (-2, -2) "Vicious Conquistador"
     moveTo Graveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do
