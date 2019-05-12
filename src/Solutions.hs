@@ -19,6 +19,7 @@ import qualified Solutions.RavnicaAllegiance7
 import qualified Solutions.RavnicaAllegiancePre2
 import qualified Solutions.RivalsOfIxalan7
 import qualified Solutions.UltimateMasters
+import qualified Solutions.WarOfTheSpark2
 
 all = [
   ("ChannelFireball", Solutions.ChannelFireball.solution, Solutions.ChannelFireball.formatter),
@@ -37,5 +38,6 @@ all = [
   ("RavnicaAllegiance7", Solutions.RavnicaAllegiance7.solution, Solutions.RavnicaAllegiance7.formatter),
   ("RavnicaAllegiancePre2", Solutions.RavnicaAllegiancePre2.solution, Solutions.RavnicaAllegiancePre2.formatter),
   ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter . view stepNumber),
-  ("UltimateMasters", Solutions.UltimateMasters.solution, Solutions.UltimateMasters.formatter)
+  ("UltimateMasters", Solutions.UltimateMasters.solution, Solutions.UltimateMasters.formatter),
+  ("WarOfTheSpark2", Solutions.WarOfTheSpark2.solution, Solutions.WarOfTheSpark2.formatter)
   ]

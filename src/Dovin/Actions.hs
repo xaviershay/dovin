@@ -946,7 +946,7 @@ tap :: CardName -> GameMonad ()
 tap name = do
   c <- requireCard name (matchInPlay <> missingAttribute tapped)
 
-  when (applyMatcher (matchAttribute creature) c) $ do
+  when (applyMatcher (matchAttribute creature) c) $
     validate (labelMatch "does not have summoning sickness" (
                     matchAttribute haste
                     `matchOr`

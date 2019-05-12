@@ -113,6 +113,8 @@ solutions for published Possibility Storm puzzles!)
   interactions.
 * `UltimateMasters` shows how to track opponent actions.
 * `ChannelFireball` automatically calculates High Tide mana.
+* `WarOfTheSpark2` shows off a hack for effects that depend on attributes of
+  other cards (hopefully will have a better fix in API soon!)
 
 ## Development
 
