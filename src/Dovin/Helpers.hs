@@ -3,6 +3,7 @@
 module Dovin.Helpers where
 
 import Dovin.Types
+import Dovin.Attributes
 import Dovin.Prelude
 
 import Data.List (sort)
@@ -151,6 +152,10 @@ matchController player = CardMatcher ("has controller " <> show player) $
 
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
+
+matchToughness :: Int -> CardMatcher
+matchToughness n = labelMatch ("toughness = " <> show n) $ (CardMatcher "" $
+  (== n) . view cardToughness) <> matchAttribute creature
 
 missingAttribute = invert . matchAttribute
 

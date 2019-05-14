@@ -8,7 +8,7 @@ import           Control.Monad.State hiding (state)
 
 import Dovin.Types
 
-runMonad :: Board -> GameMonad () -> (Either String (), Board, [Step])
+runMonad :: Board -> GameMonad a -> (Either String a, Board, [Step])
 runMonad state m =
   let ((e, b), log) = runIdentity $
                         runWriterT (runStateT (runReaderT (runExceptT m) emptyEnv) state) in
