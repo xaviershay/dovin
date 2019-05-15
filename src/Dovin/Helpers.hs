@@ -72,13 +72,18 @@ applyEffects (BaseCard card) = do
 
   card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
 
-  let counterModifier = mconcat
-                          . replicate (view cardPlusOneCounters card')
-                          . mkStrength $ (1, 1)
+  let plusModifier = let n = view cardPlusOneCounters card' in
+                          mkStrength (n, n)
+  let minusModifier = let n = view cardMinusOneCounters card' in
+                          mkStrength (-n, -n)
 
   let strengthModifier = view cardStrengthModifier card'
 
-  return $ over cardStrength ((strengthModifier <> counterModifier) <>) card'
+  return
+    $ over
+        cardStrength
+        ((strengthModifier <> plusModifier <> minusModifier) <>)
+        card'
 
   where
     applyEffect2 :: Card -> CardEffect -> GameMonad Card
@@ -127,6 +132,10 @@ matchLoyalty n = CardMatcher (show n <> " loyalty") $
 matchPlusOneCounters :: Int -> CardMatcher
 matchPlusOneCounters n = CardMatcher (show n <> " +1/+1 counters") $
   (==) n . view cardPlusOneCounters
+
+matchMinusOneCounters :: Int -> CardMatcher
+matchMinusOneCounters n = CardMatcher (show n <> " -1/-1 counters") $
+  (==) n . view cardMinusOneCounters
 
 matchLocation :: CardLocation -> CardMatcher
 matchLocation loc = CardMatcher ("in location " <> show loc) $

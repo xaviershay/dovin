@@ -64,8 +64,13 @@ formatCard c =
          <> "/"
          <> show (view cardToughness c)
          <> (let n = view cardPlusOneCounters c in
-               if n > 0 then
-                  ", +" <> show n <> "/+" <> show n
+              if n > 0 then
+                ", +" <> show n <> "/+" <> show n
+              else
+                mempty)
+         <> (let n = view cardMinusOneCounters c in
+              if n > 0 then
+                ", -" <> show n <> "/-" <> show n
               else
                 mempty)
          <> (if view cardDamage c > 0 then

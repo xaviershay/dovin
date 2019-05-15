@@ -1102,6 +1102,16 @@ runStateBasedActions = do
           when (hasAttribute token c) $
             remove cn >> incrementCounter
 
+        let p1 = view cardPlusOneCounters c
+        let m1 = view cardMinusOneCounters c
+        let p1' = maximum [0, p1 - m1]
+        let m1' = maximum [0, m1 - p1]
+
+        when (p1 /= p1' || m1 /= m1') $ do
+          modifyCard cardPlusOneCounters (const p1') cn
+          modifyCard cardMinusOneCounters (const m1') cn
+          incrementCounter
+
         let matchStack =
                        matchLocation (Active, Stack)
              `matchOr` matchLocation (Opponent, Stack)

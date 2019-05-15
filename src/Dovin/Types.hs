@@ -85,6 +85,7 @@ data Card = Card
 
   -- Can probably generalize this more at some point.
   , _cardPlusOneCounters :: Int
+  , _cardMinusOneCounters :: Int
   }
 instance Hashable Player
 instance Show Card where
@@ -220,6 +221,7 @@ mkCard name location =
     , _cardLoyalty = 0
     , _cardEffects = mempty
     , _cardPlusOneCounters = 0
+    , _cardMinusOneCounters = 0
     }
 
 opposing :: Player -> Player
