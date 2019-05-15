@@ -206,3 +206,10 @@ forCards matcher f = do
 
   forM_ (map (view cardName) matchingCs) f
 
+gameFinished :: GameMonad Bool
+gameFinished = do
+  state <- use phase
+
+  return $ case state of
+             Won _ -> True
+             _     -> False

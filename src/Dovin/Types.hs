@@ -70,6 +70,7 @@ data Phase
   | EndCombat
   | SecondMain
   | EndStep
+  | Won Player
   deriving (Show, Eq, Ord)
 
 data Card = Card
