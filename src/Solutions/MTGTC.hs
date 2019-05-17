@@ -1,5 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
+-- https://arxiv.org/abs/1904.09828
 module Solutions.MTGTC where
 
 import Dovin.V2
@@ -19,6 +20,8 @@ colorHacked = "color-hacked"
 shroud = "shroud"
 
 aetherborn = "aetherborn"
+basilisk = "basilisk"
+cephalid = "cephalid"
 rhino = "rhino"
 sliver = "sliver"
 
@@ -97,12 +100,21 @@ instance Show Rule where
   show = triggeringCreature
 
 triggeringCreature rule =
-  let baseCreature = case view ruleState rule of
-                       Q1 -> "Rotlung Reanimator"
-                       Q2 -> "Xathrid Necromancer"
+  let baseCreature = if tapped `elem` view ruleAttributes rule then
+                       "Xathrid Necromancer"
+                      else
+                       "Rotlung Reanimator"
   in
 
   baseCreature <> " " <> show (view ruleNumber rule)
+
+
+rules =
+  [ mkRule Q1 1 aetherborn [sliver, white]
+  , mkRule Q1 3 cephalid [sliver, white]
+  , mkRule Q1 17 rhino [assassin, blue]
+  , mkRule Q1 18 sliver [green, cephalid]
+  ]
 
 solution :: GameMonad ()
 solution = do
@@ -150,12 +162,12 @@ solution = do
 
         -- TODO: setup this color pallete from black
         -- TODO: Correct P/T
-        withAttributes [red, green, black, white]
-          $ withPlusOneCounters 5 -- TODO: Where does this come from?
-          $ addCreature (2, 2) "Rotlung Reanimator 1"
-        withAttributes [red, green, black, white]
-          $ withPlusOneCounters 5 -- TODO: Where does this come from?
-          $ addCreature (2, 2) "Rotlung Reanimator 17"
+        forM_ rules $ \rule -> do
+          let name = triggeringCreature rule
+
+          withAttributes [red, green, black, white]
+            $ withPlusOneCounters 5 -- TODO: Where does this come from?
+            $ addCreature (2, 2) name
 
         withEffect
           matchInPlay
@@ -173,15 +185,17 @@ solution = do
 
   runLoop 1
 
-runLoop n = do
-  turn1 n
-  turn2 n
-  -- TODO: Check if this turn is effectively skipped by Mesmeric Orb
-  turn3 n
+runLoop n
+  | n > 11 = throwError "Looping!"
+  | True = do
+    turn1 n
+    turn2 n
+    -- TODO: Check if this turn is effectively skipped by Mesmeric Orb
+    turn3 n
 
-  whenNotHalted $ do
-    turn4 n
-    runLoop (n + 1)
+    whenNotHalted $ do
+      turn4 n
+      runLoop (n + 1)
 
 
 turnStep c n l = step ("Cycle " <> show c <> ", Turn " <> show n <> ": " <> l)
@@ -205,15 +219,10 @@ turn1 n = do
 
     lookupSingleCard (matchInPlay <> matchToughness 0)
 
-  let rules =
-        [ mkRule Q1 1 aetherborn [sliver, white]
-        , mkRule Q1 17 rhino [assassin, blue]
-        ]
-
   let maybeRule = Data.List.find (\rule -> hasAttribute (view ruleTrigger rule) deadToken) rules
 
   case maybeRule of
-    Nothing -> throwError $ "Unknown card died: " <> view cardName deadToken
+    Nothing -> throwError $ "Unknown card died: " <> formatCard deadToken
     Just rule -> do
       let c = triggeringCreature rule
 
@@ -329,8 +338,12 @@ turn4 n = do
 
       castWithWildEvocation "Soul Snuffers" >> resolveTop
 
-      forCards (matchInPlay <> matchAttribute creature) $
-        modifyCard cardMinusOneCounters (+ 1)
+      withStateBasedActions $ do
+        forCards (matchInPlay <> matchAttribute creature) $
+          modifyCard cardMinusOneCounters (+ 1)
+    
+      wheelOfSunAndMoon "Soul Snuffers"
+
   
   turnStep n 4 "Alice Draw" $ do
     transitionTo DrawStep
