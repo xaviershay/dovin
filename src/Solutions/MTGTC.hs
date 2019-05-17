@@ -61,7 +61,7 @@ lookupSingleCard matcher = do
   matchingCs <- lookupCards matcher
 
   case matchingCs of
-    [] -> throwError "No matches"
+    [] -> throwError $ "No matches: " <> show matcher
     [x] -> return x
     xs -> throwError $ "Ambigious match: " <> (intercalate ", " . map (view cardName) $ xs)
 
@@ -171,21 +171,23 @@ solution = do
     return ()
 
 
-  runLoop
+  runLoop 1
 
-runLoop = do
-  turn1
-  turn2
+runLoop n = do
+  turn1 n
+  turn2 n
   -- TODO: Check if this turn is effectively skipped by Mesmeric Orb
-  turn3
+  turn3 n
 
   whenNotHalted $ do
-    turn4
-    runLoop
+    turn4 n
+    runLoop (n + 1)
 
 
-turn1 = do
-  deadToken <- step "Read cell IV.A: Infest" $ do
+turnStep c n l = step ("Cycle " <> show c <> ", Turn " <> show n <> ": " <> l)
+
+turn1 n = do
+  deadToken <- turnStep n 1 "Upkeep: Infest" $ do
     transitionToForced Untap
     transitionTo Upkeep
 
@@ -215,7 +217,7 @@ turn1 = do
     Just rule -> do
       let c = triggeringCreature rule
 
-      step ("Action cell IV.B: " <> show rule) $ do
+      turnStep n 1 ("Action: " <> show rule) $ do
         as bob $ do
           trigger (c <> " Trigger") c >> resolveTop
 
@@ -223,26 +225,26 @@ turn1 = do
             $ withAttributes (token : view ruleAttributes rule)
             $ addCreature (2, 2) "Token 1" -- TODO: Dynamic name
 
-  step "Action cell, IV.B: Illusory Gains" $ do
+  turnStep n 1 "Illusory Gains" $ do
     as alice $ do
       trigger "Steal" "Illusory Gains" >> resolveTop
       forCards (matchController alice <> matchAttribute creature <> matchInPlay) $
         move (alice, Play) (bob, Play)
       move (bob, Play) (alice, Play) "Token 1"
 
-  step "Draw step, then end of turn" $ do
+  turnStep n 1 "Draw" $ do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Cleansing Beam"
 
     -- TODO: Validate alice can't do anything
 
-  step "Bob's turn" $ return ()
+  turnStep n 1 "Bob's turn" $ return ()
 
-turn2 = do
-  step "Changing State, IV.D" $ do
+turn2 n = do
+  turnStep n 2 "Alice Untap" $ do
     transitionToForced Untap
 
-  step "Move tape, IV.C: Cleansing Beam" $ do
+  turnStep n 2 "Upkeep: Cleansing Beam" $ do
     transitionTo Upkeep
 
     as bob $ do
@@ -272,14 +274,14 @@ turn2 = do
           -- TODO: Check for vigor
           modifyCard cardPlusOneCounters (+ 1) cn
 
-  step "Check halt, IV.F: Draw" $ do
+  turnStep n 2 "Alice Draw" $ do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Coalition Victory"
 
-  step "Bob's turn" $ return ()
+  turnStep n 2 "Bob's turn" $ return ()
 
-turn3 = do
-  step "Check halt, IV.F: Coalition Victory" $ do
+turn3 n = do
+  turnStep n 3 "Upkeep: Coalition Victory" $ do
     transitionToForced Untap
     transitionTo Upkeep
 
@@ -305,14 +307,14 @@ turn3 = do
         wheelOfSunAndMoon "Coalition Victory"
 
   whenNotHalted $ do
-    step "Move tape, IV.C: Draw" $ do
+    turnStep n 3 "Alice Draw" $ do
       transitionTo DrawStep
       move (alice, Deck) (alice, Hand) "Soul Snuffers"
 
-    step "Bob's turn" $ return ()
+    turnStep n 3 "Bob's turn" $ return ()
 
-turn4 = do
-  step "Move tape, IV.C: Soul Snuffers" $ do
+turn4 n = do
+  turnStep n 4 "Upkeep: Soul Snuffers" $ do
     transitionToForced Untap
     transitionTo Upkeep
 
@@ -329,5 +331,9 @@ turn4 = do
 
       forCards (matchInPlay <> matchAttribute creature) $
         modifyCard cardMinusOneCounters (+ 1)
+  
+  turnStep n 4 "Alice Draw" $ do
+    transitionTo DrawStep
+    move (alice, Deck) (alice, Hand) "Infest"
 
 formatter _ = boardFormatter

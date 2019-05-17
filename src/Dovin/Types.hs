@@ -186,7 +186,7 @@ _manaPoolForTyping :: Board -> ManaPool
 _manaPoolForTyping = view (manaPoolFor Active)
 
 instance Show CardMatcher where
-  show _ = "<matcher>"
+  show (CardMatcher l _) = l
 
 instance Semigroup CardMatcher where
   (CardMatcher d1 f) <> (CardMatcher d2 g) =
