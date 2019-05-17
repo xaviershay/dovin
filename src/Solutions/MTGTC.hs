@@ -5,11 +5,13 @@ module Solutions.MTGTC where
 
 import Dovin.V2
 import Dovin.Prelude
+import Dovin.Monad
 import Data.List (intercalate)
 
 import Control.Lens
 import qualified Data.List
 import qualified Data.Set
+import qualified Data.Ord
 
 alice = Opponent
 bob = Active
@@ -24,6 +26,15 @@ basilisk = "basilisk"
 cephalid = "cephalid"
 rhino = "rhino"
 sliver = "sliver"
+
+tapeTypes =
+  [ aetherborn
+  , basilisk
+  , cephalid
+  , rhino
+  , sliver
+  , assassin
+  ]
 
 assassin = "assassin"
 assemblyWorker = "assembly-worker"
@@ -133,7 +144,8 @@ solution = do
         withAttribute black $ addCreature (3, 3) "Soul Snuffers"
 
       withLocation Play $ do
-        withAttributes [token, aetherborn] $ addCreature (2, 2) "Rhino"
+        withAttributes [token, sliver] $ addCreature (2, 2) "Token i1"
+
         addAura "Illusory Gains"
         withAttributes allColors $ addLand "Island"
         withAttribute green $ addEnchantment "Choke"
@@ -145,17 +157,20 @@ solution = do
 
     as bob $ do
       withLocation Play $ do
+        withAttributes [token, sliver, white] $ addCreature (3, 3) "Token i2"
+        withAttributes [token, rhino, white] $ addCreature (4, 4) "Token i4"
+        --withAttributes [token, rhino, green] $ addCreature (3, 3) "Token i5"
         addEnchantment "Wild Evocation"
         withEffect
           matchInPlay
-          (const $ matchAttributes [creature, black])
+          (const $ matchAttribute creature <> matchAttribute black)
           (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
           $ withAttribute colorHacked
           $ addEnchantment "Dread of Night 1"
 
         withEffect
           matchInPlay
-          (const $ matchAttributes [creature, black])
+          (const $ matchAttribute creature <> matchAttribute black)
           (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
           $ withAttribute colorHacked
           $ addEnchantment "Dread of Night 2"
@@ -186,7 +201,7 @@ solution = do
   runLoop 1
 
 runLoop n
-  | n > 11 = throwError "Looping!"
+  | n > 5 = throwError "Looping!"
   | True = do
     turn1 n
     turn2 n
@@ -232,14 +247,14 @@ turn1 n = do
 
           withLocation Play
             $ withAttributes (token : view ruleAttributes rule)
-            $ addCreature (2, 2) "Token 1" -- TODO: Dynamic name
+            $ addCreature (2, 2) ("Token " <> show n)
 
   turnStep n 1 "Illusory Gains" $ do
     as alice $ do
       trigger "Steal" "Illusory Gains" >> resolveTop
       forCards (matchController alice <> matchAttribute creature <> matchInPlay) $
         move (alice, Play) (bob, Play)
-      move (bob, Play) (alice, Play) "Token 1"
+      move (bob, Play) (alice, Play) ("Token " <> show n)
 
   turnStep n 1 "Draw" $ do
     transitionTo DrawStep
@@ -247,7 +262,9 @@ turn1 n = do
 
     -- TODO: Validate alice can't do anything
 
-  turnStep n 1 "Bob's turn" $ return ()
+  turnStep n 1 "EoT: Undo infest -2/-2" $ do
+    forCards (matchInPlay <> matchAttribute creature) $
+      modifyCard cardStrengthModifier (const $ mkStrength (0, 0))
 
 turn2 n = do
   turnStep n 2 "Alice Untap" $ do
@@ -281,13 +298,11 @@ turn2 n = do
           <> (foldl (\b a -> matchAttribute a `matchOr` b) (invert mempty) (extractColors card))
         ) $ \cn -> do
           -- TODO: Check for vigor
-          modifyCard cardPlusOneCounters (+ 1) cn
+          modifyCard cardPlusOneCounters (+ 2) cn
 
   turnStep n 2 "Alice Draw" $ do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Coalition Victory"
-
-  turnStep n 2 "Bob's turn" $ return ()
 
 turn3 n = do
   turnStep n 3 "Upkeep: Coalition Victory" $ do
@@ -311,7 +326,7 @@ turn3 n = do
            $ [(x, y) | x <- allColors, y <- [creature, land]]
 
       if (Prelude.all id matches) then
-        transitionTo (Won alice)
+        throwError "won game"
       else
         wheelOfSunAndMoon "Coalition Victory"
 
@@ -319,8 +334,6 @@ turn3 n = do
     turnStep n 3 "Alice Draw" $ do
       transitionTo DrawStep
       move (alice, Deck) (alice, Hand) "Soul Snuffers"
-
-    turnStep n 3 "Bob's turn" $ return ()
 
 turn4 n = do
   turnStep n 4 "Upkeep: Soul Snuffers" $ do
@@ -349,4 +362,46 @@ turn4 n = do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Infest"
 
-formatter _ = boardFormatter
+matchAny = foldl (\b a -> a `matchOr` b) (invert mempty) 
+
+tapeFormatter :: Formatter
+tapeFormatter board =
+  let f matcher = Data.List.sortBy (Data.Ord.comparing tapePosition)
+            . filter (applyMatcher $ matcher <> matchAny (map matchAttribute tapeTypes))
+             $ cs in
+
+  let leftCs = f (matchAttribute green <> invert (matchToughness 2)) in
+  let rightCs = f (matchAttribute white <> invert (matchToughness 2)) in
+  let centerCs = f (matchToughness 2) in
+
+  let tapeValid = length centerCs == 1
+                  && contiguous (map (view cardToughness) leftCs)
+                  && contiguous (map (view cardToughness) rightCs) 
+                  && (null leftCs || minimum (map (view cardToughness) leftCs) == 3)
+                  && (null rightCs || minimum (map (view cardToughness) rightCs) == 3)
+                in
+
+  let tapeWithHead = map extractSymbol (reverse leftCs) <> "[" <> map extractSymbol centerCs <> "]" <> map extractSymbol rightCs in
+
+  if tapeValid then
+    "\n      tape: " <> tapeWithHead
+  else
+    ""
+
+  where
+    cs = let Right value = execMonad board allCards in value
+    extractSymbol c = if hasAttribute assassin c then 'H' else head . head . Data.Set.toList $ (Data.Set.fromList tapeTypes) `Data.Set.intersection` (view cardAttributes c)
+    tapePosition c = view cardPower c
+
+matchOwner :: Player -> CardMatcher
+matchOwner x = CardMatcher ("owner " <> show x) $
+  (==) x . fst . view cardLocation
+
+contiguous xs = Prelude.all (\(x, y) -> y - x == 1) $ zip xs (tail xs)
+
+formatter _ = 
+     tapeFormatter
+   -- <> cardFormatter "tape (bob)" (matchAny (map matchAttribute tapeTypes) <> matchOwner bob)
+   -- <> cardFormatter "tape (alice)" (matchAny (map matchAttribute tapeTypes) <> matchOwner alice)
+  -- <> boardFormatter
+-- 
