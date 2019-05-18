@@ -12,6 +12,7 @@ import Control.Lens
 import qualified Data.List
 import qualified Data.Set
 import qualified Data.Ord
+import qualified Data.Map as M
 
 alice = Opponent
 bob = Active
@@ -139,7 +140,7 @@ instance Show Rule where
 triggeringCreature rule =
   let baseCreature = if tapped `elem` view ruleAttributes rule then
                        "Xathrid Necromancer"
-                      else
+                     else
                        "Rotlung Reanimator"
   in
 
@@ -185,6 +186,29 @@ rules =
   , mkRule Q2 18 sliver [white, myr]
   ]
 
+mappings = M.fromList
+  . map (\x -> (head x, x))
+  $ tapeTypes
+
+charToType :: Char -> GameMonad CardAttribute
+charToType c = do
+  case M.lookup c mappings of
+    Nothing -> throwError ("Unknown tape symbol: " <> [c])
+    Just x -> return x
+
+encodeTape :: String -> Char -> String -> GameMonad ()
+encodeTape ls c rs = do
+  forM_ (zip (reverse ls) [3..]) $ \(l, s) -> do
+    t <- charToType l
+    withAttributes [token, green, t] $ addCreature (s, s) ("Initial L" <> show s)
+
+  t <- charToType c
+  withAttributes [token, t] $ addCreature (2, 2) ("Initial C")
+
+  forM_ (zip rs [3..]) $ \(l, s) -> do
+    t <- charToType l
+    withAttributes [token, white, t] $ addCreature (s, s) ("Initial R" <> show s)
+
 solution :: GameMonad ()
 solution = do
   let hand = ["Infest"]
@@ -202,7 +226,6 @@ solution = do
         withAttribute black $ addCreature (3, 3) "Soul Snuffers"
 
       withLocation Play $ do
-        withAttributes [token, sliver] $ addCreature (2, 2) "Token i1"
 
         addAura "Illusory Gains"
         withAttributes allColors $ addLand "Island"
@@ -215,9 +238,7 @@ solution = do
 
     as bob $ do
       withLocation Play $ do
-        withAttributes [token, sliver, white] $ addCreature (3, 3) "Token i2"
-        withAttributes [token, rhino, white] $ addCreature (4, 4) "Token i4"
-        --withAttributes [token, rhino, green] $ addCreature (3, 3) "Token i5"
+        encodeTape "" 's' "sr"
         addEnchantment "Wild Evocation"
         withEffect
           matchInPlay
@@ -448,8 +469,9 @@ tapeFormatter board =
 
   where
     cs = let Right value = execMonad board allCards in value
-    extractSymbol c = if hasAttribute assassin c then 'H' else head . head . Data.Set.toList $ (Data.Set.fromList tapeTypes) `Data.Set.intersection` (view cardAttributes c)
     tapePosition c = view cardPower c
+
+extractSymbol c = if hasAttribute assassin c then 'H' else head . head . Data.Set.toList $ (Data.Set.fromList tapeTypes) `Data.Set.intersection` (view cardAttributes c)
 
 matchOwner :: Player -> CardMatcher
 matchOwner x = CardMatcher ("owner " <> show x) $
