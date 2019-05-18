@@ -24,16 +24,42 @@ shroud = "shroud"
 aetherborn = "aetherborn"
 basilisk = "basilisk"
 cephalid = "cephalid"
+demon = "demon"
+elf = "elf"
+faerie = "fairie"
+giant = "giant"
+harpy = "harpy"
+illusion = "illusion"
+juggernaut = "juggernaut"
+kavu = "kavu"
+leviathan = "leviathan"
+myr = "myr"
+noggle = "noggle"
+orc = "orc"
+pegasus = "pegasus"
 rhino = "rhino"
 sliver = "sliver"
 
 tapeTypes =
-  [ aetherborn
+  [ assassin
+  , aetherborn
   , basilisk
   , cephalid
+  , demon
+  , elf
+  , faerie
+  , giant
+  , harpy
+  , illusion
+  , juggernaut
+  , kavu
+  , leviathan
+  , myr
+  , noggle
+  , orc
+  , pegasus
   , rhino
   , sliver
-  , assassin
   ]
 
 assassin = "assassin"
@@ -90,7 +116,7 @@ whenNotHalted m = do
 
   unless halted m
 
-data State = Q1 | Q2
+data State = Q1 | Q2 deriving Show
 
 data Rule = Rule
   { _ruleState :: State
@@ -117,14 +143,46 @@ triggeringCreature rule =
                        "Rotlung Reanimator"
   in
 
-  baseCreature <> " " <> show (view ruleNumber rule)
+  baseCreature <> " " <> show (view ruleState rule) <> " " <> show (view ruleNumber rule)
 
 
 rules =
   [ mkRule Q1 1 aetherborn [sliver, white]
+  , mkRule Q1 2 basilisk [green, elf]
   , mkRule Q1 3 cephalid [sliver, white]
+  , mkRule Q1 4 demon [green, aetherborn]
+  , mkRule Q1 5 elf [white, demon]
+  , mkRule Q1 6 faerie [green, harpy]
+  , mkRule Q1 7 giant [green, juggernaut]
+  , mkRule Q1 8 harpy [white, faerie]
+  , mkRule Q1 9 illusion [green, faerie]
+  , mkRule Q1 10 juggernaut [white, illusion]
+  , mkRule Q1 11 kavu [white, leviathan, tapped]
+  , mkRule Q1 12 leviathan [white, illusion, tapped]
+  , mkRule Q1 13 myr [white, basilisk, tapped]
+  , mkRule Q1 14 noggle [green, orc]
+  , mkRule Q1 15 orc [white, pegasus]
+  , mkRule Q1 16 pegasus [green, rhino, tapped]
   , mkRule Q1 17 rhino [assassin, blue]
   , mkRule Q1 18 sliver [green, cephalid]
+  , mkRule Q2 1 aetherborn [green, cephalid]
+  , mkRule Q2 2 basilisk [green, cephalid]
+  , mkRule Q2 3 cephalid [white, basilisk]
+  , mkRule Q2 4 demon [green, elf]
+  , mkRule Q2 5 elf [white, aetherborn]
+  , mkRule Q2 6 faerie [green, kavu, tapped]
+  , mkRule Q2 7 giant [green, harpy]
+  , mkRule Q2 8 harpy [white, giant]
+  , mkRule Q2 9 illusion [green, juggernaut]
+  , mkRule Q2 10 juggernaut [white, giant]
+  , mkRule Q2 11 kavu [green, faerie, tapped]
+  , mkRule Q2 12 leviathan [green, juggernaut]
+  , mkRule Q2 13 myr [green, orc]
+  , mkRule Q2 14 noggle [green, orc]
+  , mkRule Q2 15 orc [white, noggle]
+  , mkRule Q2 16 pegasus [green, sliver]
+  , mkRule Q2 17 rhino [white, sliver, tapped]
+  , mkRule Q2 18 sliver [white, myr]
   ]
 
 solution :: GameMonad ()
@@ -354,15 +412,15 @@ turn4 n = do
       withStateBasedActions $ do
         forCards (matchInPlay <> matchAttribute creature) $
           modifyCard cardMinusOneCounters (+ 1)
-    
+
       wheelOfSunAndMoon "Soul Snuffers"
 
-  
+
   turnStep n 4 "Alice Draw" $ do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Infest"
 
-matchAny = foldl (\b a -> a `matchOr` b) (invert mempty) 
+matchAny = foldl (\b a -> a `matchOr` b) (invert mempty)
 
 tapeFormatter :: Formatter
 tapeFormatter board =
@@ -376,7 +434,7 @@ tapeFormatter board =
 
   let tapeValid = length centerCs == 1
                   && contiguous (map (view cardToughness) leftCs)
-                  && contiguous (map (view cardToughness) rightCs) 
+                  && contiguous (map (view cardToughness) rightCs)
                   && (null leftCs || minimum (map (view cardToughness) leftCs) == 3)
                   && (null rightCs || minimum (map (view cardToughness) rightCs) == 3)
                 in
@@ -399,9 +457,9 @@ matchOwner x = CardMatcher ("owner " <> show x) $
 
 contiguous xs = Prelude.all (\(x, y) -> y - x == 1) $ zip xs (tail xs)
 
-formatter _ = 
+formatter _ =
      tapeFormatter
    -- <> cardFormatter "tape (bob)" (matchAny (map matchAttribute tapeTypes) <> matchOwner bob)
    -- <> cardFormatter "tape (alice)" (matchAny (map matchAttribute tapeTypes) <> matchOwner alice)
   -- <> boardFormatter
--- 
+--
