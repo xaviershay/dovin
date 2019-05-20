@@ -255,12 +255,10 @@ solution = do
           $ addEnchantment "Dread of Night 2"
 
         -- TODO: setup this color pallete from black
-        -- TODO: Correct P/T
         forM_ rules $ \rule -> do
           let name = triggeringCreature rule
 
           withAttributes [red, green, black, white]
-            $ withPlusOneCounters 5 -- TODO: Where does this come from?
             $ addCreature (2, 2) name
 
         withEffect
