@@ -19,6 +19,8 @@ bob = Active
 
 -- Indicates that a card's color text has been changed by Glamerdye
 colorHacked = "color-hacked"
+phasing = "phasing"
+phasedOut = "phasedOut"
 
 shroud = "shroud"
 
@@ -90,6 +92,19 @@ castNoRestrictions mana name = do
       (counters . at storm . non 0)
       (+ 1)
 
+phaseCards owner = do
+  forCards (matchAttribute phasing <> matchController owner) $ \cn -> do
+    c <- requireCard cn mempty
+
+    if hasAttribute phasedOut c then
+      loseAttribute phasedOut cn
+    else
+      gainAttribute phasedOut cn
+
+findM :: (a -> GameMonad ()) -> [a] -> GameMonad a
+findM f [] = throwError "No matching element"
+findM f (x:xs) = (f x >> return x) `catchError` (\_ -> findM f xs)
+
 -- Technically the card should never hit the graveyard, but that's not relevant
 -- in this proof. Instead, move from graveyard to bottom of deck.
 wheelOfSunAndMoon name = do
@@ -117,7 +132,7 @@ whenNotHalted m = do
 
   unless halted m
 
-data State = Q1 | Q2 deriving Show
+data State = Q1 | Q2 deriving (Show, Eq)
 
 data Rule = Rule
   { _ruleState :: State
@@ -258,7 +273,12 @@ solution = do
         forM_ rules $ \rule -> do
           let name = triggeringCreature rule
 
+          let extraAttributes = if view ruleState rule == Q2 then
+                                  [phasedOut]
+                                else
+                                  []
           withAttributes [red, green, black, white]
+            $ withAttributes (phasing:extraAttributes)
             $ addCreature (2, 2) name
 
         withEffect
@@ -289,12 +309,14 @@ runLoop n
       turn4 n
       runLoop (n + 1)
 
-
 turnStep c n l = step ("Cycle " <> show c <> ", Turn " <> show n <> ": " <> l)
 
 turn1 n = do
-  deadToken <- turnStep n 1 "Upkeep: Infest" $ do
+  turnStep n 1 "Alice: Untap" $ do
     transitionToForced Untap
+    phaseCards alice
+
+  deadToken <- turnStep n 1 "Upkeep: Infest" $ do
     transitionTo Upkeep
 
     as bob $ do
@@ -311,20 +333,27 @@ turn1 n = do
 
     lookupSingleCard (matchInPlay <> matchToughness 0)
 
-  let maybeRule = Data.List.find (\rule -> hasAttribute (view ruleTrigger rule) deadToken) rules
+  let matchingRules =
+        filter
+          (\rule -> hasAttribute (view ruleTrigger rule) deadToken)
+          rules
 
-  case maybeRule of
-    Nothing -> throwError $ "Unknown card died: " <> formatCard deadToken
-    Just rule -> do
-      let c = triggeringCreature rule
+  when (null matchingRules) $
+    throwError ("Unknown card died: " <> formatCard deadToken)
 
-      turnStep n 1 ("Action: " <> show rule) $ do
-        as bob $ do
-          trigger (c <> " Trigger") c >> resolveTop
+  rule <- findM
+            (validate (missingAttribute phasedOut) . triggeringCreature)
+            matchingRules
 
-          withLocation Play
-            $ withAttributes (token : view ruleAttributes rule)
-            $ addCreature (2, 2) ("Token " <> show n)
+  let c = triggeringCreature rule
+
+  turnStep n 1 ("Action: " <> show rule) $ do
+    as bob $ do
+      trigger (c <> " Trigger") c >> resolveTop
+
+      withLocation Play
+        $ withAttributes (token : view ruleAttributes rule)
+        $ addCreature (2, 2) ("Token " <> show n)
 
   turnStep n 1 "Illusory Gains" $ do
     as alice $ do
@@ -343,9 +372,13 @@ turn1 n = do
     forCards (matchInPlay <> matchAttribute creature) $
       modifyCard cardStrengthModifier (const $ mkStrength (0, 0))
 
+  turnStep n 1 "Bob: Untap and Phase" $ do
+    phaseCards bob
+
 turn2 n = do
   turnStep n 2 "Alice Untap" $ do
     transitionToForced Untap
+    phaseCards alice
 
   turnStep n 2 "Upkeep: Cleansing Beam" $ do
     transitionTo Upkeep
@@ -381,9 +414,14 @@ turn2 n = do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Coalition Victory"
 
+  turnStep n 2 "Bob: Untap and Phase" $ do
+    phaseCards bob
+
 turn3 n = do
   turnStep n 3 "Upkeep: Coalition Victory" $ do
     transitionToForced Untap
+    phaseCards alice
+
     transitionTo Upkeep
 
     as bob $ do
@@ -412,9 +450,13 @@ turn3 n = do
       transitionTo DrawStep
       move (alice, Deck) (alice, Hand) "Soul Snuffers"
 
+  turnStep n 3 "Bob: Untap and Phase" $ do
+    phaseCards bob
+
 turn4 n = do
   turnStep n 4 "Upkeep: Soul Snuffers" $ do
     transitionToForced Untap
+    phaseCards alice
     transitionTo Upkeep
 
     as bob $ do
@@ -438,6 +480,9 @@ turn4 n = do
   turnStep n 4 "Alice Draw" $ do
     transitionTo DrawStep
     move (alice, Deck) (alice, Hand) "Infest"
+
+  turnStep n 4 "Bob: Untap and Phase" $ do
+    phaseCards bob
 
 matchAny = foldl (\b a -> a `matchOr` b) (invert mempty)
 
