@@ -106,6 +106,9 @@ data Board = Board
   -- deck and graveyard need to be ordered also - but works for now. Need to
   -- think more about "hiding" this data structure.
   , _stack :: [CardName]
+  -- ... well I guess the deck cares about order too now hmmm. Need to figure
+  -- this out.
+  , _deck :: M.HashMap Player [CardName]
   , _counters :: M.HashMap String Int
   -- In theory, life could be just another counter. Need to think more about
   -- making that happen.
@@ -233,6 +236,7 @@ emptyBoard = Board
                { _cards = mempty
                , _counters = mempty
                , _stack = mempty
+               , _deck = mempty
                , _life = mempty
                , _manaPool = mempty
                , _phase = FirstMain

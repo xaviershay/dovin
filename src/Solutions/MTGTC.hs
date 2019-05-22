@@ -92,6 +92,24 @@ castNoRestrictions mana name = do
       (counters . at storm . non 0)
       (+ 1)
 
+draw :: CardName -> GameMonad ()
+draw expectedName = do
+  active <- view envActor
+  s <- use $ deck . at active . non mempty
+
+  case s of
+    [] -> throwError $ "deck is empty, expecting " <> expectedName
+    (name:cs) -> do
+      unless (name == expectedName) $
+        throwError $ "unexpected top of deck: expected "
+                       <> expectedName
+                       <> ", got "
+                       <> name
+      moveTo Hand expectedName
+      modifying
+        (deck . at alice . non mempty)
+        (drop 1)
+
 phaseCards owner = do
   forCards (matchAttribute phasing <> matchController owner) $ \cn -> do
     c <- requireCard cn mempty
@@ -111,6 +129,9 @@ wheelOfSunAndMoon name = do
   active <- view envActor
   validate (matchLocation (active, Graveyard)) name
   moveTo Deck name
+  modifying
+    (deck . at active . non mempty)
+    (\xs -> xs ++ [name])
 
 lookupSingleCard :: CardMatcher -> GameMonad Card
 lookupSingleCard matcher = do
@@ -240,6 +261,10 @@ solution = do
         addSorcery "Coalition Victory"
         withAttribute black $ addCreature (3, 3) "Soul Snuffers"
 
+        assign
+          (deck . at alice)
+          (Just ["Cleansing Beam", "Coalition Victory", "Soul Snuffers"])
+
       withLocation Play $ do
 
         addAura "Illusory Gains"
@@ -364,7 +389,7 @@ turn1 n = do
 
   turnStep n 1 "Draw" $ do
     transitionTo DrawStep
-    move (alice, Deck) (alice, Hand) "Cleansing Beam"
+    as alice $ draw "Cleansing Beam"
 
     -- TODO: Validate alice can't do anything
 
@@ -412,7 +437,7 @@ turn2 n = do
 
   turnStep n 2 "Alice Draw" $ do
     transitionTo DrawStep
-    move (alice, Deck) (alice, Hand) "Coalition Victory"
+    as alice $ draw "Coalition Victory"
 
   turnStep n 2 "Bob: Untap and Phase" $ do
     phaseCards bob
@@ -448,7 +473,7 @@ turn3 n = do
   whenNotHalted $ do
     turnStep n 3 "Alice Draw" $ do
       transitionTo DrawStep
-      move (alice, Deck) (alice, Hand) "Soul Snuffers"
+      as alice $ draw "Soul Snuffers"
 
   turnStep n 3 "Bob: Untap and Phase" $ do
     phaseCards bob
@@ -479,7 +504,7 @@ turn4 n = do
 
   turnStep n 4 "Alice Draw" $ do
     transitionTo DrawStep
-    move (alice, Deck) (alice, Hand) "Infest"
+    as alice $ draw "Infest"
 
   turnStep n 4 "Bob: Untap and Phase" $ do
     phaseCards bob
@@ -526,5 +551,3 @@ formatter _ =
      tapeFormatter
    -- <> cardFormatter "tape (bob)" (matchAny (map matchAttribute tapeTypes) <> matchOwner bob)
    -- <> cardFormatter "tape (alice)" (matchAny (map matchAttribute tapeTypes) <> matchOwner alice)
-  -- <> boardFormatter
---
