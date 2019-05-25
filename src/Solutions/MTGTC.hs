@@ -110,6 +110,36 @@ draw expectedName = do
         (deck . at alice . non mempty)
         (drop 1)
 
+mill :: CardName -> GameMonad ()
+mill expectedName = do
+  active <- view envActor
+  s <- use $ deck . at active . non mempty
+
+  case s of
+    [] -> throwError $ "deck is empty, expecting " <> expectedName
+    (name:cs) -> do
+      unless (name == expectedName) $
+        throwError $ "unexpected top of deck: expected "
+                       <> expectedName
+                       <> ", got "
+                       <> name
+      moveTo Graveyard expectedName
+      modifying
+        (deck . at active . non mempty)
+        (drop 1)
+
+drawTop = do
+  active <- view envActor
+  s <- use $ deck . at active . non mempty
+
+  case s of
+    [] -> throwError $ "deck is empty"
+    (name:cs) -> do
+      moveTo Hand name
+      modifying
+        (deck . at active . non mempty)
+        (drop 1)
+
 phaseCards owner = do
   forCards (matchAttribute phasing <> matchController owner) $ \cn -> do
     c <- requireCard cn mempty
@@ -152,6 +182,11 @@ whenNotHalted m = do
   halted <- gameFinished
 
   unless halted m
+
+whenState f m = do
+  result <- (f >> pure True) `catchError` (const $ pure False)
+
+  when result m
 
 data State = Q1 | Q2 deriving (Show, Eq)
 
@@ -266,10 +301,12 @@ solution = do
           (Just ["Cleansing Beam", "Coalition Victory", "Soul Snuffers"])
 
       withLocation Play $ do
-
+        addArtifact "Mesmeric Orb"
         addAura "Illusory Gains"
         withAttributes allColors $ addLand "Island"
         withAttribute green $ addEnchantment "Choke"
+        -- TODO: This should be (2, 2), but then dread of night/infest kills it?
+        withAttributes [red, green, white, black, assemblyWorker] $ addCreature (5, 5) "Fungus Sliver"
         withEffect
           matchInPlay
           (pure $ matchAttribute creature <> matchAttribute assemblyWorker)
@@ -278,7 +315,8 @@ solution = do
 
     as bob $ do
       withLocation Play $ do
-        encodeTape "" 's' "sr"
+        encodeTape "" 'p' "fr"
+        --encodeTape "" 's' "sr"
         addEnchantment "Wild Evocation"
         withEffect
           matchInPlay
@@ -327,8 +365,10 @@ runLoop n
   | True = do
     turn1 n
     turn2 n
-    -- TODO: Check if this turn is effectively skipped by Mesmeric Orb
-    turn3 n
+
+    whenState (validate (matchLocation (alice, Hand)) "Coalition Victory") $ do
+      turn3 n
+
 
     whenNotHalted $ do
       turn4 n
@@ -383,7 +423,8 @@ turn1 n = do
   turnStep n 1 "Illusory Gains" $ do
     as alice $ do
       trigger "Steal" "Illusory Gains" >> resolveTop
-      forCards (matchController alice <> matchAttribute creature <> matchInPlay) $
+      -- TODO: Better tracking of what Illusory Gains is attached to
+      forCards (matchController alice <> matchAttributes [creature, token] <> matchInPlay) $
         move (alice, Play) (bob, Play)
       move (bob, Play) (alice, Play) ("Token " <> show n)
 
@@ -404,6 +445,20 @@ turn2 n = do
   turnStep n 2 "Alice Untap" $ do
     transitionToForced Untap
     phaseCards alice
+
+    as alice $ do
+      tappedCard <- lookupCards (matchController alice <> matchAttribute tapped)
+
+      case tappedCard of
+        [] -> return ()
+        [c] -> do
+          let cn = view cardName c
+          untap cn
+          -- No priority in untap phase, to this doesn't technically go on stack until Upkeep
+          trigger "Mill" "Mesmeric Orb"
+
+        cs -> throwError $ "Too many tapped cards: " <> intercalate ", " (map (view cardName) cs)
+
 
   turnStep n 2 "Upkeep: Cleansing Beam" $ do
     transitionTo Upkeep
@@ -435,9 +490,18 @@ turn2 n = do
           -- TODO: Check for vigor
           modifyCard cardPlusOneCounters (+ 2) cn
 
+  turnStep n 2 "Mill from Mesmeric Orb (if triggered)" $ do
+    s <- use $ stack
+
+    as alice $ do
+      when (not . null $ s) $ do
+        resolve "Mill"
+        mill "Coalition Victory"
+        wheelOfSunAndMoon "Coalition Victory"
+
   turnStep n 2 "Alice Draw" $ do
     transitionTo DrawStep
-    as alice $ draw "Coalition Victory"
+    as alice $ drawTop
 
   turnStep n 2 "Bob: Untap and Phase" $ do
     phaseCards bob
@@ -462,7 +526,7 @@ turn3 n = do
 
       matches <-
         sequence
-          . map (\(c, t) -> (not . null) <$> lookupCards (matchAttributes [c, t]))
+          . map (\(c, t) -> (not . null) <$> lookupCards (matchController alice <> matchAttributes [c, t]))
            $ [(x, y) | x <- allColors, y <- [creature, land]]
 
       if (Prelude.all id matches) then
@@ -547,7 +611,9 @@ matchOwner x = CardMatcher ("owner " <> show x) $
 
 contiguous xs = Prelude.all (\(x, y) -> y - x == 1) $ zip xs (tail xs)
 
-formatter _ =
-     tapeFormatter
-   -- <> cardFormatter "tape (bob)" (matchAny (map matchAttribute tapeTypes) <> matchOwner bob)
-   -- <> cardFormatter "tape (alice)" (matchAny (map matchAttribute tapeTypes) <> matchOwner alice)
+deckFormatter actor board = "\n      deck: " <> intercalate "" (map (\cn -> "\n        " <> cn) (view (deck . at actor . non mempty) board))
+formatter step = case view stepNumber step of
+  _ -> tapeFormatter
+--    <> cardFormatter "tape (bob)" (matchAny (map matchAttribute tapeTypes) <> matchOwner bob)
+--    <> cardFormatter "tape (alice)" (matchAny (map matchAttribute tapeTypes) <> matchOwner alice)
+--    <> deckFormatter alice
