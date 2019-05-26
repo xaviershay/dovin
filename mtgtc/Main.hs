@@ -12,7 +12,8 @@ main = do
   --let tape = "[s]sr"
   --let tape = "[p]fr"
   --let tape =  "crrffafafaffaffaaaaaaafaaaaaf[f]amamamc"
-  let tape = "rrffafafaf[f]amamam"
+  --let tape = "rrffafafaf[f]amamamccccccccccc"
+  let tape = "[s]"
 
   let (e, initialBoard, _) = runMonad emptyBoard (MTGTC.setup tape)
   putStrLn . MTGTC.tapeFormatter2 $ initialBoard
@@ -25,12 +26,15 @@ runCycle board n = do
 
   putStrLn ""
   putStrLn . MTGTC.tapeFormatter2 $ newBoard
---  forM_ log $ \step -> do
---    putStr $ show (view stepNumber step) <> ". "
---    putStr $ view stepLabel step
---    putStrLn . MTGTC.tapeFormatter . view stepState $ step
+ -- forM_ log $ \step -> do
+ --   putStr $ show (view stepNumber step) <> ". "
+ --   putStr $ view stepLabel step
+ --   putStrLn . myFormatter . view stepState $ step
 
   case e of
     Left "won game" -> putStrLn "Won!" >> exitSuccess
     Left x -> putStrLn x >> exitFailure
     Right _ -> return newBoard
+
+myFormatter =
+  cardFormatter "tape" (MTGTC.matchAny (map matchAttribute MTGTC.tapeTypes))

@@ -45,6 +45,9 @@ pegasus = "pegasus"
 rhino = "rhino"
 sliver = "sliver"
 
+lyurgoyf = "lyurgoyf"
+rat = "rat"
+
 tapeTypes =
   [ assassin
   , aetherborn
@@ -65,6 +68,8 @@ tapeTypes =
   , pegasus
   , rhino
   , sliver
+  , lyurgoyf
+  , rat
   ]
 
 unicodeMappings = M.fromList
@@ -86,6 +91,10 @@ unicodeMappings = M.fromList
   , (pegasus, "c⃗₁")
   , (rhino, "c⃖₂")
   , (sliver, "c₂")
+
+  , (assassin, "!!")
+  , (lyurgoyf, "L ")
+  , (rat, "R ")
   ]
 
 assassin = "assassin"
@@ -305,6 +314,13 @@ encodeTape xs = do
     t <- charToType l
     withAttributes [token, white, t] $ addCreature (s, s) ("Initial R" <> show s)
 
+  let n = length ls + 2
+
+  withAttributes [green, lyurgoyf, token] $ addCreature (n, n) "Lyurgoyf Left Tape"
+
+  let n = length rs + 2
+  withAttributes [white, rat, token] $ addCreature (n, n) "Rat Right Tape"
+
 setup :: String -> GameMonad ()
 setup tape = do
   transitionToForced Untap
@@ -342,6 +358,7 @@ setup tape = do
       --encodeTape "" 's' "sr"
       --encodeTape "crrffafafaffaffaaaaaaafaaaaaf" 'f' "amamamc"
       addEnchantment "Wild Evocation"
+
       withEffect
         matchInPlay
         (const $ matchAttribute creature <> matchAttribute black)
@@ -355,6 +372,18 @@ setup tape = do
         (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
         $ withAttribute colorHacked
         $ addEnchantment "Dread of Night 2"
+
+      withEffect
+        matchInPlay
+        (const $ matchAttribute creature <> matchAttribute rat)
+        (pure . over cardStrengthModifier (mkStrength (1, 1) <>))
+        $ addEnchantment "Shared Triumph 1"
+
+      withEffect
+        matchInPlay
+        (const $ matchAttribute creature <> matchAttribute lyurgoyf)
+        (pure . over cardStrengthModifier (mkStrength (1, 1) <>))
+        $ addEnchantment "Shared Triumph 2"
 
       -- TODO: setup this color pallete from black
       forM_ rules $ \rule -> do
@@ -411,11 +440,41 @@ turn1 n = do
     forCards (matchInPlay <> matchAttribute creature) $
       modifyCard cardStrengthModifier (mkStrength (-2, -2) <>)
 
-    lookupSingleCard (matchInPlay <> matchToughness 0)
+    lookupSingleCard (matchInPlay <> matchAttribute creature <> matchLesserPower 1)
+
+  deadToken' <-
+    if (hasAttribute rat deadToken) then
+      do
+        -- Handle infinite tape on right side
+        -- TODO: Trigger and resolve things, don't just create creatures
+        as bob $ do
+          -- TODO: Illusory gains, though shouldn't be relevant
+          withAttributes [rat, white, token] $ addCreature (2, 2) ("Rat " <> show n)
+
+        as alice $ do
+            withAttributes [cephalid, black, token] $ addCreature (2, 2) ("Cephalid " <> show n)
+
+        requireCard ("Cephalid " <> show n) (matchLesserPower 1)
+    else if (hasAttribute lyurgoyf deadToken) then
+      do
+        -- Handle infinite tape on right side
+        -- TODO: Trigger and resolve things, don't just create creatures
+        as bob $ do
+          -- TODO: Illusory gains, though shouldn't be relevant
+          withLocation Play $
+            withAttributes [lyurgoyf, green, token] $ addCreature (2, 2) ("Lyurgoyf " <> show n)
+
+        as alice $ do
+          withLocation Play $
+            withAttributes [cephalid, black, token] $ addCreature (2, 2) ("Cephalid " <> show n)
+
+        requireCard ("Cephalid " <> show n) (matchLesserPower 1)
+    else
+      return deadToken
 
   let matchingRules =
         filter
-          (\rule -> hasAttribute (view ruleTrigger rule) deadToken)
+          (\rule -> hasAttribute (view ruleTrigger rule) deadToken')
           rules
 
   when (null matchingRules) $
@@ -655,7 +714,7 @@ extractSymbol c = if hasAttribute assassin c then 'H' else head . head . Data.Se
 extractSymbol2 :: Card -> String
 extractSymbol2 c = 
   case M.lookup relevantAttribute unicodeMappings of
-    Nothing -> "?"
+    Nothing -> "? "
     Just x -> x
 
   where

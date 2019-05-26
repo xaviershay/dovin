@@ -56,7 +56,7 @@ cardFormatter title matcher board =
 formatCards = intercalate "\n" . map (("      " <>) . formatCard)
 
 formatCard c =
-  "  " <> view cardName c <>
+  "  " <> view cardName c <> " / " <> show (view cardLocation c) <>
   " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
   <> if hasAttribute "creature" c then
        " ("
