@@ -1,0 +1,1857 @@
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b >b  1  c  1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b  b⃖ >1  c  1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b >b⃖  c₂ c  1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1 >b  b  c₂ c  1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b⃖ >b  c₂ c  1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b⃖  b⃖ >c₂ c  1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b⃖  b⃖  1⃖ >c  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b⃖  b⃖ >1⃖  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1  b⃖ >b⃖  1⃗  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1 >b⃖  b⃗  1⃗  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b >1  b⃗  b⃗  1⃗  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖ >b⃗  b⃗  1⃗  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖ >b⃗  1⃗  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖ >1⃗  1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖ >1⃗  1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖ >1  c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖ >c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  c⃖ >1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  c⃖  1⃖ >c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  c⃖  1⃖  c⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  c⃖  1⃖ >c⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  c⃖ >1⃖  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖ >c⃖  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖  1⃖ >1⃖  c⃗  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖  1⃖ >1⃖  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖  b⃖ >1⃖  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖  b⃖ >b⃖  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b  1⃖ >b⃖  b⃗  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b >1⃖  b⃗  b⃗  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1 >b  1⃗  b⃗  b⃗  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂>1⃗  b⃗  b⃗  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁>b⃗  b⃗  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁>b⃗  1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁>1⃗  1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁>1⃗  1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁>1⃗  c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>c⃗  1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖ >1⃗  c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖  1⃖₁>c⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖  1⃖₁ c⃖ >1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖  1⃖₁ c⃖  1⃖₁>1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖  1⃖₁ c⃖ >1⃖₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖  1⃖₁>c⃖  1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ c⃖ >1⃖₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>c⃖  1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁ 1⃖₁>1⃖₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁ 1⃖₁>1⃖₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁ b⃖₁>1⃖₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁ b⃖₁>b⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂ 1⃖₁>b⃖₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1  b₂>1⃖₁ b⃗₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1 >b₂ 1⃗₁ b⃗₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b >1  b₃ 1⃗₁ b⃗₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖ >b₃ 1⃗₁ b⃗₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁>1⃗₁ b⃗₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁>b⃗₁ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁>b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b >1⃗₁ 1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1 >1⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1 >1⃗₁ c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1 >c⃗₁ 1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁>1⃗₁ c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁ 1⃖₁>c⃗₁ 1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁ 1⃖₁ c₂>1⃗₁ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁ 1⃖₁ c₂ 1⃖₁>c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁ 1⃖₁ c₂>1⃖₁ c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁ 1⃖₁>c₂ 1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1  c⃖₁>1⃖₁ c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1  1 >c⃖₁ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1  1 >1  c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b  1 >1  c₂ c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b >1  c₂ c₂ c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁>b  c₂ c₂ c₂ c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖ >c₂ c₂ c₂ c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖ >c₂ c₂ c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖  1⃖ >c₂ c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖  1⃖  1⃖ >c₂ 1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖  1⃖  1⃖  1⃖ >1  c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖  1⃖ >1⃖  c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁ b⃖ >1⃖  c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁ b⃖₁>b⃖  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁ 1⃖₁>b⃖₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖  b⃖₁>1⃖₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b  1⃖ >b⃖₁ 1⃗₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b >1⃖  b⃗₁ 1⃗₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1 >b  c₂ b⃗₁ 1⃗₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖ >c₂ b⃗₁ 1⃗₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖ >b⃗₁ 1⃗₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b >1⃗₁ b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1 >b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b >b  c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖ >c₂ c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖ >c₂ c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖ >c₂ c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b  b⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b >b⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1 >b  b⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂>b⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1  c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂ b⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1  b₂>b⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1 >b₂ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b >1  b₃ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖ >b₃ b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁>b⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁>1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1 >1⃗₁ 1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1 >1⃗₁ c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1 >c₂ c  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1  1⃖ >c  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1 >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1 >1  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1⃖ >1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1⃖  1⃖ >1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1⃖  1⃖ >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1  1⃖ >1⃖  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1 >1⃖  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1 >1  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖ >1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖ >1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖  1⃖ >1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖  1⃖  1⃖ >1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1 >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1 >1  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1 >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1 >1  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1 >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1 >1  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1 >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁>1  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖  1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁ 1⃖ >1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁ b⃖₁>1⃖  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖  b⃖₁>b⃖₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b  1⃖ >b⃖₁ b⃗₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b >1⃖  b⃗₁ b⃗₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖ >b  1⃗  b⃗₁ b⃗₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂>1⃗  b⃗₁ b⃗₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁>b⃗₁ b⃗₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b >b⃗₁ 1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b >1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃗  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁ 1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b  1⃖₁>1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b >1⃖₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b >b  1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖ >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1 >1⃗₁ 1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1 >1⃗₁ 1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1  1 >1⃗₁ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1  1  1 >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1  1  1 >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1  1 >1  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1  1 >1  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖  1 >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b  b⃖ >1  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b >b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁>b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖ >b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖  b⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁ b⃖ >b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂ 1⃖₁>b⃖  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖  b₂>1⃖₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1  b⃖  1⃖ >b₂ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1  b⃖ >1⃖  b₃ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1 >b⃖  1⃗  b₃ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b >1  b⃗  1⃗  b₃ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖ >b⃗  1⃗  b₃ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖ >1⃗  b₃ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖ >b₃ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁>1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁>b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂>b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂ b⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b₂>b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁>b₂ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖  b⃖₁>1⃖₁ b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖  1⃖ >b⃖₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖  b⃖ >1⃖  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b  1⃖ >b⃖  1⃗  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b >1⃖  b⃗  1⃗  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b >b  1⃗  b⃗  1⃗  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂>1⃗  b⃗  1⃗  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁>b⃗  1⃗  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁>1⃗  b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁>b⃗₁ 1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁ b >1  b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁>b  c₂ b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁ b⃖ >c₂ b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁ b⃖  1⃖ >b₃ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁ b⃖ >1⃖  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁ 1⃖₁>b⃖  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁ b⃖₁>1⃖₁ b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b₂ 1⃖₁>b⃖₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b  b₂>1⃖₁ b⃗₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q2
+tape: c⃖₁ c⃖₁ b >b₂ 1  b⃗₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b >1  b⃗₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b >b  c₂ b⃗₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖ >c₂ b⃗₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖ >b⃗₁ 1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b >1  b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖ >b  c₂ b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖ >c₂ b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖ >b⃗  1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁>1⃗  b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁>b⃗₁ b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b >b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b  b⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b >b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁>b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖ >b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖  b⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁ b⃖ >b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁ 1⃖₁>b⃖  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖  b⃖₁>1⃖₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖  1⃖ >b⃖₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖  b⃖ >1⃖  b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖  1⃖ >b⃖  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b  b⃖ >1⃖  b  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b >b⃖  c₂ b  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁>b  b  c₂ b  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖ >b  c₂ b  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖ >c₂ b  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖ >b  c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖ >c₂ b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖ >b⃗₁ 1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b >1⃗₁ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1 >b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖ >b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖  b⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1  b⃖ >b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b  1 >b⃖  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b >1  b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖ >b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖ >c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖ >b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖ >b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖  1⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖  b⃖ >1⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖  b⃖ >b⃖  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖  1⃖ >b⃖  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖  b⃖ >1⃖  b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖  1⃖ >b⃖  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖  b⃖ >1⃖  b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖  1⃖ >b⃖  c₂ b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖  b⃖ >1⃖  b  c₂ b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁ b⃖ >b⃖  c₂ b  c₂ b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁ c⃖₁>b⃖  b  c₂ b  c₂ b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁>c⃖₁ b  b  c₂ b  c₂ b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+
+state: Q1
+tape: c⃖₁>!! b  b  c₂ b  c₂ b  c₂ b  b  c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ c₂ 
+

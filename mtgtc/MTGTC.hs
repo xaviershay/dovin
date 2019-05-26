@@ -90,7 +90,7 @@ unicodeMappings = M.fromList
   , (noggle, "c⃗ ")
   , (orc, "c⃖ ")
   , (pegasus, "c⃗₁")
-  , (rhino, "c⃖₂")
+  , (rhino, "c⃖₁")
   , (sliver, "c₂")
 
   , (assassin, "!!")

@@ -57,6 +57,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - dovin
+    - Stream
 
 tests:
   dovin-test:
