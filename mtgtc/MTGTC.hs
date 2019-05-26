@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 -- https://arxiv.org/abs/1904.09828
-module Solutions.MTGTC where
+module MTGTC where
 
 import Dovin.V2
 import Dovin.Prelude
@@ -13,6 +13,8 @@ import qualified Data.List
 import qualified Data.Set
 import qualified Data.Ord
 import qualified Data.Map as M
+
+import Data.List.Split (splitOneOf)
 
 alice = Opponent
 bob = Active
@@ -63,6 +65,27 @@ tapeTypes =
   , pegasus
   , rhino
   , sliver
+  ]
+
+unicodeMappings = M.fromList
+  [ (aetherborn, "1 ")
+  , (basilisk, "1⃗ ")
+  , (cephalid, "1⃖ ")
+  , (demon, "1⃗₁")
+  , (elf, "1⃖₁")
+  , (faerie, "b ")
+  , (giant, "b⃗ ")
+  , (harpy, "b⃖ ")
+  , (illusion, "b⃗₁")
+  , (juggernaut, "b⃖₁")
+  , (kavu, "b₂")
+  , (leviathan, "b₃")
+  , (myr, "c ")
+  , (noggle, "c⃗ ")
+  , (orc, "c⃖ ")
+  , (pegasus, "c⃗₁")
+  , (rhino, "c⃖₂")
+  , (sliver, "c₂")
   ]
 
 assassin = "assassin"
@@ -267,8 +290,10 @@ charToType c = do
     Nothing -> throwError ("Unknown tape symbol: " <> [c])
     Just x -> return x
 
-encodeTape :: String -> Char -> String -> GameMonad ()
-encodeTape ls c rs = do
+encodeTape :: String -> GameMonad ()
+encodeTape xs = do
+  let [ls, (c:_), rs] = splitOneOf "[]" xs
+
   forM_ (zip (reverse ls) [3..]) $ \(l, s) -> do
     t <- charToType l
     withAttributes [token, green, t] $ addCreature (s, s) ("Initial L" <> show s)
@@ -280,99 +305,89 @@ encodeTape ls c rs = do
     t <- charToType l
     withAttributes [token, white, t] $ addCreature (s, s) ("Initial R" <> show s)
 
-solution :: GameMonad ()
-solution = do
-  let hand = ["Infest"]
+setup :: String -> GameMonad ()
+setup tape = do
+  transitionToForced Untap
 
-  step "Initial state" $ do
-    transitionToForced Untap
+  as alice $ do
+    withLocation Hand $ do
+      addSorcery "Infest"
 
-    as alice $ do
-      withLocation Hand $ do
-        addSorcery "Infest"
+    withLocation Deck $ do
+      addInstant "Cleansing Beam"
+      addSorcery "Coalition Victory"
+      withAttribute black $ addCreature (3, 3) "Soul Snuffers"
 
-      withLocation Deck $ do
-        addInstant "Cleansing Beam"
-        addSorcery "Coalition Victory"
-        withAttribute black $ addCreature (3, 3) "Soul Snuffers"
+      assign
+        (deck . at alice)
+        (Just ["Cleansing Beam", "Coalition Victory", "Soul Snuffers"])
 
-        assign
-          (deck . at alice)
-          (Just ["Cleansing Beam", "Coalition Victory", "Soul Snuffers"])
+    withLocation Play $ do
+      addArtifact "Mesmeric Orb"
+      addAura "Illusory Gains"
+      withAttributes allColors $ addLand "Island"
+      withAttribute green $ addEnchantment "Choke"
+      -- TODO: This should be (2, 2), but then dread of night/infest kills it?
+      withAttributes [red, green, white, black, assemblyWorker] $ addCreature (5, 5) "Fungus Sliver"
+      withEffect
+        matchInPlay
+        (pure $ matchAttribute creature <> matchAttribute assemblyWorker)
+        (pure . setAttribute shroud)
+        $ addEnchantment "Steely Resolve"
 
-      withLocation Play $ do
-        addArtifact "Mesmeric Orb"
-        addAura "Illusory Gains"
-        withAttributes allColors $ addLand "Island"
-        withAttribute green $ addEnchantment "Choke"
-        -- TODO: This should be (2, 2), but then dread of night/infest kills it?
-        withAttributes [red, green, white, black, assemblyWorker] $ addCreature (5, 5) "Fungus Sliver"
-        withEffect
-          matchInPlay
-          (pure $ matchAttribute creature <> matchAttribute assemblyWorker)
-          (pure . setAttribute shroud)
-          $ addEnchantment "Steely Resolve"
+  as bob $ do
+    withLocation Play $ do
+      encodeTape tape
+      -- "[p]fr"
+      --encodeTape "" 's' "sr"
+      --encodeTape "crrffafafaffaffaaaaaaafaaaaaf" 'f' "amamamc"
+      addEnchantment "Wild Evocation"
+      withEffect
+        matchInPlay
+        (const $ matchAttribute creature <> matchAttribute black)
+        (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
+        $ withAttribute colorHacked
+        $ addEnchantment "Dread of Night 1"
 
-    as bob $ do
-      withLocation Play $ do
-        encodeTape "" 'p' "fr"
-        --encodeTape "" 's' "sr"
-        addEnchantment "Wild Evocation"
-        withEffect
-          matchInPlay
-          (const $ matchAttribute creature <> matchAttribute black)
-          (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
-          $ withAttribute colorHacked
-          $ addEnchantment "Dread of Night 1"
+      withEffect
+        matchInPlay
+        (const $ matchAttribute creature <> matchAttribute black)
+        (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
+        $ withAttribute colorHacked
+        $ addEnchantment "Dread of Night 2"
 
-        withEffect
-          matchInPlay
-          (const $ matchAttribute creature <> matchAttribute black)
-          (pure . over cardStrengthModifier (mkStrength (-1, -1) <>))
-          $ withAttribute colorHacked
-          $ addEnchantment "Dread of Night 2"
+      -- TODO: setup this color pallete from black
+      forM_ rules $ \rule -> do
+        let name = triggeringCreature rule
 
-        -- TODO: setup this color pallete from black
-        forM_ rules $ \rule -> do
-          let name = triggeringCreature rule
+        let extraAttributes = if view ruleState rule == Q2 then
+                                [phasedOut]
+                              else
+                                []
+        withAttributes [red, green, black, white]
+          $ withAttributes (phasing:extraAttributes)
+          $ addCreature (2, 2) name
 
-          let extraAttributes = if view ruleState rule == Q2 then
-                                  [phasedOut]
-                                else
-                                  []
-          withAttributes [red, green, black, white]
-            $ withAttributes (phasing:extraAttributes)
-            $ addCreature (2, 2) name
+      withEffect
+        matchInPlay
+        (matchLocation . view cardLocation)
+        (pure . setAttribute hexproof)
+        $ addEnchantment "Privileged Position"
 
-        withEffect
-          matchInPlay
-          (matchLocation . view cardLocation)
-          (pure . setAttribute hexproof)
-          $ addEnchantment "Privileged Position"
+stepCompute :: Int -> GameMonad ()
+stepCompute n = do
+  runLoop n
 
-    -- Create rotlung reanimators
-    -- Create Xathrid Necromancers
-    -- Create some tokens for initial tape
-    -- Create sides of tape
-    -- Create Alice's dec
-    return ()
+runLoop n = do
+  turn1 n
+  turn2 n
 
-
-  runLoop 1
-
-runLoop n
-  | n > 5 = throwError "Looping!"
-  | True = do
-    turn1 n
-    turn2 n
-
-    whenState (validate (matchLocation (alice, Hand)) "Coalition Victory") $ do
-      turn3 n
+  whenState (validate (matchLocation (alice, Hand)) "Coalition Victory") $ do
+    turn3 n
 
 
-    whenNotHalted $ do
-      turn4 n
-      runLoop (n + 1)
+  whenNotHalted $ do
+    turn4 n
 
 turnStep c n l = step ("Cycle " <> show c <> ", Turn " <> show n <> ": " <> l)
 
@@ -595,7 +610,7 @@ tapeFormatter board =
   let tapeWithHead = map extractSymbol (reverse leftCs) <> "[" <> map extractSymbol centerCs <> "]" <> map extractSymbol rightCs in
 
   if tapeValid then
-    "\n      tape: " <> tapeWithHead
+    "tape: " <> tapeWithHead
   else
     ""
 
@@ -603,7 +618,53 @@ tapeFormatter board =
     cs = let Right value = execMonad board allCards in value
     tapePosition c = view cardPower c
 
+tapeFormatter2 :: Formatter
+tapeFormatter2 board =
+  let f matcher = Data.List.sortBy (Data.Ord.comparing tapePosition)
+            . filter (applyMatcher $ matcher <> matchAny (map matchAttribute tapeTypes))
+             $ cs in
+
+  let leftCs = f (matchAttribute green <> invert (matchToughness 2)) in
+  let rightCs = f (matchAttribute white <> invert (matchToughness 2)) in
+  let centerCs = f (matchToughness 2) in
+
+  let tapeValid = length centerCs == 1
+                  && contiguous (map (view cardToughness) leftCs)
+                  && contiguous (map (view cardToughness) rightCs)
+                  && (null leftCs || minimum (map (view cardToughness) leftCs) == 3)
+                  && (null rightCs || minimum (map (view cardToughness) rightCs) == 3)
+                in
+
+  let tapeWithHead =
+          formatSymbols (reverse leftCs) <> ">" <>
+            formatSymbols centerCs <> " " <>
+            formatSymbols rightCs in
+
+  if tapeValid then
+    "tape: " <> tapeWithHead
+  else
+    ""
+
+  where
+    cs = let Right value = execMonad board allCards in value
+    tapePosition c = view cardPower c
+    formatSymbols = intercalate " " . map extractSymbol2
+
 extractSymbol c = if hasAttribute assassin c then 'H' else head . head . Data.Set.toList $ (Data.Set.fromList tapeTypes) `Data.Set.intersection` (view cardAttributes c)
+
+extractSymbol2 :: Card -> String
+extractSymbol2 c = 
+  case M.lookup relevantAttribute unicodeMappings of
+    Nothing -> "?"
+    Just x -> x
+
+  where
+    relevantAttribute =
+      head
+      .  Data.Set.toList
+      $ (Data.Set.fromList tapeTypes)
+          `Data.Set.intersection`
+          (view cardAttributes c)
 
 matchOwner :: Player -> CardMatcher
 matchOwner x = CardMatcher ("owner " <> show x) $

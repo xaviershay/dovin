@@ -32,6 +32,7 @@ dependencies:
   - mtl
   - unordered-containers
   - parsec
+  - split
 
 library:
   source-dirs: src
@@ -40,6 +41,16 @@ executables:
   dovin:
     main:                Main.hs
     source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dovin
+
+  mtgtc:
+    main:                Main.hs
+    source-dirs:         mtgtc
     ghc-options:
     - -threaded
     - -rtsopts

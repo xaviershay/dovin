@@ -12,7 +12,6 @@ import qualified Solutions.GuildsOfRavnica3
 import qualified Solutions.GuildsOfRavnica8
 import qualified Solutions.GuildsOfRavnica9
 import qualified Solutions.GuildsOfRavnicaPre2
-import qualified Solutions.MTGTC
 import qualified Solutions.RavnicaAllegiance3
 import qualified Solutions.RavnicaAllegiance4
 import qualified Solutions.RavnicaAllegiance5
@@ -33,7 +32,6 @@ all = [
   ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter . view stepNumber),
   ("GuildsOfRavnica9", Solutions.GuildsOfRavnica9.solution, Solutions.GuildsOfRavnica9.formatter . view stepNumber),
   ("GuildsOfRavnicaPre2", Solutions.GuildsOfRavnicaPre2.solution, Solutions.GuildsOfRavnicaPre2.formatter . view stepNumber),
-  ("MTGTC", Solutions.MTGTC.solution, Solutions.MTGTC.formatter),
   ("RavnicaAllegiance3", Solutions.RavnicaAllegiance3.solution, Solutions.RavnicaAllegiance3.formatter),
   ("RavnicaAllegiance4", Solutions.RavnicaAllegiance4.solution, Solutions.RavnicaAllegiance4.formatter),
   ("RavnicaAllegiance5", Solutions.RavnicaAllegiance5.solution, Solutions.RavnicaAllegiance5.formatter),
