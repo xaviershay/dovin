@@ -49,8 +49,7 @@ lyurgoyf = "lyurgoyf"
 rat = "rat"
 
 tapeTypes =
-  [ assassin
-  , aetherborn
+  [ aetherborn
   , basilisk
   , cephalid
   , demon
@@ -68,6 +67,8 @@ tapeTypes =
   , pegasus
   , rhino
   , sliver
+
+  , assassin
   , lyurgoyf
   , rat
   ]
@@ -291,6 +292,9 @@ rules =
 
 mappings = M.fromList
   . map (\x -> (head x, x))
+  . Data.List.delete rat
+  . Data.List.delete lyurgoyf
+  . Data.List.delete assassin
   $ tapeTypes
 
 charToType :: Char -> GameMonad CardAttribute
@@ -449,9 +453,11 @@ turn1 n = do
         -- TODO: Trigger and resolve things, don't just create creatures
         as bob $ do
           -- TODO: Illusory gains, though shouldn't be relevant
-          withAttributes [rat, white, token] $ addCreature (2, 2) ("Rat " <> show n)
+          withLocation Play $
+            withAttributes [rat, white, token] $ addCreature (2, 2) ("Rat " <> show n)
 
         as alice $ do
+          withLocation Play $
             withAttributes [cephalid, black, token] $ addCreature (2, 2) ("Cephalid " <> show n)
 
         requireCard ("Cephalid " <> show n) (matchLesserPower 1)
@@ -677,6 +683,16 @@ tapeFormatter board =
     cs = let Right value = execMonad board allCards in value
     tapePosition c = view cardPower c
 
+stateFormatter :: Formatter
+stateFormatter board =
+  let expr = requireCard "Rotlung Reanimator Q1 1" mempty in
+  let Right value = execMonad board expr in
+
+  if hasAttribute phasedOut value then
+    "\nstate: Q2"
+  else
+    "\nstate: Q1"
+
 tapeFormatter2 :: Formatter
 tapeFormatter2 board =
   let f matcher = Data.List.sortBy (Data.Ord.comparing tapePosition)
@@ -690,8 +706,6 @@ tapeFormatter2 board =
   let tapeValid = length centerCs == 1
                   && contiguous (map (view cardToughness) leftCs)
                   && contiguous (map (view cardToughness) rightCs)
-                  && (null leftCs || minimum (map (view cardToughness) leftCs) == 3)
-                  && (null rightCs || minimum (map (view cardToughness) rightCs) == 3)
                 in
 
   let tapeWithHead =
@@ -700,9 +714,9 @@ tapeFormatter2 board =
             formatSymbols rightCs in
 
   if tapeValid then
-    "tape: " <> tapeWithHead
+    "\ntape: " <> tapeWithHead
   else
-    ""
+    "\ntape invalid"
 
   where
     cs = let Right value = execMonad board allCards in value
