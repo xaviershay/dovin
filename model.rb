@@ -38,8 +38,10 @@ RULES = {
     "b"   => ["b2", R, 1],
     "bR"  => ["bL", R, 2],
     "bL"  => ["bR", L, 2],
-    "bR1" => ["bL1", R, 1],
-    "bL1" => ["bR1", L, 2],
+    # TODO: This was a bug!
+    "bR1" => ["bL1", R, 2],
+    # TODO: This was another bug!
+    "bL1" => ["bR", L, 2],
     "b2"  => ["b", R, 1],
     "b3"  => ["bL1", R, 2],
     "c"   => ["cL", R, 2],
@@ -76,7 +78,49 @@ LABELS = {
 
 ENCODING = LABELS.keys.zip(('a'..'z').select {|x| x != "q" }).map(&:reverse).to_h
 
-tape = "rrffafafaf[f]amamam"
+replicator = {
+  "a" => {
+    production: "aa"
+  }
+}
+
+collatz = {
+  "a" => {production: "bc"},
+  "b" => {production: "a"},
+  "c" => {production: "aaa"}
+}
+
+
+#tags = collatz
+tags = replicator
+last = nil
+tags.each.with_index do |(k, v), i|
+  v[:n] = if last
+            last[:n] + last[:production].length + 1
+          else
+            1
+          end
+  last = v
+end
+
+require 'pp'
+tags.each do |(k, v)|
+  tokens = v[:production].chars.map {|x| tags.fetch(x).fetch(:n)  + 1 }
+  tokens[0] -= 1
+  v[:p] = "ff" + tokens.map {|x| 'a' * x }.reverse.join("f")
+end
+rhs = "rr" + tags.values.sort_by {|x| x[:n] }.map {|x| x.fetch(:p) }.reverse.join + "ff"
+lhs = "amamam"
+
+tape = rhs[0..-2] + "[" + rhs[-1] + "]" + lhs
+# tape = rhs + "[" + lhs[0] + "]" + lhs[1..-1]
+puts tape
+
+# tape = "rrffafafaf[f]amamam"
+# tape = "rrffafafaffaffaaaaaaafaaaaaf[f]amamam"
+# tape = "rrffaffaaaf[f]aaamamam"
+# tape = "rrffaaaaaffaaaf[f]aaamam"
+# tape = "rrffafaf[f]amamam"
 
 cursor = tape.index("[")
 tape = tape.chars.map {|x| ENCODING[x] }.compact
@@ -110,5 +154,4 @@ while true
     tape.unshift "1L"
     cursor += 1
   end
-  sleep 0.01
 end
