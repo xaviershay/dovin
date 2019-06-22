@@ -12,7 +12,9 @@ main = do
   --let tape = "[s]ssr"
   --let tape = "[p]fr"
   --let tape =  "crrffafafaffaffaaaaaaafaaaaaf[f]amamamc"
-  let tape = "rrffafafaf[f]amamam"
+  --let tape = "rrffafafaf[f]amamam"
+  let tape = "rrffaafaf[f]amam"
+  let tape = "rrffaaaaaaaaaaaffaaaaaaaaaaaafaaaaaaaaaaaafaaaaaaaaaaaffaaaaaaaaaffaaaaaf[f]amaaamaaamaaam"
   --let tape = "[s]"
 
   let (e, initialBoard, _) = runMonad emptyBoard (MTGTC.setup tape)
@@ -45,6 +47,6 @@ runCycle board n = do
       return newBoard
 
 myFormatter =
-     MTGTC.stateFormatter 
-  <> MTGTC.tapeFormatter2 
+     MTGTC.stateFormatter
+  <> MTGTC.tapeFormatter2
     -- <> cardFormatter "tape" (MTGTC.matchAny (map matchAttribute MTGTC.tapeTypes))

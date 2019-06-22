@@ -675,7 +675,7 @@ tapeFormatter board =
   let tapeWithHead = map extractSymbol (reverse leftCs) <> "[" <> map extractSymbol centerCs <> "]" <> map extractSymbol rightCs in
 
   if tapeValid then
-    "tape: " <> tapeWithHead
+    tapeWithHead
   else
     ""
 
@@ -689,9 +689,9 @@ stateFormatter board =
   let Right value = execMonad board expr in
 
   if hasAttribute phasedOut value then
-    "\nstate: Q2"
+    "Q2: "
   else
-    "\nstate: Q1"
+    "Q1: "
 
 tapeFormatter2 :: Formatter
 tapeFormatter2 board =
@@ -714,7 +714,7 @@ tapeFormatter2 board =
             formatSymbols rightCs in
 
   if tapeValid then
-    "\ntape: " <> tapeWithHead
+    tapeWithHead
   else
     "\ntape invalid"
 
