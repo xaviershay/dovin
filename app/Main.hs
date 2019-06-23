@@ -4,7 +4,6 @@ import Control.Monad (forM_)
 import Dovin
 
 import qualified Solutions
---import Solutions.MTGTC
 
 main :: IO ()
 --main = run formatter solution
