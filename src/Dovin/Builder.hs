@@ -27,6 +27,7 @@ module Dovin.Builder (
   , withEffect
   , withLocation
   , withPlusOneCounters
+  , withMinusOneCounters
   ) where
 
 import Control.Monad.Reader (ask, local)
@@ -118,3 +119,7 @@ withLocation loc m = do
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()
 withPlusOneCounters = local . set (envTemplate . cardPlusOneCounters)
+
+-- | Set the number of -1/-1 counters of the created card.
+withMinusOneCounters :: Int -> GameMonad () -> GameMonad ()
+withMinusOneCounters = local . set (envTemplate . cardMinusOneCounters)

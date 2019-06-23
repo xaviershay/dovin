@@ -70,6 +70,7 @@ data Phase
   | EndCombat
   | SecondMain
   | EndStep
+  | Won Player
   deriving (Show, Eq, Ord)
 
 data Card = Card
@@ -85,6 +86,7 @@ data Card = Card
 
   -- Can probably generalize this more at some point.
   , _cardPlusOneCounters :: Int
+  , _cardMinusOneCounters :: Int
   }
 instance Hashable Player
 instance Show Card where
@@ -104,6 +106,9 @@ data Board = Board
   -- deck and graveyard need to be ordered also - but works for now. Need to
   -- think more about "hiding" this data structure.
   , _stack :: [CardName]
+  -- ... well I guess the deck cares about order too now hmmm. Need to figure
+  -- this out.
+  , _deck :: M.HashMap Player [CardName]
   , _counters :: M.HashMap String Int
   -- In theory, life could be just another counter. Need to think more about
   -- making that happen.
@@ -184,7 +189,7 @@ _manaPoolForTyping :: Board -> ManaPool
 _manaPoolForTyping = view (manaPoolFor Active)
 
 instance Show CardMatcher where
-  show _ = "<matcher>"
+  show (CardMatcher l _) = l
 
 instance Semigroup CardMatcher where
   (CardMatcher d1 f) <> (CardMatcher d2 g) =
@@ -220,6 +225,7 @@ mkCard name location =
     , _cardLoyalty = 0
     , _cardEffects = mempty
     , _cardPlusOneCounters = 0
+    , _cardMinusOneCounters = 0
     }
 
 opposing :: Player -> Player
@@ -230,6 +236,7 @@ emptyBoard = Board
                { _cards = mempty
                , _counters = mempty
                , _stack = mempty
+               , _deck = mempty
                , _life = mempty
                , _manaPool = mempty
                , _phase = FirstMain

@@ -1,10 +1,10 @@
 name:                dovin
-version:             0.1.0.1
+version:             0.2
 github:              "xaviershay/dovin"
 license:             BSD3
 author:              "Xavier Shay"
 maintainer:          "contact@xaviershay.com"
-copyright:           "2018 Xavier Shay"
+copyright:           "2019 Xavier Shay"
 
 extra-source-files:
 - README.md
@@ -32,6 +32,7 @@ dependencies:
   - mtl
   - unordered-containers
   - parsec
+  - split
 
 library:
   source-dirs: src
@@ -46,6 +47,17 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - dovin
+
+  mtgtc:
+    main:                Main.hs
+    source-dirs:         mtgtc
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dovin
+    - Stream
 
 tests:
   dovin-test:

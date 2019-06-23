@@ -143,7 +143,7 @@ castFromLocation loc mana name = action "castFromLocation" $ do
     (hasAttribute instant card || hasAttribute flash card)
     validateCanCastSorcery
 
-  modifyCardDeprecated name (location . _2) $ const Stack
+  modifyCard (location . _2) (const Stack) name
 
   card <- requireCard name mempty
 
@@ -1052,10 +1052,11 @@ validateLife n player = do
 
 -- | Pause running of state-based actions for the duration of the action,
 -- running them at the end.
-withStateBasedActions :: GameMonad () -> GameMonad ()
+withStateBasedActions :: GameMonad a -> GameMonad a
 withStateBasedActions m = do
-  local (set envSBAEnabled False) m
+  x <- local (set envSBAEnabled False) m
   runStateBasedActions
+  return x
 
 -- | Run state-based actions. These include:
 --
@@ -1101,6 +1102,16 @@ runStateBasedActions = do
           when (hasAttribute token c) $
             remove cn >> incrementCounter
 
+        let p1 = view cardPlusOneCounters c
+        let m1 = view cardMinusOneCounters c
+        let p1' = maximum [0, p1 - m1]
+        let m1' = maximum [0, m1 - p1]
+
+        when (p1 /= p1' || m1 /= m1') $ do
+          modifyCard cardPlusOneCounters (const p1') cn
+          modifyCard cardMinusOneCounters (const m1') cn
+          incrementCounter
+
         let matchStack =
                        matchLocation (Active, Stack)
              `matchOr` matchLocation (Opponent, Stack)
@@ -1119,7 +1130,7 @@ runStateBasedActions = do
 -- run.  'runStateBasedActions' is implicitly called at the end of each step.
 -- Nested 'step' invocations execute the nested action but have no other
 -- effects - generally they should be avoided.
-step :: String -> GameMonad () -> GameMonad ()
+step :: String -> GameMonad a -> GameMonad a
 step desc m = withStateBasedActions $ do
   b <- get
   let (e, b', _) = runMonad b m
@@ -1130,7 +1141,7 @@ step desc m = withStateBasedActions $ do
 
   case e of
     Left x -> throwError x
-    Right _ -> return ()
+    Right y -> return y
 
 -- | Branch off a labeled alternative line. Steps inside the fork will be
 -- reported at the end of the main line output.

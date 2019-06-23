@@ -3,6 +3,7 @@
 module Dovin.Helpers where
 
 import Dovin.Types
+import Dovin.Attributes
 import Dovin.Prelude
 
 import Data.List (sort)
@@ -71,13 +72,18 @@ applyEffects (BaseCard card) = do
 
   card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
 
-  let counterModifier = mconcat
-                          . replicate (view cardPlusOneCounters card')
-                          . mkStrength $ (1, 1)
+  let plusModifier = let n = view cardPlusOneCounters card' in
+                          mkStrength (n, n)
+  let minusModifier = let n = view cardMinusOneCounters card' in
+                          mkStrength (-n, -n)
 
   let strengthModifier = view cardStrengthModifier card'
 
-  return $ over cardStrength ((strengthModifier <> counterModifier) <>) card'
+  return
+    $ over
+        cardStrength
+        ((strengthModifier <> plusModifier <> minusModifier) <>)
+        card'
 
   where
     applyEffect2 :: Card -> CardEffect -> GameMonad Card
@@ -127,6 +133,10 @@ matchPlusOneCounters :: Int -> CardMatcher
 matchPlusOneCounters n = CardMatcher (show n <> " +1/+1 counters") $
   (==) n . view cardPlusOneCounters
 
+matchMinusOneCounters :: Int -> CardMatcher
+matchMinusOneCounters n = CardMatcher (show n <> " -1/-1 counters") $
+  (==) n . view cardMinusOneCounters
+
 matchLocation :: CardLocation -> CardMatcher
 matchLocation loc = CardMatcher ("in location " <> show loc) $
   (==) loc . view cardLocation
@@ -151,6 +161,10 @@ matchController player = CardMatcher ("has controller " <> show player) $
 
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
+
+matchToughness :: Int -> CardMatcher
+matchToughness n = labelMatch ("toughness = " <> show n) $ (CardMatcher "" $
+  (== n) . view cardToughness) <> matchAttribute creature
 
 missingAttribute = invert . matchAttribute
 
@@ -192,3 +206,10 @@ forCards matcher f = do
 
   forM_ (map (view cardName) matchingCs) f
 
+gameFinished :: GameMonad Bool
+gameFinished = do
+  state <- use phase
+
+  return $ case state of
+             Won _ -> True
+             _     -> False
