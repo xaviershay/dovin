@@ -1,24 +1,14 @@
--- Dumping ground for things that haven't been thought through or tested yet.
-module Dovin.Dump where
+-- Top-level run function for executing and printing solutions.
+module Dovin.Runner
+  ( run
+  ) where
 
-import Control.Arrow (second)
-import Control.Lens
-import Control.Monad.Except
-import Control.Monad.State
-import Control.Monad.Writer
-import qualified Data.HashMap.Strict as M
-import qualified Data.Set as S
 import System.Exit
 import Data.List (groupBy, sort, sortBy)
 import Data.Ord (comparing)
 import Data.Function (on)
-import Debug.Trace
 
-import Dovin.Actions
-import Dovin.Attributes
-import Dovin.Builder
-import Dovin.Formatting
-import Dovin.Helpers
+import Dovin.Prelude
 import Dovin.Monad
 import Dovin.Types
 

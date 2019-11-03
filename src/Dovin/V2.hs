@@ -11,7 +11,7 @@ V2 makes the following changes from V1:
   since it will virtually always be required for normal formatters.
 -}
 module Dovin.V2
-  ( module Dovin.Dump
+  ( module Dovin.Runner
   , module Dovin.Actions
   , module Dovin.Attributes
   , module Dovin.Builder
@@ -22,10 +22,10 @@ module Dovin.V2
   )
   where
 
+import Dovin.Runner
 import Dovin.Actions
 import qualified Dovin.V1
 import Dovin.Prelude
-import Dovin.Dump hiding (activate, trigger, fork)
 import Dovin.Attributes
 import Dovin.Builder
 import Dovin.Formatting

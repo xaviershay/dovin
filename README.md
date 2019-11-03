@@ -21,9 +21,7 @@ them as you would in a real game of paper magic.
 
 I've only added actions "as needed" to solve problems, so the built-in
 functions are rather incomplete right now. It is straightforward to add more
-though. See `src/Dovin/V2.hs` in conjuction with `src/Dovin/Actions.hs` for
-supported and tested actions, and `src/Dovin/Dump.hs` for untested experimental
-ones.
+though. See `src/Dovin/V2.hs` in conjuction with `src/Dovin/Actions.hs`.
 
 ## Example
 
@@ -122,8 +120,7 @@ solutions for published Possibility Storm puzzles!)
     bin/test # Runs all tests and lints
     bin/run  # Runs all solutions
 
-`src/Dovin/Dump.hs` is currently a dumping ground for prototype code. Actions
-are in the process of being moved to `Dovin.Actions`. To be moved they must:
+New actions go into `Dovin.Actions`. They must:
 
   * Be unit tested.
   * Be documented.

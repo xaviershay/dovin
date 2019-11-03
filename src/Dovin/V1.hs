@@ -1,5 +1,5 @@
 module Dovin.V1
-  ( module Dovin.Dump
+  ( module Dovin.Runner
   , module Dovin.Actions
   , module Dovin.Attributes
   , module Dovin.Builder
@@ -14,7 +14,7 @@ module Dovin.V1
   , fork
   ) where
 
-import Dovin.Dump
+import Dovin.Runner
 import Dovin.Actions hiding (validate, validateLife, activate, trigger, fork)
 import qualified Dovin.Actions
 import Dovin.Attributes
