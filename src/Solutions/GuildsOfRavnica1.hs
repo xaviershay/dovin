@@ -7,8 +7,6 @@ import Dovin.V1
 -- http://www.possibilitystorm.com/083-guilds-of-ravnica-puzzle-1/
 solution :: GameMonad ()
 solution = do
-  let mentor = "mentor"
-
   step "Initial state" $ do
     setLife Opponent 5
 
@@ -49,10 +47,20 @@ solution = do
     modifyStrength (2, 0) "Goblin Banneret"
 
   step "Attack with everything, stacking Mentor triggers on to Aurelia" $ do
-    attackWith ["Aurelia, Exemplar of Justice", "Blade Instructor", "Goblin Banneret", "Barging Sergeant"]
-    triggerMentor "Blade Instructor" "Aurelia, Exemplar of Justice"
-    triggerMentor "Barging Sergeant" "Aurelia, Exemplar of Justice"
-    triggerMentor "Goblin Banneret" "Aurelia, Exemplar of Justice"
+    attackWith
+      [ "Aurelia, Exemplar of Justice"
+      , "Blade Instructor"
+      , "Goblin Banneret"
+      , "Barging Sergeant"
+      ]
+
+    triggerMentor "Aurelia, Exemplar of Justice" "Goblin Banneret"
+    triggerMentor "Aurelia, Exemplar of Justice" "Barging Sergeant"
+    triggerMentor "Aurelia, Exemplar of Justice" "Blade Instructor"
+
+    resolveMentor "Aurelia, Exemplar of Justice" "Blade Instructor"
+    resolveMentor "Aurelia, Exemplar of Justice" "Barging Sergeant"
+    resolveMentor "Aurelia, Exemplar of Justice" "Goblin Banneret"
 
     combatDamage [] "Aurelia, Exemplar of Justice"
 

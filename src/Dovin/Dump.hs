@@ -22,15 +22,6 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
--- TODO: Better name (resolveMentor?), check source has mentor attribute
-triggerMentor sourceName targetName = do
-  source <- requireCard sourceName $ matchAttribute attacking
-  _      <- requireCard targetName $
-                 matchAttribute attacking
-              <> matchLesserPower (view cardPower source)
-
-  modifyStrength (1, 1) targetName
-
 gainLife :: Player -> Int -> GameMonad ()
 gainLife player amount =
   modifying

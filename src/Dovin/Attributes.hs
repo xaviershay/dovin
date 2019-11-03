@@ -58,6 +58,8 @@ legendary :: CardAttribute
 legendary = "legendary"
 lifelink :: CardAttribute
 lifelink = "lifelink"
+mentor :: CardAttribute
+mentor = "mentor"
 planeswalker :: CardAttribute
 planeswalker = "planeswalker"
 sorcery :: CardAttribute

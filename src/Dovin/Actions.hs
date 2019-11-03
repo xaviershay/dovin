@@ -19,6 +19,7 @@ module Dovin.Actions (
   , jumpstart
   , resolve
   , resolveTop
+  , resolveMentor
   , splice
   , tapForMana
   , target
@@ -41,6 +42,7 @@ module Dovin.Actions (
   , transitionTo
   , transitionToForced
   , trigger
+  , triggerMentor
   , with
   -- * Validations
   , validate
@@ -263,7 +265,6 @@ resolve expectedName = do
 
       resolveTop
 
-
 -- | Resolves the top card of the stack. Use this for simple cast-and-resolve
 -- scenarios. For more complicated stack states, prefer 'resolve' with a named
 -- spell to ensure the expected one is resolving.
@@ -296,6 +297,33 @@ resolveTop = action "resolveTop" $ do
         moveTo Play x
 
       assign stack xs
+
+-- | Resolves a trigger created by `triggerMentor`. Adds +1/+1 to target card
+-- if still a valid mentor target.
+--
+-- > resolveMentor "Goblin 1" "Legion Warboss"
+--
+-- [Validates]
+--
+--   * Mentor trigger is top of stack.
+--   * Target card is attacking.
+--   * Target card has less power than source card.
+--
+-- [Effects]
+--
+--   * Target card gets +1/+1.
+--   * Trigger is removed from top of stack.
+resolveMentor targetName sourceName = do
+  let triggerName = "Mentor " <> targetName <> " from " <> sourceName
+
+  resolve triggerName
+
+  source <- requireCard sourceName mempty
+  _      <- requireCard targetName $
+                 matchAttribute attacking
+              <> matchLesserPower (view cardPower source)
+
+  modifyStrength (1, 1) targetName
 
 -- | Sacrifice a permanent.
 --
@@ -412,6 +440,31 @@ trigger triggerName sourceName = do
   modifying
     stack
     ((:) triggerName)
+
+-- | Triggers a mentor effect from an attacking creature, targeting another
+-- attacking creature with lesser power. Typically you will want to
+-- `resolveMentor` after triggering.
+--
+-- > triggerMentor "Goblin 1" "Legion Warboss"
+--
+-- [Validates]
+--
+--   * Source card has attacking and mentor attributes.
+--   * Target card is attacking.
+--   * Target card has less power than source card.
+--
+-- [Effects]
+--
+--   * A triggered card is placed on the stack.
+triggerMentor :: CardName -> CardName -> GameMonad ()
+triggerMentor targetName sourceName = do
+  source <- requireCard sourceName $ matchAttributes [attacking, mentor]
+  _      <- requireCard targetName $
+                 matchAttribute attacking
+              <> matchLesserPower (view cardPower source)
+
+  trigger ("Mentor " <> targetName <> " from " <> sourceName) sourceName
+
 
 -- | Helper function to provide a scoped let.
 --

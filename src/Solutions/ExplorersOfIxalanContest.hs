@@ -19,7 +19,7 @@ solution = do
 
   step "Relevant initial state" $ do
     withLocation (Active, Hand) $ do
-      withAttribute goblin $ addCreature (2, 2) "Legion Warboss"
+      withAttributes [goblin, mentor] $ addCreature (2, 2) "Legion Warboss"
       withAttribute doublestrike
         $ withEffect
             matchInPlay
@@ -97,7 +97,8 @@ solution = do
   step "Attack with lazav and all goblins (haste from Garna), with mentor from Warboss" $ do
     attackWith [lazav, "Legion Warboss", "Goblin 1", "Goblin 2", "Goblin 3"]
 
-    triggerMentor "Legion Warboss" "Goblin 1"
+    triggerMentor "Goblin 1" "Legion Warboss"
+    resolveMentor "Goblin 1" "Legion Warboss"
 
   step "Trigger lazav-as-isareth, reanimating Seige-Gang Commander" $ do
     trigger lazav
