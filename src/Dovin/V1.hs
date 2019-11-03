@@ -11,6 +11,7 @@ module Dovin.V1
   , withLocation
   , activate
   , trigger
+  , fork
   ) where
 
 import Dovin.Dump
@@ -23,6 +24,8 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
+import Control.Monad (forM_)
+import Control.Monad.State (put, get)
 import Control.Monad.Reader (local)
 import Control.Lens (set, view)
 
@@ -66,4 +69,14 @@ trigger targetName = do
   card <- requireCard targetName matchInPlay
 
   return ()
+
+-- | Branch off to an alternate line.
+fork :: [GameMonad ()] -> GameMonad ()
+fork options = do
+  b <- get
+  let cs = view currentStep b
+
+  forM_ options $ \m -> do
+    m
+    put $ set currentStep cs b
 

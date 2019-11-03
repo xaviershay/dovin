@@ -43,15 +43,6 @@ loseLife player amount = gainLife player (-amount)
 setLife :: Player -> Int -> GameMonad ()
 setLife p n = assign (life . at p) (Just n)
 
-fork :: [GameMonad ()] -> GameMonad ()
-fork options = do
-  b <- get
-  let cs = view currentStep b
-
-  forM_ options $ \m -> do
-    m
-    put $ set currentStep cs b
-
 run :: (Step -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution

@@ -1143,7 +1143,7 @@ step desc m = withStateBasedActions $ do
     Left x -> throwError x
     Right y -> return y
 
--- | Branch off a labeled alternative line. Steps inside the fork will be
+-- | Branch off a labeled alternate line. Steps inside the fork will be
 -- reported at the end of the main line output.
 fork :: String -> GameMonad () -> GameMonad ()
 fork label m = do
