@@ -33,7 +33,7 @@ solution = do
   let merfolk = "merfolk"
 
   step "Initial state" $ do
-    setLife Opponent 12
+    as Opponent $ setLife 12
 
     withLocation (Active, Hand) $ do
       addSorcery "Undercity Uprising"
@@ -185,7 +185,7 @@ solution = do
     sacrifice $ numbered 3 "Afzocan Archer"
     cast "BB" "Torgaar, Famine Incarnate"
     resolve "Torgaar, Famine Incarnate"
-    setLife Opponent 10
+    as Opponent $ setLife 10
 
   step "Attack with Adeliz and initial archer for lethal" $ do
     attackWith ["Adeliz, the Cinder Wind", "Afzocan Archer"]

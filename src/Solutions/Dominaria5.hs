@@ -6,7 +6,7 @@ import Dovin.Prelude
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 8
+    as Opponent $ setLife 8
     withLocation (Active, Hand) $ do
       addPlaneswalker 5 "Karn, Scion of Urza 2"
 

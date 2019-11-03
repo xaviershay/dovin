@@ -5,7 +5,7 @@ import Dovin.V1
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 9
+    as Opponent $ setLife 9
 
     withLocation (Active, Hand) $ do
       addCreature (1, 1) "Ochran Assassin"

@@ -6,7 +6,7 @@ import Dovin.Prelude
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 13
+    as Opponent $ setLife 13
 
     withLocation Play $ do
       addEnchantment "Rhythm of the Wild"

@@ -36,9 +36,12 @@ module Dovin.Actions (
   , exert
   , exile
   , fight
+  , gainLife
+  , loseLife
   , modifyStrength
   , moveTo
   , sacrifice
+  , setLife
   , transitionTo
   , transitionToForced
   , trigger
@@ -1210,3 +1213,39 @@ fork label m = do
   where
     f label Nothing = Just label
     f label (Just existing) = Just $ existing <> " - " <> label
+
+-- | Increments life total for current actor.
+--
+-- > as Opponent $ gainLife 1
+--
+-- [Effects]
+--
+--   * Increases life total by amount
+gainLife :: Int -> GameMonad ()
+gainLife amount = do
+  actor <- view envActor
+  modifying
+    (life . at actor . non 0)
+    (+ amount)
+
+-- | Decrements life total for current actor.
+--
+-- > as Opponent $ loseLife 1
+--
+-- [Effects]
+--
+--   * Decreases life total by amount
+loseLife :: Int -> GameMonad ()
+loseLife amount = gainLife (-amount)
+
+-- | Sets life total for current actor.
+--
+-- > as Opponent $ setLife 1
+--
+-- [Effects]
+--
+--   * Sets life total to amount
+setLife :: Int -> GameMonad ()
+setLife n = do
+  actor <- view envActor
+  assign (life . at actor) (Just n)

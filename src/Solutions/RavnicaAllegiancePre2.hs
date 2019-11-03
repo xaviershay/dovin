@@ -10,7 +10,7 @@ import Debug.Trace
 solution :: GameMonad ()
 solution = do
   step "Initial Setup" $ do
-    setLife Opponent 7
+    as Opponent $ setLife 7
 
     withLocation Play $ do
       addLands 3 "Blood Crypt"

@@ -20,10 +20,9 @@ solution = do
         c <- requireCard name mempty
 
         when (hasAttribute black c) $ do
-          gainLife Active 1
+          gainLife 1
           trigger "Epicure of Blood"
-          loseLife Opponent 1
-
+          as Opponent $ loseLife 1
 
   -- Helper function to keep track of which permanent types have been cast
   -- using Muldrotha's ability.
@@ -45,7 +44,7 @@ solution = do
             assign (counters . at counterName) (Just 1)
 
   step "Initial state" $ do
-    setLife Opponent 7
+    as Opponent $ setLife 7
 
     withLocation (Active, Play) $ do
       addCreature (4, 4) "Epicure of Blood"

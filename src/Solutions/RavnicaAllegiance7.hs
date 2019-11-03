@@ -8,7 +8,7 @@ unblockable = "unblockable"
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 18
+    as Opponent $ setLife 18
 
     withLocation Hand $ do
       addAura "Deep Freeze 1"

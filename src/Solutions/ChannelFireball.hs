@@ -10,7 +10,7 @@ import Debug.Trace
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Active 1
+    setLife 1
 
     withLocation Play $ do
       addLands 4 "Steam Vents"
@@ -201,7 +201,7 @@ solution = do
 
     let payment = show l <> "R"
 
-    loseLife Active l
+    loseLife l
     addMana $ show l
 
     withTriggers (cast payment) "Fireball"
@@ -253,7 +253,7 @@ solution = do
     let dmg = (life - 1) + (mana - 1)
     let payment = show dmg <> "R"
 
-    loseLife Active (life - 1)
+    loseLife (life - 1)
     addMana $ show (life - 1)
 
     withTriggers (flashbackSnapped payment) "Fireball"
@@ -347,7 +347,7 @@ resolveAetherflux n = do
   resolve $ aetherfluxTriggerName n
 
   x <- use spellCounter
-  gainLife Active x
+  gainLife x
 
 flashbackSnapped mana castName = do
   validate (matchAttribute snapped) castName

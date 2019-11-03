@@ -22,18 +22,6 @@ import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
 
-gainLife :: Player -> Int -> GameMonad ()
-gainLife player amount =
-  modifying
-    (life . at player . non 0)
-    (+ amount)
-
-loseLife :: Player -> Int -> GameMonad ()
-loseLife player amount = gainLife player (-amount)
-
-setLife :: Player -> Int -> GameMonad ()
-setLife p n = assign (life . at p) (Just n)
-
 run :: (Step -> Formatter) -> GameMonad () -> IO ()
 run formatter solution = do
   let (e, _, log) = runMonad emptyBoard solution

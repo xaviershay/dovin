@@ -8,7 +8,7 @@ blocked = "blocked"
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 7
+    as Opponent $ setLife 7
 
     withLocation (Active, Play) $ do
       addLands 2 "Mountain"

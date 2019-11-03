@@ -17,15 +17,15 @@ castWithTriggers cost name = do
     $ const $ do
       trigger "Aetherflux Reservoir"
       x <- use $ counters . at spellCount . non 0
-      gainLife Active x
+      gainLife x
 
   cast cost name
 
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 50
-    setLife Active 1
+    as Opponent $ setLife 50
+    setLife 1
 
     withLocation (Active, Play) $ do
       addLands 3 "Spirebluff Canal"
@@ -105,7 +105,7 @@ solution = do
 
   step "Activate Aetherflux Reservoir, targeting opponent" $ do
     activate "" "Aetherflux Reservoir"
-    loseLife Active 50
+    loseLife 50
     damage (const 50) (targetPlayer Opponent) "Aetherflux Reservoir"
     validateLife Opponent 0
 

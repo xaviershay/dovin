@@ -13,7 +13,7 @@ sacrificeToAltar mana name = do
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 20
+    as Opponent $ setLife 20
 
     withLocation Hand $ do
       addInstant "Through the Breach"

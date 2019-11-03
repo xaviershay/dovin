@@ -16,8 +16,8 @@ tapWithFreyalise mana card = do
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 16
-    setLife Active 17
+    as Opponent $ setLife 16
+    as Active $ setLife 17
 
     withLocation Graveyard $ do
       addLand "Forest"
@@ -62,7 +62,7 @@ solution = do
   step "Use Vona to destroy Bodyguard" $ do
     activate "Destroy" "" "Vona, Butcher of Magan"
     tap "Vona, Butcher of Magan"
-    loseLife Active 7
+    loseLife 7
 
     resolveTop
 
@@ -92,7 +92,7 @@ solution = do
     trigger "Explore" "Path of Discovery" >> resolveTop
     modifyCardDeprecated "Wildgrowth Walker" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
-    gainLife Active 3
+    gainLife 3
     trigger "Untap" "Famished Paladin" >> resolveTop
     untap "Famished Paladin"
 
@@ -108,7 +108,7 @@ solution = do
     resolveTop
     modifyCardDeprecated "Merfolk Branchwalker" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
-    gainLife Active 3
+    gainLife 3
     trigger "Untap" "Famished Paladin" >> resolveTop
     untap "Famished Paladin"
 
@@ -117,7 +117,7 @@ solution = do
     resolveTop
     modifyCardDeprecated "Merfolk Branchwalker" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
-    gainLife Active 3
+    gainLife 3
     trigger "Untap" "Famished Paladin" >> resolveTop
     untap "Famished Paladin"
 
@@ -132,14 +132,14 @@ solution = do
     resolveTop
     modifyCardDeprecated "Tenth District Veteran" cardPlusOneCounters (+ 1)
     trigger "Gain life" "Wildgrowth Walker" >> resolveTop
-    gainLife Active 3
+    gainLife 3
     trigger "Untap" "Famished Paladin" >> resolveTop
     untap "Famished Paladin"
 
   step "Use Vona to destroy Baird" $ do
     activate "Destroy" "" "Vona, Butcher of Magan"
     tap "Vona, Butcher of Magan"
-    loseLife Active 7
+    loseLife 7
 
     resolveTop
 
@@ -170,7 +170,7 @@ solution = do
 
     activate "Destroy" "" "Vona, Butcher of Magan"
     tap "Vona, Butcher of Magan"
-    loseLife Active 7
+    loseLife 7
 
     resolveTop
 
@@ -185,7 +185,7 @@ solution = do
   step "Use Vona to destroy Everdawn Champion" $ do
     activate "Destroy" "" "Vona, Butcher of Magan"
     tap "Vona, Butcher of Magan"
-    loseLife Active 7
+    loseLife 7
 
     resolveTop
 

@@ -6,7 +6,7 @@ import Dovin.Prelude
 solution :: GameMonad ()
 solution = do
   step "Initial Setup" $ do
-    setLife Opponent 15
+    as Opponent $ setLife 15
 
     withLocation Play $ do
       addLands 2 "Godless Shrine"

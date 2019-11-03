@@ -31,7 +31,7 @@ solution = do
               $ addArtifact "Treasure"
 
   step "Initial state" $ do
-    setLife Opponent 9
+    as Opponent $ setLife 9
 
     withLocation (Active, Hand) $ do
       withAttribute lifelink $ addCreature (1, 1) "Hunted Witness"

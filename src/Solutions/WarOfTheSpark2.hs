@@ -9,7 +9,7 @@ tricked = "tricked"
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 4
+    as Opponent $ setLife 4
 
     withLocation Hand $ do
       addAura "Kaya's Ghostform"
@@ -92,7 +92,7 @@ solution = do
   step "Resolve midnight reaper damage" $ do
     resolve "Self-damage"
 
-    loseLife Opponent 1
+    as Opponent $ loseLife 1
 
   step "Resolve -1/-1, killing Midnight Reaper and Trickster" $ do
     resolve "-1/-1"
@@ -115,7 +115,7 @@ solution = do
   step "Resolve midnight reaper damage" $ do
     resolve "Self-damage"
 
-    loseLife Opponent 1
+    as Opponent $ loseLife 1
 
   step "Resolve -1/-1 for Reaper" $ do
     resolve "-1/-1 Reaper"

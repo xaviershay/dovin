@@ -5,7 +5,7 @@ import Dovin
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 3
+    as Opponent $ setLife 3
 
     withLocation Hand $ addInstant "Plummet"
     withLocation Play $ do

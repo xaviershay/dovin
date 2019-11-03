@@ -8,7 +8,7 @@ import Dovin.V1
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 5
+    as Opponent $ setLife 5
 
     withLocation (Active, Hand)
       $ withAttributes [flying, mentor]
