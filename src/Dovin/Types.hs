@@ -19,12 +19,12 @@ type Colors = S.Set Color
 
 type CardName = String
 type CardAttribute = String
-data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
+data Player = Active | Opponent | OpponentN Integer deriving (Show, Eq, Generic, Ord)
 -- This is pretty dodgy - one char per mana - but works for now.
 type ManaPool = String
 type ManaString = String
 -- TODO: Stack shouldn't be in here because there is only one of them
-data Location = Hand | Graveyard | Play | Stack | Exile | Deck
+data Location = Hand | Graveyard | Play | Stack | Exile | Deck | Command
   deriving (Show, Eq, Ord)
 
 -- The original CardEffect type. This is deprecated as of V3, replaced by
@@ -88,7 +88,7 @@ mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
   -- matcher.
   { _effectEnabled = enabled
-  -- If the effect is enabled, this filter determines wheter any particular
+  -- If the effect is enabled, this filter determines whether any particular
   -- card is affected by it.
   , _effectFilter = filter
   -- The action to apply to affected cards.
@@ -291,6 +291,10 @@ emptyEnv = Env
   { _envTemplate = emptyCard
   , _envSBAEnabled = True
   , _envActor = Active
+  -- This is a bit of a hack for allowing us to default the owner to the
+  -- location if none was specified. Ideally, the type of cardOwner in the
+  -- template would be a Maybe, but that would require duplicating the Card
+  -- type which doesn't seem worth it.
   , _envOwner = Nothing
   }
 
@@ -300,7 +304,6 @@ mkCard name location =
   Card
     { _cardName = name
     , _location = location
-    , _cardOwner = fst location
     , _cardDefaultAttributes = mempty
     , _cardColors = mempty
     , _cardAttributes = mempty
@@ -316,6 +319,7 @@ mkCard name location =
     , _cardPassiveEffects = mempty
     , _cardAbilityEffects = mempty
     , _cardTimestamp = 0
+    , _cardOwner = fst location
     }
 
 opposing :: Player -> Player

@@ -31,6 +31,7 @@ module Dovin.Builder (
   , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
+  , withTarget
   ) where
 
 import Dovin.Attributes
@@ -96,7 +97,7 @@ addSorcery name = withAttribute sorcery $ addCard name
 
 -- | Perform action as the specified player.
 as :: Player -> GameMonad () -> GameMonad ()
-as player = local (set envActor player)
+as = local . set envActor
 
 -- | Add an attribute to the created card, as identified by a string.
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
@@ -160,7 +161,11 @@ withLocation loc m = do
 -- | Set the owner for the created card. If not specified, defaults to the
 -- owner of the card location.
 withOwner :: Player -> GameMonad () -> GameMonad ()
-withOwner owner = local (set envOwner (Just owner))
+withOwner = local . set envOwner . Just
+
+-- | Set the target for the created card.
+withTarget :: Target -> GameMonad () -> GameMonad ()
+withTarget target = local (over (envTemplate . cardTargets) ((:) target))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

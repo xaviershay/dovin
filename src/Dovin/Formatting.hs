@@ -57,6 +57,7 @@ cardFormatter title matcher board =
 formatCards = intercalate "\n" . map (("      " <>) . formatCard)
 
 formatCard c =
+  let targets = view cardTargets c in
   "  " <> view cardName c <>
   " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
   <> if hasAttribute "creature" c then
@@ -85,6 +86,15 @@ formatCard c =
          <> ")"
      else
       ""
+  <> if length targets > 0 then
+       " (targets: "
+       <> (intercalate "," . sort . map formatTarget $ targets)
+       <> ")"
+     else
+       ""
+  where
+    formatTarget (TargetCard cn) = cn
+    formatTarget (TargetPlayer p) = show p
 
 boardFormatter :: Formatter
 boardFormatter board =
