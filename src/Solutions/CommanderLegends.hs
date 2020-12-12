@@ -4,6 +4,9 @@ import Dovin.V2
 import Dovin.Prelude
 
 import Data.Maybe (mapMaybe)
+import qualified Data.Set as S
+
+commander = "commander"
 
 solution :: GameMonad ()
 solution = do
@@ -27,6 +30,7 @@ solution = do
         addLands 2 "Plains"
 
         addCreature (4, 4) "Port Razer"
+
         addCreature (2, 2) "Ardenn, Intrepid Archaeologist"
 
         withOwner (OpponentN 3)
@@ -38,7 +42,23 @@ solution = do
                 (\cn m -> matchName cn `matchOr` m)
                 (matchName "")
                 . mapMaybe extractCardTarget . view cardTargets)
-              (pure . over cardStrengthModifier (mkStrength (3, 3) <>))
+                (pure . over cardStrengthModifier (mkStrength (3, 3) <>))
+         --     (\card ->
+         --       do
+         --         cs <- allCards
+         --         let commanderMatcher =
+         --                  matchAttribute commander
+         --               <> matchOwner (view cardOwner card)
+
+         --         let commanderColors =
+         --                 foldr (<>) mempty
+         --               . map (view cardColors)
+         --               . filter (applyMatcher commanderMatcher)
+         --               $ cs
+
+         --         return 
+         --           . over cardStrengthModifier (mkStrength (3, 3) <>)
+         --           $ card)
               $ addArtifact "Commander's Plate"
         withTarget (TargetCard "Commander's Plate") $ addAura "Confiscate"
         withTarget (TargetCard "Ardenn, Intrepid Archaeologist")
@@ -78,10 +98,20 @@ solution = do
     attach "Commander's Plate" "Port Razer"
     attach "Seraphic Greatsword" "Port Razer"
 
+  step "Attack P3 with Port Razer & Malcolm" $ do
+    -- TODO: Haste a hack here for Frenzied Saddle Brute, need to make sure in
+    -- play.
+    gainAttribute haste "Malcolm, Keen-Eyed Navigator"
+    attackWith ["Port Razer", "Malcolm, Keen-Eyed Navigator"]
+
+
 attach cn tn = do
   c <- requireCard cn $ matchInPlay
 
   modifyCard cardTargets (const [TargetCard tn]) cn
+
+matchOwner :: Player -> CardMatcher
+matchOwner p = CardMatcher ("has owner " <> show p) $ (==) p . view cardOwner
 
 extractCardTarget (TargetCard cn) = Just cn
 extractCardTarget _ = Nothing

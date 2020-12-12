@@ -1,18 +1,123 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 
 module Dovin.Types where
 
 import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _2, _Just, at, non)
+import Control.Monad.Trans
 import Control.Monad.Reader (ReaderT)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
-import Control.Monad.State (StateT)
-import Control.Monad.Writer (WriterT)
+import Control.Monad.State (StateT, MonadState, put, get)
+import Control.Monad.Writer (WriterT, MonadWriter, tell, listen, pass)
 import qualified Data.HashMap.Strict as M
 import Data.Hashable (Hashable)
 import qualified Data.Set as S
 import GHC.Generics
+
+newtype ComputedStateT s m a = ComputedStateT { runComputedStateT :: s -> m (a,s) }
+
+instance Functor m => Functor (ComputedStateT s m) where
+  fmap f m = ComputedStateT $ \s -> fmap (\(a, s') -> (f a, s')) $ runComputedStateT m s
+
+instance (Functor m, Monad m) => Applicative (ComputedStateT s m) where
+  pure x = ComputedStateT $ \s -> return (x, s)
+  ComputedStateT mf <*> ComputedStateT mx = ComputedStateT $ \s -> do
+    ~(f, s') <- mf s
+    ~(x, s'') <- mx s'
+    return (f x, s'')
+
+instance (Monad m) => Monad (ComputedStateT s m) where
+    return a = ComputedStateT $ \s -> return (a, s)
+    m >>= k  = ComputedStateT $ \s0 -> do          -- in monad m
+                 ~(a, s1) <- runComputedStateT m s0
+                 runComputedStateT (k a) s1
+
+instance MonadTrans (ComputedStateT s) where
+    lift ma = ComputedStateT $ \s -> do            -- in monad m
+                a <- ma
+                return (a, s)
+
+instance Monad m => MonadState Board (ComputedStateT Board m) where
+  get = ComputedStateT $ \s -> return (s, s)
+  put x = ComputedStateT $ \_ -> return ((), resolveEffects x)
+
+instance MonadWriter w m => MonadWriter w (ComputedStateT s m) where
+  tell = lift . Control.Monad.Writer.tell
+  listen = Control.Monad.Writer.listen
+  pass = Control.Monad.Writer.pass
+
+evalComputedStateT :: (Monad m) => ComputedStateT s m a -> s -> m a
+evalComputedStateT m s = do
+    ~(a, _) <- runComputedStateT m s
+    return a
+
+resolveEffects :: Board -> Board
+resolveEffects = id
+
+-- Some good test cases https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
+--
+-- For each card, map (Card, [Effect])
+-- An effect:
+--   Has a timestamp
+--   Be conditional (on board state)
+--   Affect a subset of cards ("attached card")
+--   Specify changes that will belong in a layer, that are dependent on board
+--   state ("pro from colors of commander of owning player")
+
+-- The final state of the board can only change if the board is explicitly
+-- modified. => the board should be re-calculated on each change, important to
+-- ensure correct validations are run
+-- 
+-- We have a "board as printed" in which attributes of cards should never
+-- change, can only be added/removed/moved
+--
+-- The result of "evaluating" a board "consumes" all effects and produces a
+-- board where the cards have new attributes.
+--
+-- For each card, collect effects that apply to it _from all cards_, apply them
+-- according to layers.
+--
+-- Collect all effects. For each card, apply the effect stack to them.
+
+-- A card can have many effects applied to it, each with a layer + timestamp
+-- .. or define the types of effects explicitly then have a function to layer them
+-- CDA, can we type a CDA change? Power/Toughness/Subtype
+--   CDA = intrinsic (part of object when created)
+--         color, subtype, P/T
+--         only affects same card
+--
+--         .. should be able to have on the card?
+--         Doesn't depend on zone
+-- How to model dependency?
+--   Seems pretty hard, would need to spell out all the things that can be
+--   dependend on?
+--   .... try in different orders and see if different results!?
+--   .... 613.8b loop = abort, use timestamp order
+-- Instants creating effects? Seems better than the current modifying P/T thing
+--   Add effects to cards
+
+instance Show CardMatcher where
+  show (CardMatcher l _) = l
+
+instance Semigroup CardMatcher where
+  (CardMatcher d1 f) <> (CardMatcher d2 g) =
+    CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
+
+instance Monoid CardMatcher where
+  mempty = CardMatcher "" $ const True
+
+instance Semigroup CardStrength where
+  CardStrength p1 t1 <> CardStrength p2 t2 =
+   CardStrength (p1 + p2) (t1 + t2)
+
+instance Monoid CardStrength where
+  mempty = CardStrength 0 0
 
 type CardName = String
 type CardAttribute = String
@@ -85,6 +190,7 @@ data Card = Card
   , _cardEffects :: [CardEffect]
   , _cardTargets :: [Target]
   , _cardOwner :: Player
+  , _cardColors :: S.Set String -- TODO: Color type
 
   -- Can probably generalize this more at some point.
   , _cardPlusOneCounters :: Int
@@ -135,7 +241,7 @@ data Step = Step
   }
 
 type GameMonad a
-   = (ExceptT String (ReaderT Env (StateT Board (WriterT [Step] Identity)))) a
+   = (ExceptT String (ReaderT Env (ComputedStateT Board (WriterT [Step] Identity)))) a
 type Formatter = Board -> String
 
 incrementStep :: StepIdentifier -> StepIdentifier
@@ -180,30 +286,12 @@ cardToughness f parent = fmap
     setToughness t (CardStrength p _) = CardStrength p t
     toughness (CardStrength _ t) = t
 
-
 manaPoolFor p = manaPool . at p . non mempty
 
 -- I can't figure out the right type signature for manaPoolFor, so instead
 -- providing this function to make it inferrable.
 _manaPoolForTyping :: Board -> ManaPool
 _manaPoolForTyping = view (manaPoolFor Active)
-
-instance Show CardMatcher where
-  show (CardMatcher l _) = l
-
-instance Semigroup CardMatcher where
-  (CardMatcher d1 f) <> (CardMatcher d2 g) =
-    CardMatcher (d1 <> " and " <> d2) $ \c -> f c && g c
-
-instance Monoid CardMatcher where
-  mempty = CardMatcher "" $ const True
-
-instance Semigroup CardStrength where
-  CardStrength p1 t1 <> CardStrength p2 t2 =
-   CardStrength (p1 + p2) (t1 + t2)
-
-instance Monoid CardStrength where
-  mempty = CardStrength 0 0
 
 emptyEnv = Env
   { _envTemplate = emptyCard

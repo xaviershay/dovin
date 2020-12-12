@@ -11,12 +11,12 @@ import Dovin.Types
 runMonad :: Board -> GameMonad a -> (Either String a, Board, [Step])
 runMonad state m =
   let ((e, b), log) = runIdentity $
-                        runWriterT (runStateT (runReaderT (runExceptT m) emptyEnv) state) in
+                        runWriterT (runComputedStateT (runReaderT (runExceptT m) emptyEnv) state) in
 
   (e, b, log)
 
 execMonad :: Board -> GameMonad a -> Either String a
 execMonad state m =
-  let result = fst $ runIdentity (runWriterT (evalStateT (runReaderT (runExceptT m) emptyEnv) state)) in
+  let result = fst $ runIdentity (runWriterT (evalComputedStateT (runReaderT (runExceptT m) emptyEnv) state)) in
 
   result
