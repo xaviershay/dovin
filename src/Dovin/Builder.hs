@@ -26,8 +26,10 @@ module Dovin.Builder (
   , withAttributes
   , withEffect
   , withLocation
+  , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
+  , withTarget
   ) where
 
 import Control.Monad.Reader (ask, local)
@@ -46,7 +48,13 @@ addCard name = do
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
-      modifying cards (M.insert name (BaseCard $ set cardName name template))
+      owner <- view envOwner
+      let newCard = setOwner owner $ set cardName name template
+      modifying cards (M.insert name (BaseCard newCard))
+
+  where
+    setOwner Nothing = id
+    setOwner (Just x) = set cardOwner x
 
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name
@@ -82,7 +90,7 @@ addSorcery name = withAttribute sorcery $ addCard name
 
 -- | Perform action as the specified player.
 as :: Player -> GameMonad () -> GameMonad ()
-as player = local (set envActor player)
+as = local . set envActor
 
 -- | Add an attribute to the created card, as identified by a string.
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
@@ -115,6 +123,14 @@ withLocation loc m = do
   p <- view envActor
 
   local (set (envTemplate . cardLocation) (p, loc)) m
+
+-- | Set the owner of a card. By default, the owner is set to match the
+-- | location of card so this function won't often be needed.
+withOwner :: Player -> GameMonad () -> GameMonad ()
+withOwner = local . set envOwner . Just
+
+withTarget :: Target -> GameMonad () -> GameMonad ()
+withTarget target = local (over (envTemplate . cardTargets) ((:) target))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

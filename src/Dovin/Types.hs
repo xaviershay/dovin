@@ -16,12 +16,12 @@ import GHC.Generics
 
 type CardName = String
 type CardAttribute = String
-data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
+data Player = Active | Opponent | OpponentN Integer deriving (Show, Eq, Generic, Ord)
 -- This is pretty dodgy - one char per mana - but works for now.
 type ManaPool = String
 type ManaString = String
 -- TODO: Stack shouldn't be in here because there is only one of them
-data Location = Hand | Graveyard | Play | Stack | Exile | Deck
+data Location = Hand | Graveyard | Play | Stack | Exile | Deck | Command
   deriving (Show, Eq, Ord)
 
 data CardEffect = CardEffect
@@ -34,7 +34,7 @@ mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
   -- matcher.
   { _effectEnabled = enabled
-  -- If the effect is enabled, this filter determines wheter any particular
+  -- If the effect is enabled, this filter determines whether any particular
   -- card is affected by it.
   , _effectFilter = filter
   -- The action to apply to affected cards.
@@ -83,6 +83,8 @@ data Card = Card
   , _cardDamage :: Int
   , _cardLoyalty :: Int
   , _cardEffects :: [CardEffect]
+  , _cardTargets :: [Target]
+  , _cardOwner :: Player
 
   -- Can probably generalize this more at some point.
   , _cardPlusOneCounters :: Int
@@ -122,6 +124,7 @@ data Env = Env
   { _envTemplate :: Card
   , _envSBAEnabled :: Bool
   , _envActor :: Player
+  , _envOwner :: Maybe Player
   }
 
 type StepIdentifier = (Maybe String, Int)
@@ -158,9 +161,6 @@ mkStep id label state = Step
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location
-
-cardOwner :: Control.Lens.Lens' Card Player
-cardOwner = cardLocation . _1
 
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
@@ -209,6 +209,11 @@ emptyEnv = Env
   { _envTemplate = emptyCard
   , _envSBAEnabled = True
   , _envActor = Active
+  -- This is a bit of a hack for allowing us to default the owner to the
+  -- location if none was specified. Ideally, the type of cardOwner in the
+  -- template would be a Maybe, but that would require duplicating the Card
+  -- type which doesn't seem worth it.
+  , _envOwner = Nothing
   }
 
 mkStrength (p, t) = CardStrength p t
@@ -226,6 +231,8 @@ mkCard name location =
     , _cardEffects = mempty
     , _cardPlusOneCounters = 0
     , _cardMinusOneCounters = 0
+    , _cardTargets = mempty
+    , _cardOwner = fst location
     }
 
 opposing :: Player -> Player
