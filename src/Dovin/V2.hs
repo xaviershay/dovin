@@ -31,5 +31,13 @@ import Dovin.Builder
 import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
-import Dovin.Types
+import Dovin.Types hiding
+  ( cards
+  , stack
+  , deck
+  , life
+  , manaPool
+  , phase
+  , currentStep
+  )
 import Control.Lens (view)
