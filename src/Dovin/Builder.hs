@@ -35,9 +35,9 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
 import Dovin.Attributes
---import Dovin.Actions
 import Dovin.Prelude
 import Dovin.Types
+import Dovin.Helpers (resolveEffects)
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
@@ -47,6 +47,7 @@ addCard name = do
     Nothing -> do
       template <- view envTemplate
       modifying cards (M.insert name (BaseCard $ set cardName name template))
+      resolveEffects
 
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name

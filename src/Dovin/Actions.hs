@@ -760,6 +760,8 @@ copySpell newName targetName = do
     stack
     ((:) newName)
 
+  resolveEffects
+
 -- | Applies damage from a source to a target.
 --
 -- > damage (const 2) (targetPlayer Opponent) "Shock"
@@ -797,9 +799,9 @@ damage f t source = action "damage" $ do
     throwError $ "damage must be positive, was " <> show dmg
 
   damage' dmg t c
-
   when (hasAttribute lifelink c) $
     modifying (life . at (fst . view location $ c) . non 0) (+ dmg)
+  resolveEffects
 
   where
     damage' dmg (TargetPlayer t) c =
@@ -954,6 +956,7 @@ remove :: CardName -> GameMonad ()
 remove cn = do
   modifying cards (M.delete cn)
   modifying stack (filter (/= cn))
+  resolveEffects
 
 -- | Remove mana from the pool. Colored mana will be removed first, then extra
 -- mana of any type will be removed to match the colorless required.
@@ -1227,6 +1230,7 @@ gainLife amount = do
   modifying
     (life . at actor . non 0)
     (+ amount)
+  resolveEffects
 
 -- | Decrements life total for current actor.
 --

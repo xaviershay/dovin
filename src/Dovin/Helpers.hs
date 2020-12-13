@@ -11,6 +11,7 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.Char (isDigit)
 import Control.Lens (_1, _2, ASetter, both, _Just)
+import Control.Monad.State (get)
 
 import Text.Parsec
 
@@ -40,63 +41,72 @@ parseMana pool =
 
 requireCard :: CardName -> CardMatcher -> GameMonad Card
 requireCard name f = do
-  maybeCard <- use $ cards . at name
+  maybeCard <- use $ resolvedCards . at name
 
   case maybeCard of
     Nothing -> throwError $ "Card does not exist: " <> name
-    Just card -> do
-      card' <- applyEffects card
-      case applyMatcherWithDesc f card' of
-        Right () -> return card'
+    Just card ->
+      case applyMatcherWithDesc f card of
+        Right () -> return card
         Left msg ->
           throwError $ name <> " does not match requirements: " <> msg
 
-applyEffects :: BaseCard -> GameMonad Card
-applyEffects (BaseCard card) = do
-  cs <- map unwrap . M.elems <$> use cards
+resolveEffects :: GameMonad ()
+resolveEffects = do
+  board <- get
+  cs <- resolveEffects' board
+  assign resolvedCards cs
 
-  let allEffects =
-        concatMap
-          (\c -> map (\e -> (e, c)) . view cardEffects $ c)
-          cs
-
-  let enabledEffects =
-        filter
-          (\(e, c) -> applyMatcher (view effectEnabled e) c)
-          allEffects
-
-  let applicableEffects =
-        filter
-          (\(e, c) -> applyMatcher (view effectFilter e c) card)
-          enabledEffects
-
-  card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
-
-  let plusModifier = let n = view cardPlusOneCounters card' in
-                          mkStrength (n, n)
-  let minusModifier = let n = view cardMinusOneCounters card' in
-                          mkStrength (-n, -n)
-
-  let strengthModifier = view cardStrengthModifier card'
-
-  return
-    $ over
-        cardStrength
-        ((strengthModifier <> plusModifier <> minusModifier) <>)
-        card'
-
+resolveEffects' :: Board -> GameMonad (M.HashMap CardName Card)
+resolveEffects' board = foldM f mempty (M.toList $ view cards board)
   where
-    applyEffect2 :: Card -> CardEffect -> GameMonad Card
-    applyEffect2 card e = view effectAction e card
+    f a (cn, c) = do
+                    card <- applyEffects c
+                    return (M.insert cn card a)
 
-    unwrap :: BaseCard -> Card
-    unwrap (BaseCard card) = card
+    applyEffects :: BaseCard -> GameMonad Card
+    applyEffects (BaseCard card) = do
+      cs <- map unwrap . M.elems <$> use cards
+
+      let allEffects =
+            concatMap
+              (\c -> map (\e -> (e, c)) . view cardEffects $ c)
+              cs
+
+      let enabledEffects =
+            filter
+              (\(e, c) -> applyMatcher (view effectEnabled e) c)
+              allEffects
+
+      let applicableEffects =
+            filter
+              (\(e, c) -> applyMatcher (view effectFilter e c) card)
+              enabledEffects
+
+      card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
+
+      let plusModifier = let n = view cardPlusOneCounters card' in
+                              mkStrength (n, n)
+      let minusModifier = let n = view cardMinusOneCounters card' in
+                              mkStrength (-n, -n)
+
+      let strengthModifier = view cardStrengthModifier card'
+
+      return
+        $ over
+            cardStrength
+            ((strengthModifier <> plusModifier <> minusModifier) <>)
+            card'
+
+      where
+        applyEffect2 :: Card -> CardEffect -> GameMonad Card
+        applyEffect2 card e = view effectAction e card
+
+        unwrap :: BaseCard -> Card
+        unwrap (BaseCard card) = card
 
 allCards :: GameMonad [Card]
-allCards = do
-  bases <- M.elems <$> use cards
-
-  mapM applyEffects bases
+allCards = M.elems <$> use resolvedCards
 
 modifyCardDeprecated :: CardName -> ASetter Card Card a b -> (a -> b) -> GameMonad ()
 modifyCardDeprecated name lens f = do
@@ -110,6 +120,8 @@ modifyCardDeprecated name lens f = do
   -- business is happening.
   when (view cardPlusOneCounters card < 0) $
     throwError "Cannot reduce +1/+1 counters to less than 0"
+
+  resolveEffects
 
 modifyCard :: ASetter Card Card a b -> (a -> b) -> CardName -> GameMonad ()
 modifyCard lens f name = modifyCardDeprecated name lens f
@@ -163,8 +175,8 @@ matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
 
 matchToughness :: Int -> CardMatcher
-matchToughness n = labelMatch ("toughness = " <> show n) $ (CardMatcher "" $
-  (== n) . view cardToughness) <> matchAttribute creature
+matchToughness n = labelMatch ("toughness = " <> show n) $ CardMatcher ""
+  ((== n) . view cardToughness) <> matchAttribute creature
 
 missingAttribute = invert . matchAttribute
 

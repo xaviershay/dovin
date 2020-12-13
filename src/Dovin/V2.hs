@@ -39,5 +39,6 @@ import Dovin.Types hiding
   , manaPool
   , phase
   , currentStep
+  , resolvedCards
   )
 import Control.Lens (view)

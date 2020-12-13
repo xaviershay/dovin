@@ -101,6 +101,8 @@ type EffectName = String
 
 data Board = Board
   { _cards :: M.HashMap CardName BaseCard
+  , _resolvedCards :: M.HashMap CardName Card
+
   -- The stack is currently the only location where we care about order, so
   -- store that information alongside the main _cards map. This won't scale -
   -- deck and graveyard need to be ordered also - but works for now. Need to
@@ -234,6 +236,7 @@ opposing Opponent = Active
 
 emptyBoard = Board
                { _cards = mempty
+               , _resolvedCards = mempty
                , _counters = mempty
                , _stack = mempty
                , _deck = mempty
