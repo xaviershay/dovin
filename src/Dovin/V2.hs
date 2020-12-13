@@ -31,5 +31,5 @@ import Dovin.Builder
 import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
-import Dovin.Types
+import Dovin.Types hiding (cards, manaPool, life, stack, deck, phase, currentStep) -- Need to hide counters too eventually. By not exporting these, means users can't modify board data structure directly.
 import Control.Lens (view)

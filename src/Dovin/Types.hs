@@ -61,7 +61,6 @@ resolveEffects :: Board -> Board
 resolveEffects = id
 
 -- Some good test cases https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
---
 -- For each card, map (Card, [Effect])
 -- An effect:
 --   Has a timestamp
@@ -100,7 +99,22 @@ resolveEffects = id
 --   .... try in different orders and see if different results!?
 --   .... 613.8b loop = abort, use timestamp order
 -- Instants creating effects? Seems better than the current modifying P/T thing
---   Add effects to cards
+--   Add effects to cards? Then can be applied same as all other effects. Need
+--   to be stored separately from intrinsic effects so can be removed when
+--   moving zones (more generically, after a duration - "Leave Play", "End of turn", Forever, etc?
+--
+-- Maybe don't export board lens? Life & counters maybe used in solutions
+--
+--
+-- Should we separate "Card Definition" from "Resolved Card"?
+-- Definition: Color/Attributes/Power/Toughness/Effects
+-- Resolved: Defintion+Damage+Attributes+Targets+Owner+Counters+Loyalty+Location
+--
+-- At rest: Color/Attributes/Power/Toughness/Effects/Counters/Location/Targets
+-- What can change as a result of effects? Attributes/PT
+--
+-- Builders can only affect definition? Nah - need to be able to set up board
+-- state as well as definition.
 
 instance Show CardMatcher where
   show (CardMatcher l _) = l
