@@ -25,6 +25,7 @@ module Dovin.Builder (
   , withAttribute
   , withAttributes
   , withEffect
+  , withEffectV3
   , withLocation
   , withPlusOneCounters
   , withMinusOneCounters
@@ -110,6 +111,18 @@ withEffect ::
  -> GameMonad ()
 withEffect applyCondition filter action =
   local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
+
+-- | Add an effect to the created card.
+withEffectV3 ::
+    EffectMonad Bool
+ -> EffectMonad CardMatcher
+ -> (Card -> EffectMonad LayeredEffect)
+ -> EffectName
+ -> GameMonad ()
+ -> GameMonad ()
+withEffectV3 enabled appliesTo effect name =
+  local (over (envTemplate . cardPassiveEffects)
+  (mkLayeredEffect enabled appliesTo effect name:))
 
 withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do

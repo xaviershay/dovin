@@ -4,7 +4,7 @@
 module Dovin.Types where
 
 import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _2, _Just, at, non)
-import Control.Monad.Reader (ReaderT)
+import Control.Monad.Reader (ReaderT, Reader, ask)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
 import Control.Monad.State (StateT)
@@ -13,6 +13,8 @@ import qualified Data.HashMap.Strict as M
 import Data.Hashable (Hashable)
 import qualified Data.Set as S
 import GHC.Generics
+
+data Color = Red | Green | Blue | Black | White deriving (Show, Eq, Ord)
 
 type CardName = String
 type CardAttribute = String
@@ -30,6 +32,76 @@ data CardEffect = CardEffect
   , _effectAction :: Card -> GameMonad Card
   }
 
+type EffectMonad a = Reader (Board, Card) a
+data LayeredEffectDefinition = LayeredEffectDefinition
+  { _leEnabled :: EffectMonad Bool
+  , _leAppliesTo :: EffectMonad CardMatcher
+  , _leEffect :: Card -> EffectMonad LayeredEffect
+  , _leName :: EffectName
+  }
+
+--askBoard = fst <$> ask
+askSelf :: EffectMonad Card
+askSelf = snd <$> ask
+
+viewSelf x = do
+  self <- askSelf
+  return (view x self)
+
+--
+---- Drover
+--enabled = do
+--  -- do we have a dino
+--  controller <- viewSelf cardOwner
+--  dinos <- askCards $ matchAttribute "dinosaur" <> matchInPlay <> matchController controller
+--
+--  return $ length dinos > 0
+--
+--appliesTo = applyToSelf
+--effect = pure (effectPTAdjustment (mkStrength 2 2))
+--
+---- Commander's Plate
+--enabled = pure True
+--appliesTo =
+--  foldr (\a -> matchOr a . matchTarget) mempty <$> viewSelf cardTargets
+--effect = do
+--  owner <- viewSelf cardOwner
+--  commanders <- askCards $ matchAttribute "commander" <> matchOwner owner
+--
+--  let proEffect = foldr (\a v -> a <> effectProtection v) mempty
+--    . S.toList
+--    . foldr (<>) mempty
+--    . map (view cardColors)
+--    $ commanders
+--
+--  return (proEffect <> effectPTAdjustment (mkStrength 3 3))
+
+-- Sliver legion
+
+--enabled = enabledInPlay -- default?
+--appliesTo = pure (matchAttribute "sliver" <> matchInPlay)
+--effect = do
+--  self <- askSelf
+--  slivers <- length <$> askCards (matchAttribute "sliver" <> matchInPlay <> matchOtherCreatures self)
+--
+--  return (effectPTAdjustment (mkStrength slivers slivers))
+
+
+data LayeredEffect = EffectNone
+  | EffectPTAdjustment CardStrength
+  | EffectPTSet CardStrength
+  | EffectProtection Color
+  | EffectCombine LayeredEffect LayeredEffect
+  | EffectNoAbilities
+  | EffectType CardAttribute
+  deriving (Show, Eq)
+
+instance Monoid LayeredEffect where
+  mempty = EffectNone
+
+instance Semigroup LayeredEffect where
+  (<>) = EffectCombine
+
 mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
   -- matcher.
@@ -41,10 +113,18 @@ mkEffect enabled filter action = CardEffect
   , _effectAction = action
   }
 
+mkLayeredEffect enabled appliesTo effect name = LayeredEffectDefinition
+  { _leEnabled = enabled
+  , _leAppliesTo = appliesTo
+  , _leEffect = effect
+  , _leName = name
+  }
+
 -- A target for a spell or ability.
 data Target =
     TargetPlayer Player -- ^ Target a player, use 'targetPlayer' to construct.
   | TargetCard CardName -- ^ Target a card, use 'targetCard' to construct.
+  deriving (Eq, Show)
 
 targetPlayer = TargetPlayer
 targetCard = TargetCard
@@ -73,6 +153,11 @@ data Phase
   | Won Player
   deriving (Show, Eq, Ord)
 
+type Timestamp = Integer
+data EffectDuration = EndOfTurn
+
+data AbilityEffect = AbilityEffect Timestamp EffectDuration LayeredEffect
+
 data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
@@ -83,6 +168,17 @@ data Card = Card
   , _cardDamage :: Int
   , _cardLoyalty :: Int
   , _cardEffects :: [CardEffect]
+  , _cardCmc :: Int
+  , _cardColors :: S.Set Color
+  , _cardTargets :: [Target]
+
+  , _cardTimestamp :: Maybe Timestamp
+  -- These are typically set when a card is created. They can be removed by
+  -- "lose all abilities" effects.
+  , _cardPassiveEffects :: [LayeredEffectDefinition]
+  -- These are added as the result of spells or abilities. Typically are
+  -- cleared when a card changes zones(?)
+  , _cardAbilityEffects :: [AbilityEffect]
 
   -- Can probably generalize this more at some point.
   , _cardPlusOneCounters :: Int
@@ -220,6 +316,7 @@ mkCard name location =
     { _cardName = name
     , _location = location
     , _cardDefaultAttributes = mempty
+    , _cardColors = mempty
     , _cardAttributes = mempty
     , _cardStrength = mempty
     , _cardStrengthModifier = mempty
@@ -228,6 +325,8 @@ mkCard name location =
     , _cardEffects = mempty
     , _cardPlusOneCounters = 0
     , _cardMinusOneCounters = 0
+    , _cardCmc = 0
+    , _cardTargets = mempty
     }
 
 opposing :: Player -> Player
@@ -246,3 +345,8 @@ emptyBoard = Board
                , _currentStep = (Nothing, 0)
                }
 
+effectPTAdjustment p t = EffectPTAdjustment $ mkStrength (p, t)
+effectPTSet p t = EffectPTSet $ mkStrength (p, t)
+effectNoAbilities = EffectNoAbilities
+effectProtection = EffectProtection
+effectType = EffectType

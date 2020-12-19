@@ -27,6 +27,7 @@ module Dovin.Actions (
   -- * Uncategorized
   , activate
   , activatePlaneswalker
+  , addEffect
   , attackWith
   , combatDamage
   , copySpell
@@ -1253,3 +1254,12 @@ setLife :: Int -> GameMonad ()
 setLife n = do
   actor <- view envActor
   assign (life . at actor) (Just n)
+
+addEffect :: LayeredEffect -> CardName -> GameMonad ()
+addEffect e cn = do
+  card <- requireCard cn mempty
+  now <- getTimestamp
+
+  let ae = AbilityEffect now EndOfTurn e
+
+  modifyCard cardAbilityEffects (\es -> ae:es) cn

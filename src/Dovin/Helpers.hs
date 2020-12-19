@@ -12,6 +12,7 @@ import qualified Data.Set as S
 import Data.Char (isDigit)
 import Control.Lens (_1, _2, ASetter, both, _Just)
 import Control.Monad.State (get)
+import Control.Monad.Reader (ask)
 
 import Text.Parsec
 
@@ -166,7 +167,13 @@ matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
 
 matchOtherCreatures :: Card -> CardMatcher
-matchOtherCreatures card = matchLocation (view cardLocation card) <> invert (matchName (view cardName card))
+matchOtherCreatures = matchOther creature
+
+matchOther :: CardAttribute -> Card -> CardMatcher
+matchOther attribute card =
+     matchLocation (view cardLocation card)
+  <> matchAttribute attribute
+  <> invert (matchName (view cardName card))
 
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view (location . _1)
@@ -177,6 +184,10 @@ matchLesserPower n = CardMatcher ("power < " <> show n) $
 matchToughness :: Int -> CardMatcher
 matchToughness n = labelMatch ("toughness = " <> show n) $ CardMatcher ""
   ((== n) . view cardToughness) <> matchAttribute creature
+
+matchTarget :: Target -> CardMatcher
+matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
+  ((==) t . TargetCard . view cardName)
 
 missingAttribute = invert . matchAttribute
 
@@ -225,3 +236,9 @@ gameFinished = do
   return $ case state of
              Won _ -> True
              _     -> False
+
+getTimestamp :: GameMonad Timestamp
+getTimestamp = return 0 -- TODO
+
+askCards :: CardMatcher -> EffectMonad [Card]
+askCards matcher = filter (applyMatcher matcher) . map snd . M.toList . view resolvedCards . fst <$> ask
