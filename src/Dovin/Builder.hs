@@ -116,7 +116,7 @@ withEffect applyCondition filter action =
 withEffectV3 ::
     EffectMonad Bool
  -> EffectMonad CardMatcher
- -> (Card -> EffectMonad LayeredEffect)
+ -> [LayeredEffect]
  -> EffectName
  -> GameMonad ()
  -> GameMonad ()

@@ -12,7 +12,8 @@ test_Effects = testGroup "effects (magic judges examples)"
         withEffectV3
           (pure True) -- TODO card matcher?
           (matchOtherCreatures <$> askSelf)
-          (const . pure $ effectPTSet 1 1)
+          [ effectPTSet (1, 1)
+          ]
           "Other creatures are 1/1" $ do
             addCreature (4, 4) "Godhead of Awe"
 
@@ -21,7 +22,8 @@ test_Effects = testGroup "effects (magic judges examples)"
         unless (view cardStrength c == mkStrength (1, 1)) $
           throwError "Did not apply 1/1 effect"
 
-        addEffect (effectPTSet 0 1 <> effectNoAbilities) "Godhead of Awe"
+        addEffect (effectPTSet (0, 1)) "Godhead of Awe"
+        addEffect (effectNoAbilities) "Godhead of Awe"
 
         c <- requireCard "Grizzly Bear" mempty
 
@@ -32,18 +34,17 @@ test_Effects = testGroup "effects (magic judges examples)"
         withEffectV3
          (pure True)
          (pure $ matchAttribute creature)
-         (const . pure $ effectPTSet 0 1 <> effectNoAbilities)
+         [ effectPTSet (0, 1)
+         , effectNoAbilities
+         ]
          "Each creature loses all abilities and is 1/1" $
            addEnchantment "Humility"
 
         withEffectV3
           (pure True)
           (matchOther enchantment <$> askSelf)
-          (\c -> do
-            let cmc = view cardCmc c
-
-            return $ effectPTSet cmc cmc <> effectType creature
-          )
+          [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectType creature
+          ]
           "Other enchanments are creatures with P/T equal to CMC" $
             addEnchantment "Opalescence"
 
@@ -60,21 +61,20 @@ test_Effects = testGroup "effects (magic judges examples)"
             ts <- viewSelf cardTargets
             return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
           )
-          (const $ do
-            --owner <- viewSelf cardOwner
-            commanders <- askCards $ matchAttribute "commander" -- <> matchOwner owner
+          [ effectPTAdjustment (3, 3)
+          , effectProtectionF (
+              const $ do
+                --owner <- viewSelf cardOwner
+                commanders <- askCards $ matchAttribute "commander" -- <> matchOwner owner
 
-            let colors = S.toList
-                         $ foldr (<>) mempty
-                         . map (view cardColors)
-                         $ commanders :: [Color]
-            -- TODO: Need to invert color list!
-            let proEffect = foldr (<>) mempty
-                            . map effectProtection
-                            $ colors
+                -- TODO: Need to invert color list!
+                let colors =   foldr (<>) mempty
+                             . map (view cardColors)
+                             $ commanders
 
-            return (proEffect <> effectPTAdjustment 3 3)
-          )
+                return colors
+            )
+            ]
           "+3/+3 and pro commander colors" $
             addArtifact "Commander's Plate"
   ]

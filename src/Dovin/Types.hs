@@ -3,7 +3,7 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _2, _Just, at, non)
+import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _2, _Just, at, non, set)
 import Control.Monad.Reader (ReaderT, Reader, ask)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
@@ -15,6 +15,7 @@ import qualified Data.Set as S
 import GHC.Generics
 
 data Color = Red | Green | Blue | Black | White deriving (Show, Eq, Ord)
+type Colors = S.Set Color
 
 type CardName = String
 type CardAttribute = String
@@ -33,10 +34,24 @@ data CardEffect = CardEffect
   }
 
 type EffectMonad a = Reader (Board, Card) a
+data Layer =
+    Layer1
+  | Layer2
+  | Layer3
+  | Layer4
+  | Layer5
+  | Layer6
+  | Layer7A
+  | Layer7B
+  | Layer7C
+  | Layer7D
+  | Layer7E
+  | LayerOther deriving (Show, Ord, Eq)
+data LayeredEffect = LayeredEffect Layer (Card -> EffectMonad Card)
 data LayeredEffectDefinition = LayeredEffectDefinition
   { _leEnabled :: EffectMonad Bool
   , _leAppliesTo :: EffectMonad CardMatcher
-  , _leEffect :: Card -> EffectMonad LayeredEffect
+  , _leEffect :: [LayeredEffect]
   , _leName :: EffectName
   }
 
@@ -87,20 +102,20 @@ viewSelf x = do
 --  return (effectPTAdjustment (mkStrength slivers slivers))
 
 
-data LayeredEffect = EffectNone
-  | EffectPTAdjustment CardStrength
-  | EffectPTSet CardStrength
-  | EffectProtection Color
-  | EffectCombine LayeredEffect LayeredEffect
-  | EffectNoAbilities
-  | EffectType CardAttribute
-  deriving (Show, Eq)
-
-instance Monoid LayeredEffect where
-  mempty = EffectNone
-
-instance Semigroup LayeredEffect where
-  (<>) = EffectCombine
+--data LayeredEffect = EffectNone
+--  | EffectPTAdjustment CardStrength
+--  | EffectPTSet CardStrength
+--  | EffectProtection Color
+--  | EffectCombine LayeredEffect LayeredEffect
+--  | EffectNoAbilities
+--  | EffectType CardAttribute
+--  deriving (Show, Eq)
+--
+--instance Monoid LayeredEffect where
+--  mempty = EffectNone
+--
+--instance Semigroup LayeredEffect where
+--  (<>) = EffectCombine
 
 mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
@@ -169,7 +184,7 @@ data Card = Card
   , _cardLoyalty :: Int
   , _cardEffects :: [CardEffect]
   , _cardCmc :: Int
-  , _cardColors :: S.Set Color
+  , _cardColors :: Colors
   , _cardTargets :: [Target]
 
   , _cardTimestamp :: Maybe Timestamp
@@ -345,8 +360,25 @@ emptyBoard = Board
                , _currentStep = (Nothing, 0)
                }
 
-effectPTAdjustment p t = EffectPTAdjustment $ mkStrength (p, t)
-effectPTSet p t = EffectPTSet $ mkStrength (p, t)
-effectNoAbilities = EffectNoAbilities
-effectProtection = EffectProtection
-effectType = EffectType
+effectPTSet :: (Int, Int) -> LayeredEffect
+effectPTSet = effectPTSetF . const . pure
+
+effectPTSetF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffect
+effectPTSetF f = LayeredEffect Layer7B $ \c -> do
+                   pt <- f c
+                   return $ set cardStrength (mkStrength pt) c
+
+effectPTAdjustment pt = LayeredEffect Layer7C (pure . over cardStrength (mkStrength pt <>))
+effectNoAbilities = LayeredEffect Layer6 (pure . set cardEffects mempty)
+
+effectType attr = LayeredEffect Layer4 (pure . over cardAttributes (S.insert attr))
+
+effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffect
+effectProtectionF f = LayeredEffect Layer6 $ \c -> do
+                        colors <- f c
+                        return c -- TODO
+--effectPTAdjustment p t = EffectPTAdjustment $ mkStrength (p, t)
+--effectPTSet p t = EffectPTSet $ mkStrength (p, t)
+--effectNoAbilities = EffectNoAbilities
+--effectProtection = EffectProtection
+--effectType = EffectType
