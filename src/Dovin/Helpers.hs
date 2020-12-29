@@ -302,6 +302,9 @@ matchController player = CardMatcher ("has controller " <> show player) $
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
 
+matchCard :: Card -> CardMatcher
+matchCard = matchName . view cardName
+
 matchToughness :: Int -> CardMatcher
 matchToughness n = labelMatch ("toughness = " <> show n) $ CardMatcher ""
   ((== n) . view cardToughness) <> matchAttribute creature

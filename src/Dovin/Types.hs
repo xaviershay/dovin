@@ -66,67 +66,12 @@ data LayeredEffectDefinition = LayeredEffectDefinition
   , _leName :: EffectName
   }
 
---askBoard = fst <$> ask
 askSelf :: EffectMonad Card
 askSelf = snd <$> ask
 
 viewSelf x = do
   self <- askSelf
   return (view x self)
-
---
----- Drover
---enabled = do
---  -- do we have a dino
---  controller <- viewSelf cardOwner
---  dinos <- askCards $ matchAttribute "dinosaur" <> matchInPlay <> matchController controller
---
---  return $ length dinos > 0
---
---appliesTo = applyToSelf
---effect = pure (effectPTAdjustment (mkStrength 2 2))
---
----- Commander's Plate
---enabled = pure True
---appliesTo =
---  foldr (\a -> matchOr a . matchTarget) mempty <$> viewSelf cardTargets
---effect = do
---  owner <- viewSelf cardOwner
---  commanders <- askCards $ matchAttribute "commander" <> matchOwner owner
---
---  let proEffect = foldr (\a v -> a <> effectProtection v) mempty
---    . S.toList
---    . foldr (<>) mempty
---    . map (view cardColors)
---    $ commanders
---
---  return (proEffect <> effectPTAdjustment (mkStrength 3 3))
-
--- Sliver legion
-
---enabled = enabledInPlay -- default?
---appliesTo = pure (matchAttribute "sliver" <> matchInPlay)
---effect = do
---  self <- askSelf
---  slivers <- length <$> askCards (matchAttribute "sliver" <> matchInPlay <> matchOtherCreatures self)
---
---  return (effectPTAdjustment (mkStrength slivers slivers))
-
-
---data LayeredEffect = EffectNone
---  | EffectPTAdjustment CardStrength
---  | EffectPTSet CardStrength
---  | EffectProtection Color
---  | EffectCombine LayeredEffect LayeredEffect
---  | EffectNoAbilities
---  | EffectType CardAttribute
---  deriving (Show, Eq)
---
---instance Monoid LayeredEffect where
---  mempty = EffectNone
---
---instance Semigroup LayeredEffect where
---  (<>) = EffectCombine
 
 mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
@@ -385,7 +330,14 @@ effectPTSetF f = LayeredEffect Layer7B $ \c -> do
                    pt <- f c
                    return $ set cardStrength (mkStrength pt) c
 
-effectPTAdjustment pt = LayeredEffect Layer7C (pure . over cardStrength (mkStrength pt <>))
+effectPTAdjustment :: (Int, Int) -> LayeredEffect
+effectPTAdjustment = effectPTAdjustmentF . const . pure
+
+effectPTAdjustmentF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffect
+effectPTAdjustmentF f = LayeredEffect Layer7C $ \c -> do
+                   pt <- f c
+                   return $ over cardStrength (mkStrength pt <>) c
+
 effectNoAbilities = LayeredEffect Layer6 (pure . set cardPassiveEffects mempty)
 
 effectType attr = LayeredEffect Layer4 (pure . over cardAttributes (S.insert attr))

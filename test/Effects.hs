@@ -21,6 +21,84 @@ test_Effects = testGroup "V3 effects" $
 
           unless (view cardStrength c == mkStrength (4, 4)) $
             throwError "Applied effect when disabled"
+    , prove "Sliver Legion" $ do
+        let sliver = "sliver"
+        withLocation Play $ do
+          withAttribute sliver $
+            withEffectV3
+              (applyMatcher matchInPlay <$> askSelf)
+              (pure $ matchAttribute sliver <> matchInPlay)
+              [ effectPTAdjustmentF . const $ do
+                  self <- askSelf
+                  slivers <- length <$> askCards (
+                                             matchAttribute sliver
+                                          <> matchInPlay
+                                          <> matchOtherCreatures self)
+
+                  return (slivers, slivers)
+              ]
+              "All Slivers get +1/+1 for each other Sliver"
+                $ addCreature (7, 7) "Sliver Legion"
+
+          c <- requireCard "Sliver Legion" mempty
+
+          unless (view cardStrength c == mkStrength (7, 7)) $
+            throwError "No other slivers yet, should be 7/7"
+
+          withLocation Play $ do
+            withAttribute sliver $ addCreature (2, 2) "Sliver 1"
+            withAttribute sliver $ addCreature (2, 2) "Sliver 2"
+
+          c <- requireCard "Sliver Legion" mempty
+
+          unless (view cardStrength c == mkStrength (9, 9)) $
+            throwError "Should get +2/+2 from other slivers"
+
+          c <- requireCard "Sliver 1" mempty
+
+          unless (view cardStrength c == mkStrength (4, 4)) $
+            throwError "Should get +2/+2 from other slivers"
+
+    , prove "Drover of the Mighty" $ do
+        let dinosaur = "dinosaur"
+
+        as Opponent $ do
+          withLocation Play $ do
+            withAttribute dinosaur $ addCreature (4, 4) "Dinosaur Op."
+
+        withLocation Hand $ do
+          withAttribute dinosaur $ addCreature (4, 4) "Dinosaur Hand"
+
+        withLocation Play $ do
+          withEffectV3
+            (do
+              controller <- viewSelf cardOwner
+              dinos <- askCards $ matchAttribute dinosaur
+                               <> matchInPlay
+                               <> matchController controller
+
+              return $ length dinos > 0
+            )
+            (matchCard <$> askSelf)
+            [ effectPTAdjustment (2, 2)
+            ]
+            "+2/+2 so long as you control another dinosaur"
+              $ addCreature (1, 1) "Drover of the Mighty"
+
+        c <- requireCard "Drover of the Mighty" mempty
+
+        unless (view cardStrength c == mkStrength (1, 1)) $
+          throwError "Should still be a 1/1, no dinos"
+
+        withLocation Play $ do
+          withAttribute dinosaur $ addCreature (4, 4) "Dinosaur"
+
+        c <- requireCard "Drover of the Mighty" mempty
+
+        unless (view cardStrength c == mkStrength (3, 3)) $
+          throwError "Should be a 3/3"
+
+
     , prove "Commander's Plate" $ do
         withLocation Play $
           withEffectV3
