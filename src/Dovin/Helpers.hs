@@ -54,15 +54,38 @@ requireCard name f = do
         Left msg ->
           throwError $ name <> " does not match requirements: " <> msg
 
+-- Unlike the previous effects system, V3 attempts to better mirror the
+-- layering rules while also providing a more flexible API to create more types
+-- of effects. Some notable constraints this requires solving for include:
+--
+-- * The set of cards an effect applies to needs to be fixed in the first layer
+--   in which the effect would apply.
+-- * Layers can create or remove effects in higher layers (e.g. removing all
+--   abilities in layer 6). This means it is not possible to know all effects
+--   that will be applied at the start of the algorithm, effects need to be
+--   collected layer by layer.
+--
+-- This algorithm uses the concept of a "pile" of unapplied effects, that is
+-- both added to and reduced at each layer.
+--
+-- 1. For every layer, all cards are checked for effects that would start
+--    applying on that layer, and all parts of that effect are added to the
+--    pile - alongside the set of cards to apply to. For example, "all
+--    creatures are 0/1 and have no abilities" applies on both layers 6 and 7B
+--    and it will be added to the pile when evaluating layer 6. 
+-- 2. All sub-effects that apply to the current layer are removed from the pile
+--    and evaluated in timestamp order. (Note: dependencies are not implemented
+--    yet.)
+-- 3. After the final layer, the pile should be empty.
+type Pile = [PileEntry]
+type PileEntry = (Card, Timestamp, [LayeredEffect], [Card])
+
 resolveEffectsV3 :: GameMonad ()
 resolveEffectsV3 = do
   board <- get
   cs <- resolveEffectsV3' board
           --(set resolvedCards (M.map unwrap $ view cards board) board)
   assign resolvedCards cs
-
-type Pile = [PileEntry]
-type PileEntry = (Card, Timestamp, [LayeredEffect], [Card])
 
 resolveLayer :: (Board, Pile) -> Layer -> (Board, Pile)
 resolveLayer (board, pile) layer =
@@ -135,41 +158,6 @@ resolveEffectsV3' board = do
   let (newBoard, _) = foldl resolveLayer (board, mempty) allLayers
       
   return $ view resolvedCards newBoard
-  -- CONSTRAINTS
-  -- * the cards a composite effect applies to needs to be resolved in the
-  --   first layer the effect applies
-  -- * an effect that is collected early may not exist by the time it comes to
-  --   apply (e.g. layer 6 "remove all abilities" will remove any P/T in layer
-  --   7) EXCEPT if the composite effect started applying earlier (613.5)
-  --
-  -- 1) For each layer, get all effects that **start** on this layer
-  --      resolve their appliesTo (AbilityEffects apply to the current card)
-  --      include any effects that started on a previous layer but have a
-  --      subeffect on this layer
-  --      apply them all
-  --
-  --     type Pile = [(Timestamp, [LayeredEffect], [Card])]
-  --
-  --      Add cards with effects starting at this layer to "the pile", including with their "applies To" resolved
-  --
-  --      Reduce the pile by applying and removing all effects on this layer
-  --
-  --        peel :: Layer -> Pile -> (Pile, Pile)
-  --
-  --      Go to next layer
-  --
-  --      post condition - Pile has no layered effects remaining
-  --
-  -- 1) Collect all effects to be applied (filter out by leEnabled)
-  --      (Card, [(Timestamp, LayeredEffect)])
-  -- 2) Group by layer (can contain dups?)
-  --      HashMap Layer [(Card, [LayeredEffect], Maybe [Card])]
-  -- 3) For each layer
-  --    3a) sort cards by timestamp [ignore dependencies for now]
-  --    3b) for each card in layer
-  --      3b.i) if cards not resolved, resolved (leAppliesTo)
-  --      3b.ii) apply layer effects to each card in applies to
-
 
 resolveEffects :: GameMonad ()
 resolveEffects = do
@@ -252,9 +240,6 @@ modifyCard lens f name = modifyCardDeprecated name lens f
 --
 -- Matchers are used for both filtering sets of cards, and also for verifying
 -- attributes of cards.
---
--- A wrapping type is used since I intend to add labels/introspection
--- capabilities at some point.
 matchDamage :: Int -> CardMatcher
 matchDamage n = CardMatcher (show n <> " damage") $
   (==) n . view cardDamage
