@@ -119,13 +119,13 @@ withEffect applyCondition filter action =
 withEffectV3 ::
     EffectMonad Bool
  -> EffectMonad CardMatcher
- -> [LayeredEffect]
+ -> [LayeredEffectPart]
  -> EffectName
  -> GameMonad ()
  -> GameMonad ()
 withEffectV3 enabled appliesTo effect name =
   local (over (envTemplate . cardPassiveEffects)
-  (mkLayeredEffect enabled appliesTo effect name:))
+  (mkLayeredEffectPart enabled appliesTo effect name:))
 
 withCMC :: Int -> GameMonad () -> GameMonad ()
 withCMC n =

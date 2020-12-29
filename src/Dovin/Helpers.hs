@@ -118,7 +118,7 @@ resolveLayer (board, pile) layer =
 
       where
         f source es target = foldl
-                (\t (LayeredEffect _ effect) ->
+                (\t (LayeredEffectPart _ effect) ->
                   runReader (effect t) (board, source))
                 target
                 es
@@ -135,10 +135,11 @@ resolveLayer (board, pile) layer =
             }) . view cardAbilityEffects $ c in
 
       filter
-        (isLayer layer . minimum . view peEffect)
+        ((==) layer . minimum . map extractLayer . view peEffect)
         (passiveEffects <> abilityEffects)
 
       where
+        extractLayer (LayeredEffectPart l _) = l
         isEnabled :: LayeredEffectDefinition -> Bool
         isEnabled ld = runReader (view leEnabled ld) (board, c)
 
@@ -165,8 +166,8 @@ peelLayer layer pile =
 unwrap :: BaseCard -> Card
 unwrap (BaseCard card) = card
 
-isLayer :: Layer -> LayeredEffect -> Bool
-isLayer l1 (LayeredEffect l2 _) = l1 == l2
+isLayer :: Layer -> LayeredEffectPart -> Bool
+isLayer l1 (LayeredEffectPart l2 _) = l1 == l2
 
 resolveEffects :: GameMonad ()
 resolveEffects = do
@@ -204,6 +205,7 @@ resolveEffects' board = foldM f mempty (M.toList $ view cards board)
 
       card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
 
+      -- TODO: Should be handled in Layer7C in V3 effects system
       let plusModifier = let n = view cardPlusOneCounters card' in
                               mkStrength (n, n)
       let minusModifier = let n = view cardMinusOneCounters card' in

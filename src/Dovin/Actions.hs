@@ -1255,7 +1255,7 @@ setLife n = do
   actor <- view envActor
   assign (life . at actor) (Just n)
 
-addEffect :: LayeredEffect -> CardName -> GameMonad ()
+addEffect :: LayeredEffectPart -> CardName -> GameMonad ()
 addEffect e cn = do
   card <- requireCard cn mempty
   now <- getTimestamp

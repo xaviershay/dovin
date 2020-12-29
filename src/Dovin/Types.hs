@@ -27,6 +27,8 @@ type ManaString = String
 data Location = Hand | Graveyard | Play | Stack | Exile | Deck
   deriving (Show, Eq, Ord)
 
+-- The original CardEffect type. This is deprecated as of V3, replaced by
+-- LayeredEffect.
 data CardEffect = CardEffect
   { _effectEnabled :: CardMatcher
   , _effectFilter :: Card -> CardMatcher
@@ -34,35 +36,45 @@ data CardEffect = CardEffect
   }
 
 type EffectMonad a = Reader (Board, Card) a
+
+-- These layers line up to those specified in the official rules (613).
 data Layer =
-    Layer1
-  | Layer2
-  | Layer3
-  | Layer4
-  | Layer5
-  | Layer6
-  | Layer7A
-  | Layer7B
-  | Layer7C
-  | Layer7D
-  | Layer7E
-  | LayerOther deriving (Show, Ord, Eq, Bounded, Enum)
+    Layer1A -- ^ Copiable effects
+  | Layer1B -- ^ Face down spells and permanents
+  | Layer2  -- ^ Control-changing effects
+  | Layer3  -- ^ Text changing effects
+  | Layer4  -- ^ Type changing effects
+  | Layer5  -- ^ Color changing effects
+  | Layer6  -- ^ Ability changing effects
+  | Layer7A -- ^ P/T from CDAs
+  | Layer7B -- ^ P/T from setting
+  | Layer7C -- ^ P/T adjustments (inc. counters)
+  | Layer7D -- ^ P/T Switching
+  | LayerOther -- ^ Other game rule affecting effects
+  deriving (Show, Ord, Eq, Bounded, Enum)
 
 allLayers :: [Layer]
 allLayers = [minBound..maxBound]
 
-data LayeredEffect = LayeredEffect Layer (Card -> EffectMonad Card)
-instance Show LayeredEffect where
-  show (LayeredEffect layer _) = show layer
-instance Eq LayeredEffect where
-  (LayeredEffect l1 _) == (LayeredEffect l2 _) = l1 == l2
-instance Ord LayeredEffect where
-  (LayeredEffect l1 _) `compare` (LayeredEffect l2 _) = l1 `compare` l2
+-- The atomic component of an effect, that should only affect attributes at the
+-- specified layer.
+data LayeredEffectPart = LayeredEffectPart Layer (Card -> EffectMonad Card)
 
+-- An effect is combined of multiple parts that each apply at different layers.
+-- So called to distinguish it from the deprecated CardEffect type.
+type LayeredEffect = [LayeredEffectPart]
+
+-- An effect definition best matches up to the text describing it on a card. It
+-- can generated different effects affecting different cards depending on the
+-- state of the board.
 data LayeredEffectDefinition = LayeredEffectDefinition
+  -- ^ Whether or not to apply this effect.
   { _leEnabled :: EffectMonad Bool
+  -- ^ Filter to determine which cards are affected by this effect, if enabled.
   , _leAppliesTo :: EffectMonad CardMatcher
-  , _leEffect :: [LayeredEffect]
+  -- ^ The actions to apply to affected cards.
+  , _leEffect :: LayeredEffect
+  -- ^ A human readable description of the effect. Optional.
   , _leName :: EffectName
   }
 
@@ -84,7 +96,7 @@ mkEffect enabled filter action = CardEffect
   , _effectAction = action
   }
 
-mkLayeredEffect enabled appliesTo effect name = LayeredEffectDefinition
+mkLayeredEffectPart enabled appliesTo effect name = LayeredEffectDefinition
   { _leEnabled = enabled
   , _leAppliesTo = appliesTo
   , _leEffect = effect
@@ -127,7 +139,7 @@ data Phase
 type Timestamp = Integer
 data EffectDuration = EndOfTurn
 
-data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffect]
+data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffectPart]
 
 data Card = Card
   { _cardName :: CardName
@@ -322,28 +334,28 @@ emptyBoard = Board
                , _currentTime = 0
                }
 
-effectPTSet :: (Int, Int) -> LayeredEffect
+effectPTSet :: (Int, Int) -> LayeredEffectPart
 effectPTSet = effectPTSetF . const . pure
 
-effectPTSetF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffect
-effectPTSetF f = LayeredEffect Layer7B $ \c -> do
+effectPTSetF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
+effectPTSetF f = LayeredEffectPart Layer7B $ \c -> do
                    pt <- f c
                    return $ set cardStrength (mkStrength pt) c
 
-effectPTAdjustment :: (Int, Int) -> LayeredEffect
+effectPTAdjustment :: (Int, Int) -> LayeredEffectPart
 effectPTAdjustment = effectPTAdjustmentF . const . pure
 
-effectPTAdjustmentF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffect
-effectPTAdjustmentF f = LayeredEffect Layer7C $ \c -> do
+effectPTAdjustmentF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
+effectPTAdjustmentF f = LayeredEffectPart Layer7C $ \c -> do
                    pt <- f c
                    return $ over cardStrength (mkStrength pt <>) c
 
-effectNoAbilities = LayeredEffect Layer6 (pure . set cardPassiveEffects mempty)
+effectNoAbilities = LayeredEffectPart Layer6 (pure . set cardPassiveEffects mempty)
 
-effectType attr = LayeredEffect Layer4 (pure . over cardAttributes (S.insert attr))
+effectType attr = LayeredEffectPart Layer4 (pure . over cardAttributes (S.insert attr))
 
-effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffect
-effectProtectionF f = LayeredEffect Layer6 $ \c -> do
+effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffectPart
+effectProtectionF f = LayeredEffectPart Layer6 $ \c -> do
                         colors <- f c
                         return c -- TODO
 
@@ -351,7 +363,7 @@ type Pile = [PileEntry]
 data PileEntry = PileEntry
   { _peSource :: Card
   , _peTimestamp :: Timestamp
-  , _peEffect :: [LayeredEffect]
+  , _peEffect :: [LayeredEffectPart]
   , _peAppliesTo :: [Card]
   }
 makeLenses ''PileEntry
