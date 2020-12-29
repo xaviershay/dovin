@@ -364,6 +364,6 @@ data PileEntry = PileEntry
   { _peSource :: Card
   , _peTimestamp :: Timestamp
   , _peEffect :: [LayeredEffectPart]
-  , _peAppliesTo :: [Card]
+  , _peAppliesTo :: [CardName]
   }
 makeLenses ''PileEntry

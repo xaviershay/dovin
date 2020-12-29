@@ -104,34 +104,51 @@ resolveLayer (board, pile) layer =
   (newBoard, pile')
 
   where
+    -- Take a PileEntry and apply it to the board state. It is assumed that it
+    -- has already been filtered to a single layer.
     applyEffects :: Board -> PileEntry -> Board
     applyEffects board pe =
-      let source = view peSource pe in
-      let es = view peEffect pe in
-      let cs = view peAppliesTo pe in
-      -- Re-fetch cards from board to ensure we have the most current version
-      let rcs = mapMaybe (\c -> M.lookup (view cardName c) (view resolvedCards board)) cs :: [Card] in
-      let newCards = map (f source es) rcs :: [Card] in
+      let
+        cs = mapMaybe (\cn -> M.lookup cn (view resolvedCards board))
+             . view peAppliesTo
+             $ pe :: [Card]
+        newCards = map
+                     (applyEffectParts (view peSource pe) (view peEffect pe))
+                     cs
+      in
 
-      over resolvedCards (M.union $ M.fromList $ map (\c -> (view cardName c, c)) newCards) board
+      over
+        resolvedCards
+        (M.union . M.fromList . map (\c -> (view cardName c, c)) $ newCards)
+        board
 
-      where
-        f source es target = foldl
-                (\t (LayeredEffectPart _ effect) ->
-                  runReader (effect t) (board, source))
-                target
-                es
+    applyEffectParts source es target =
+      foldl
+        (\t (LayeredEffectPart _ effect) ->
+          runReader (effect t) (board, source))
+        target
+        es
 
+    -- Find all effects on a card that begin applying at the given layer.
     extractEffects :: Layer -> Card -> Pile
     extractEffects layer c =
-      let passiveEffects = map f . filter isEnabled . view cardPassiveEffects $ c in
-      let abilityEffects = map (\(AbilityEffect t _ es) ->
+      let
+        passiveEffects =
+          map toPileEntry
+          . filter isEnabled
+          . view cardPassiveEffects
+          $ c
+        abilityEffects =
+          map (\(AbilityEffect t _ es) ->
             PileEntry {
               _peSource = c,
               _peTimestamp = t,
               _peEffect = es,
-              _peAppliesTo = [c]
-            }) . view cardAbilityEffects $ c in
+              _peAppliesTo = [view cardName c]
+            })
+          . view cardAbilityEffects
+          $ c
+      in
 
       filter
         ((==) layer . minimum . map extractLayer . view peEffect)
@@ -139,34 +156,40 @@ resolveLayer (board, pile) layer =
 
       where
         extractLayer (LayeredEffectPart l _) = l
+
         isEnabled :: LayeredEffectDefinition -> Bool
         isEnabled ld = runReader (view leEnabled ld) (board, c)
 
-        f :: LayeredEffectDefinition -> PileEntry
-        f ld =
-          let matcher = runReader (view leAppliesTo ld) (board, c) in
-          let cs' = filter (applyMatcher matcher) (M.elems . view resolvedCards $ board) in
+        toPileEntry :: LayeredEffectDefinition -> PileEntry
+        toPileEntry ld =
+          let
+            matcher = runReader (view leAppliesTo ld) (board, c)
+            cs' =
+              filter
+                (applyMatcher matcher)
+                (M.elems . view resolvedCards $ board)
+          in
 
           PileEntry {
             _peSource = c,
             _peTimestamp = view cardTimestamp c,
             _peEffect = view leEffect ld,
-            _peAppliesTo = cs'
+            _peAppliesTo = map (view cardName) cs'
           }
 
 -- Return two piles, the second including every effect part that applies at
--- this layer, the first with all the remaining.
+-- this layer, the first with all the remaining. Removes any entries that no
+-- longer have any effect parts remaining to apply.
 peelLayer :: Layer -> Pile -> (Pile, Pile)
 peelLayer layer pile =
   (f not pile, f id pile)
   where
-    f g = filter (not . null . view peEffect) . map (over peEffect (filter $ g . isLayer layer))
+    f g =
+      filter (not . null . view peEffect)
+      . map (over peEffect (filter $ g . isLayer layer))
 
-unwrap :: BaseCard -> Card
-unwrap (BaseCard card) = card
-
-isLayer :: Layer -> LayeredEffectPart -> Bool
-isLayer l1 (LayeredEffectPart l2 _) = l1 == l2
+    isLayer :: Layer -> LayeredEffectPart -> Bool
+    isLayer l1 (LayeredEffectPart l2 _) = l1 == l2
 
 resolveEffects :: GameMonad ()
 resolveEffects = do
