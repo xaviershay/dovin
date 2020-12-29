@@ -72,7 +72,7 @@ requireCard name f = do
 --    applying on that layer, and all parts of that effect are added to the
 --    pile - alongside the set of cards to apply to. For example, "all
 --    creatures are 0/1 and have no abilities" applies on both layers 6 and 7B
---    and it will be added to the pile when evaluating layer 6. 
+--    and it will be added to the pile when evaluating layer 6.
 -- 2. All sub-effects that apply to the current layer are removed from the pile
 --    and evaluated in timestamp order. (Note: dependencies are not implemented
 --    yet.)
@@ -83,14 +83,22 @@ resolveEffectsV3 = do
   cs <- resolveEffectsV3' board
   assign resolvedCards cs
 
+resolveEffectsV3' :: Board -> GameMonad (M.HashMap CardName Card)
+resolveEffectsV3' board = do
+  let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers
+
+  unless (null pile) $ throwError "assertion failed: pile should be empty"
+
+  return $ view resolvedCards newBoard
+
 resolveLayer :: (Board, Pile) -> Layer -> (Board, Pile)
 resolveLayer (board, pile) layer =
-  let cs = view resolvedCards $ board in
+  let cs = view resolvedCards board in
   let newEffects = concatMap (extractEffects layer) cs :: Pile in
   let newPile = pile <> newEffects in
   let (pile', peel) = peelLayer layer newPile in
   let sortedPeel = sortOn (view peTimestamp) peel in
-  
+
   let newBoard = foldl applyEffects board sortedPeel in
 
   (newBoard, pile')
@@ -102,8 +110,6 @@ resolveLayer (board, pile) layer =
       let es = view peEffect pe in
       let cs = view peAppliesTo pe in
       let rcs = mapMaybe (\c -> M.lookup (view cardName c) (view resolvedCards board)) cs :: [Card] in
-      -- TODO: Assert (length rcs == length cs)
-      --
       -- for each card, run ze monad
       -- place new card into resolve cards in board
       let newCards = map (f source es) rcs :: [Card] in
@@ -147,13 +153,12 @@ resolveLayer (board, pile) layer =
             _peEffect = view leEffect ld,
             _peAppliesTo = cs'
           }
-  
+
 peelLayer :: Layer -> Pile -> (Pile, Pile)
 peelLayer layer pile =
   -- TODO: This is pretty inelegant
   (
     filter (not . null . view peEffect) $ map (over peEffect (filter $ not . isLayer layer)) pile,
-    --filter (not . null . view peEffect) $ map (\(s, t, es, cs) -> (s, t, filter (isLayer layer) es, cs)) pile
     filter (not . null . view peEffect) $ map (over peEffect (filter $ isLayer layer)) pile
   )
 
@@ -162,12 +167,6 @@ unwrap (BaseCard card) = card
 
 isLayer :: Layer -> LayeredEffect -> Bool
 isLayer l1 (LayeredEffect l2 _) = l1 == l2
-
-resolveEffectsV3' :: Board -> GameMonad (M.HashMap CardName Card)
-resolveEffectsV3' board = do
-  let (newBoard, _) = foldl resolveLayer (board, mempty) allLayers
-      
-  return $ view resolvedCards newBoard
 
 resolveEffects :: GameMonad ()
 resolveEffects = do
