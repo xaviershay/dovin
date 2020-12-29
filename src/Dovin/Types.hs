@@ -46,8 +46,19 @@ data Layer =
   | Layer7C
   | Layer7D
   | Layer7E
-  | LayerOther deriving (Show, Ord, Eq)
+  | LayerOther deriving (Show, Ord, Eq, Bounded, Enum)
+
+allLayers :: [Layer]
+allLayers = [minBound..maxBound]
+
 data LayeredEffect = LayeredEffect Layer (Card -> EffectMonad Card)
+instance Show LayeredEffect where
+  show (LayeredEffect layer _) = show layer
+instance Eq LayeredEffect where
+  (LayeredEffect l1 _) == (LayeredEffect l2 _) = l1 == l2
+instance Ord LayeredEffect where
+  (LayeredEffect l1 _) `compare` (LayeredEffect l2 _) = l1 `compare` l2
+
 data LayeredEffectDefinition = LayeredEffectDefinition
   { _leEnabled :: EffectMonad Bool
   , _leAppliesTo :: EffectMonad CardMatcher
@@ -171,7 +182,7 @@ data Phase
 type Timestamp = Integer
 data EffectDuration = EndOfTurn
 
-data AbilityEffect = AbilityEffect Timestamp EffectDuration LayeredEffect
+data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffect]
 
 data Card = Card
   { _cardName :: CardName
@@ -187,7 +198,7 @@ data Card = Card
   , _cardColors :: Colors
   , _cardTargets :: [Target]
 
-  , _cardTimestamp :: Maybe Timestamp
+  , _cardTimestamp :: Timestamp
   -- These are typically set when a card is created. They can be removed by
   -- "lose all abilities" effects.
   , _cardPassiveEffects :: [LayeredEffectDefinition]
@@ -201,7 +212,7 @@ data Card = Card
   }
 instance Hashable Player
 instance Show Card where
-  show = _cardName
+  show c = _cardName c <> " " <> show (S.toList $ _cardAttributes c)
 instance Eq Card where
   a == b = _cardName a == _cardName b
 
@@ -229,6 +240,7 @@ data Board = Board
   , _manaPool :: M.HashMap Player ManaPool
   , _phase :: Phase
   , _currentStep :: StepIdentifier
+  , _currentTime :: Timestamp
   }
 
 data Env = Env
@@ -256,6 +268,7 @@ makeLenses ''Card
 makeLenses ''CardEffect
 makeLenses ''Env
 makeLenses ''Step
+makeLenses ''LayeredEffectDefinition
 
 stepFork :: Control.Lens.Lens' Step (Maybe String)
 stepFork = stepId . _1
@@ -342,6 +355,9 @@ mkCard name location =
     , _cardMinusOneCounters = 0
     , _cardCmc = 0
     , _cardTargets = mempty
+    , _cardPassiveEffects = mempty
+    , _cardAbilityEffects = mempty
+    , _cardTimestamp = 0
     }
 
 opposing :: Player -> Player
@@ -358,6 +374,7 @@ emptyBoard = Board
                , _manaPool = mempty
                , _phase = FirstMain
                , _currentStep = (Nothing, 0)
+               , _currentTime = 0
                }
 
 effectPTSet :: (Int, Int) -> LayeredEffect
@@ -369,7 +386,7 @@ effectPTSetF f = LayeredEffect Layer7B $ \c -> do
                    return $ set cardStrength (mkStrength pt) c
 
 effectPTAdjustment pt = LayeredEffect Layer7C (pure . over cardStrength (mkStrength pt <>))
-effectNoAbilities = LayeredEffect Layer6 (pure . set cardEffects mempty)
+effectNoAbilities = LayeredEffect Layer6 (pure . set cardPassiveEffects mempty)
 
 effectType attr = LayeredEffect Layer4 (pure . over cardAttributes (S.insert attr))
 
@@ -382,3 +399,5 @@ effectProtectionF f = LayeredEffect Layer6 $ \c -> do
 --effectNoAbilities = EffectNoAbilities
 --effectProtection = EffectProtection
 --effectType = EffectType
+
+data CompositeEffect = CompositeEffect [LayeredEffect]

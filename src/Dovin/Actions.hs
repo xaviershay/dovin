@@ -1260,6 +1260,6 @@ addEffect e cn = do
   card <- requireCard cn mempty
   now <- getTimestamp
 
-  let ae = AbilityEffect now EndOfTurn e
+  let ae = AbilityEffect now EndOfTurn [e]
 
   modifyCard cardAbilityEffects (\es -> ae:es) cn

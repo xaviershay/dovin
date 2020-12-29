@@ -24,6 +24,7 @@ module Dovin.Builder (
   , as
   , withAttribute
   , withAttributes
+  , withCMC
   , withEffect
   , withEffectV3
   , withLocation
@@ -38,16 +39,18 @@ import qualified Data.Set as S
 import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Helpers (resolveEffects)
+import Dovin.Helpers (resolveEffects, getTimestamp)
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
   card <- use $ cards . at name
+  now <- getTimestamp
+
   case card of
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
-      modifying cards (M.insert name (BaseCard $ set cardName name template))
+      modifying cards (M.insert name (BaseCard $ set cardName name . set cardTimestamp now $ template))
       resolveEffects
 
 addAura :: CardName -> GameMonad ()
@@ -123,6 +126,10 @@ withEffectV3 ::
 withEffectV3 enabled appliesTo effect name =
   local (over (envTemplate . cardPassiveEffects)
   (mkLayeredEffect enabled appliesTo effect name:))
+
+withCMC :: Int -> GameMonad () -> GameMonad ()
+withCMC n =
+  local (set (envTemplate . cardCmc) n)
 
 withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do

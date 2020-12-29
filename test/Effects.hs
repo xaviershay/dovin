@@ -31,16 +31,31 @@ test_Effects = testGroup "effects (magic judges examples)"
           throwError "Did not remove ability"
   , prove "Humility & Opalescence" $ do
       withLocation Play $ do
-        withEffectV3
+        withCMC 4 $ withEffectV3
          (pure True)
          (pure $ matchAttribute creature)
          [ effectPTSet (0, 1)
          , effectNoAbilities
          ]
-         "Each creature loses all abilities and is 1/1" $
+         "Each creature loses all abilities and is 0/1" $
            addEnchantment "Humility"
 
-        withEffectV3
+        withCMC 4 $ withEffectV3
+          (pure True)
+          (matchOther enchantment <$> askSelf)
+          [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc))
+          , effectType creature
+          ]
+          "Other enchanments are creatures with P/T equal to CMC" $
+            addEnchantment "Opalescence"
+
+        c <- requireCard "Humility" mempty
+
+        unless (view cardStrength c == mkStrength (4, 4)) $
+          throwError "Did not make Humility a 4/4"
+  , prove "Opalescence & Humility" $ do
+      withLocation Play $ do
+        withCMC 4 $ withEffectV3
           (pure True)
           (matchOther enchantment <$> askSelf)
           [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectType creature
@@ -48,11 +63,20 @@ test_Effects = testGroup "effects (magic judges examples)"
           "Other enchanments are creatures with P/T equal to CMC" $
             addEnchantment "Opalescence"
 
+        withCMC 4 $ withEffectV3
+         (pure True)
+         (pure $ matchAttribute creature)
+         [ effectPTSet (0, 1)
+         , effectNoAbilities
+         ]
+         "Each creature loses all abilities and is 0/1" $
+           addEnchantment "Humility"
+
+
         c <- requireCard "Humility" mempty
 
-        -- TODO: Test reverse timestamp order as well
-        unless (view cardStrength c == mkStrength (4, 4)) $
-          throwError "Did not make Humility a 4/4"
+        unless (view cardStrength c == mkStrength (0, 1)) $
+          throwError "Did not make Humility a 0/1"
   , prove "Commander's Plate" $ do
       withLocation Play $
         withEffectV3
