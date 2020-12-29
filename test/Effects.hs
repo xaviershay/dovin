@@ -10,7 +10,7 @@ test_Effects = testGroup "V3 effects" $
     [ prove "Effects only apply when enabled" $ do
         withLocation Hand $ do
           withEffectV3
-            (applyMatcher matchInPlay <$> askSelf)
+            enabledInPlay
             (pure $ matchAttribute creature)
             [ effectPTSet (1, 1)
             ]
@@ -26,7 +26,7 @@ test_Effects = testGroup "V3 effects" $
         withLocation Play $ do
           withAttribute sliver $
             withEffectV3
-              (applyMatcher matchInPlay <$> askSelf)
+              enabledInPlay
               (pure $ matchAttribute sliver <> matchInPlay)
               [ effectPTAdjustmentF . const $ do
                   self <- askSelf
@@ -102,7 +102,7 @@ test_Effects = testGroup "V3 effects" $
     , prove "Commander's Plate" $ do
         withLocation Play $
           withEffectV3
-            (applyMatcher matchInPlay <$> askSelf)
+            enabledInPlay
             (do
               ts <- viewSelf cardTargets
               return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
@@ -129,7 +129,7 @@ test_Effects = testGroup "V3 effects" $
         withLocation Play $ do
           addCreature (2, 2) "Grizzly Bear"
           withEffectV3
-            (applyMatcher matchInPlay <$> askSelf)
+            enabledInPlay
             (matchOtherCreatures <$> askSelf)
             [ effectPTSet (1, 1)
             ]
@@ -151,7 +151,7 @@ test_Effects = testGroup "V3 effects" $
     , prove "Humility & Opalescence" $ do
         withLocation Play $ do
           withCMC 4 $ withEffectV3
-            (applyMatcher matchInPlay <$> askSelf)
+            enabledInPlay
             (pure $ matchAttribute creature)
             [ effectPTSet (0, 1)
             , effectNoAbilities
@@ -160,7 +160,7 @@ test_Effects = testGroup "V3 effects" $
               addEnchantment "Humility"
 
           withCMC 4 $ withEffectV3
-            (applyMatcher matchInPlay <$> askSelf)
+            enabledInPlay
             (matchOther enchantment <$> askSelf)
             [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc))
             , effectType creature
@@ -175,7 +175,7 @@ test_Effects = testGroup "V3 effects" $
     , prove "Opalescence & Humility" $ do
         withLocation Play $ do
           withCMC 4 $ withEffectV3
-            (applyMatcher matchInPlay <$> askSelf)
+            enabledInPlay
             (matchOther enchantment <$> askSelf)
             [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectType creature
             ]

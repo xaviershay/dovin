@@ -313,6 +313,9 @@ matchTarget :: Target -> CardMatcher
 matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
   ((==) t . TargetCard . view cardName)
 
+enabledInPlay :: EffectMonad Bool
+enabledInPlay = applyMatcher matchInPlay <$> askSelf
+
 missingAttribute = invert . matchAttribute
 
 (CardMatcher d1 f) `matchOr` (CardMatcher d2 g) =
