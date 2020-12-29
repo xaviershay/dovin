@@ -346,10 +346,12 @@ effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffect
 effectProtectionF f = LayeredEffect Layer6 $ \c -> do
                         colors <- f c
                         return c -- TODO
---effectPTAdjustment p t = EffectPTAdjustment $ mkStrength (p, t)
---effectPTSet p t = EffectPTSet $ mkStrength (p, t)
---effectNoAbilities = EffectNoAbilities
---effectProtection = EffectProtection
---effectType = EffectType
 
-data CompositeEffect = CompositeEffect [LayeredEffect]
+type Pile = [PileEntry]
+data PileEntry = PileEntry
+  { _peSource :: Card
+  , _peTimestamp :: Timestamp
+  , _peEffect :: [LayeredEffect]
+  , _peAppliesTo :: [Card]
+  }
+makeLenses ''PileEntry

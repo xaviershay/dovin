@@ -77,14 +77,10 @@ requireCard name f = do
 --    and evaluated in timestamp order. (Note: dependencies are not implemented
 --    yet.)
 -- 3. After the final layer, the pile should be empty.
-type Pile = [PileEntry]
-type PileEntry = (Card, Timestamp, [LayeredEffect], [Card])
-
 resolveEffectsV3 :: GameMonad ()
 resolveEffectsV3 = do
   board <- get
   cs <- resolveEffectsV3' board
-          --(set resolvedCards (M.map unwrap $ view cards board) board)
   assign resolvedCards cs
 
 resolveLayer :: (Board, Pile) -> Layer -> (Board, Pile)
@@ -93,7 +89,7 @@ resolveLayer (board, pile) layer =
   let newEffects = concatMap (extractEffects layer) cs :: Pile in
   let newPile = pile <> newEffects in
   let (pile', peel) = peelLayer layer newPile in
-  let sortedPeel = sortOn (\(_, t, _, _) -> t) peel in
+  let sortedPeel = sortOn (view peTimestamp) peel in
   
   let newBoard = foldl applyEffects board sortedPeel in
 
@@ -101,19 +97,21 @@ resolveLayer (board, pile) layer =
 
   where
     applyEffects :: Board -> PileEntry -> Board
-    applyEffects board (source, _, es, cs) =
+    applyEffects board pe =
+      let source = view peSource pe in
+      let es = view peEffect pe in
+      let cs = view peAppliesTo pe in
       let rcs = mapMaybe (\c -> M.lookup (view cardName c) (view resolvedCards board)) cs :: [Card] in
       -- TODO: Assert (length rcs == length cs)
       --
       -- for each card, run ze monad
       -- place new card into resolve cards in board
-      let newCards = map f rcs :: [Card] in
+      let newCards = map (f source es) rcs :: [Card] in
 
       over resolvedCards (M.union $ M.fromList $ map (\c -> (view cardName c, c)) newCards) board
 
       where
-        f :: Card -> Card
-        f target = foldl
+        f source es target = foldl
                 (\t (LayeredEffect _ effect) ->
                   runReader (effect t) (board, source))
                 target
@@ -122,10 +120,16 @@ resolveLayer (board, pile) layer =
     extractEffects :: Layer -> Card -> Pile
     extractEffects layer c =
       let passiveEffects = map f . filter isEnabled . view cardPassiveEffects $ c in
-      let abilityEffects = map (\(AbilityEffect t _ es) -> (c, t, es, [c])) . view cardAbilityEffects $ c in
+      let abilityEffects = map (\(AbilityEffect t _ es) ->
+            PileEntry {
+              _peSource = c,
+              _peTimestamp = t,
+              _peEffect = es,
+              _peAppliesTo = [c]
+            }) . view cardAbilityEffects $ c in
 
       filter
-        (\(_, _, es, _) -> isLayer layer $ minimum es)
+        (isLayer layer . minimum . view peEffect)
         (passiveEffects <> abilityEffects)
 
       where
@@ -137,14 +141,20 @@ resolveLayer (board, pile) layer =
           let matcher = runReader (view leAppliesTo ld) (board, c) in
           let cs' = filter (applyMatcher matcher) (M.elems . view resolvedCards $ board) in
 
-          (c, view cardTimestamp c, view leEffect ld, cs')
+          PileEntry {
+            _peSource = c,
+            _peTimestamp = view cardTimestamp c,
+            _peEffect = view leEffect ld,
+            _peAppliesTo = cs'
+          }
   
 peelLayer :: Layer -> Pile -> (Pile, Pile)
 peelLayer layer pile =
   -- TODO: This is pretty inelegant
   (
-    filter (\(_, _, es, _) -> (not . null) es) $ map (\(s, t, es, cs) -> (s, t, filter (not . isLayer layer) es, cs)) pile,
-    filter (\(_, _, es, _) -> (not . null) es) $ map (\(s, t, es, cs) -> (s, t, filter (isLayer layer) es, cs)) pile
+    filter (not . null . view peEffect) $ map (over peEffect (filter $ not . isLayer layer)) pile,
+    --filter (not . null . view peEffect) $ map (\(s, t, es, cs) -> (s, t, filter (isLayer layer) es, cs)) pile
+    filter (not . null . view peEffect) $ map (over peEffect (filter $ isLayer layer)) pile
   )
 
 unwrap :: BaseCard -> Card
