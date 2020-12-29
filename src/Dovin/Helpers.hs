@@ -98,7 +98,7 @@ resolveLayer (board, pile) layer =
 
     extractEffects :: Layer -> Card -> Pile
     extractEffects layer c =
-      let passiveEffects = map f . view cardPassiveEffects $ c in
+      let passiveEffects = map f . filter isEnabled . view cardPassiveEffects $ c in
       let abilityEffects = map (\(AbilityEffect t _ es) -> (c, t, es, [c])) . view cardAbilityEffects $ c in
 
       filter
@@ -106,6 +106,9 @@ resolveLayer (board, pile) layer =
         (passiveEffects <> abilityEffects)
 
       where
+        isEnabled :: LayeredEffectDefinition -> Bool
+        isEnabled ld = runReader (view leEnabled ld) (board, c)
+
         f :: LayeredEffectDefinition -> PileEntry
         f ld =
           let matcher = runReader (view leAppliesTo ld) (board, c) in
