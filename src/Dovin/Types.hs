@@ -3,7 +3,7 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', Prism', makeLenses, over, view, _1, _2, _Just, at, non, set)
+import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non, set)
 import Control.Monad.Reader (ReaderT, Reader, ask)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
@@ -81,9 +81,7 @@ data LayeredEffectDefinition = LayeredEffectDefinition
 askSelf :: EffectMonad Card
 askSelf = snd <$> ask
 
-viewSelf x = do
-  self <- askSelf
-  return (view x self)
+viewSelf x = view x <$> askSelf
 
 mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
