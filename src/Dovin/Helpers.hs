@@ -154,13 +154,13 @@ resolveLayer (board, pile) layer =
             _peAppliesTo = cs'
           }
 
+-- Return two piles, the second including every effect part that applies at
+-- this layer, the first with all the remaining.
 peelLayer :: Layer -> Pile -> (Pile, Pile)
 peelLayer layer pile =
-  -- TODO: This is pretty inelegant
-  (
-    filter (not . null . view peEffect) $ map (over peEffect (filter $ not . isLayer layer)) pile,
-    filter (not . null . view peEffect) $ map (over peEffect (filter $ isLayer layer)) pile
-  )
+  (f not pile, f id pile)
+  where
+    f g = filter (not . null . view peEffect) . map (over peEffect (filter $ g . isLayer layer))
 
 unwrap :: BaseCard -> Card
 unwrap (BaseCard card) = card
