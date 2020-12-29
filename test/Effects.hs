@@ -2,11 +2,8 @@ module Effects where
 
 import TestPrelude.V2
 
-import qualified Data.Set as S
-
--- https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
 test_Effects = testGroup "V3 effects" $
-  [ testGroup ""
+  [ testGroup "assorted cards"
     [ prove "Effects only apply when enabled" $ do
         withLocation Hand $ do
           withEffectV3
@@ -124,6 +121,7 @@ test_Effects = testGroup "V3 effects" $
             "+3/+3 and pro commander colors" $
               addArtifact "Commander's Plate"
     ]
+  -- https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
   , testGroup "effects (magic judges examples)"
     [ prove "Humble & Godhead of Awe" $ do
         withLocation Play $ do

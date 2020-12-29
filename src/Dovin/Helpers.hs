@@ -2,7 +2,6 @@
 
 module Dovin.Helpers where
 
-import Debug.Trace
 import Dovin.Types
 import Dovin.Attributes
 import Dovin.Prelude
@@ -11,8 +10,7 @@ import Data.List (sort, sortOn)
 import qualified Data.HashMap.Strict as M
 import Data.Maybe (mapMaybe)
 import qualified Data.Set as S
-import Data.Char (isDigit)
-import Control.Lens (_1, _2, ASetter, both, _Just)
+import Control.Lens (_1, ASetter, _Just)
 import Control.Monad.State (get)
 import Control.Monad.Reader (ask, runReader)
 
