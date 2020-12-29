@@ -83,24 +83,24 @@ resolveEffectsV3 = do
   cs <- resolveEffectsV3' board
   assign resolvedCards cs
 
-resolveEffectsV3' :: Board -> GameMonad (M.HashMap CardName Card)
-resolveEffectsV3' board = do
-  let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers
+  where
+    resolveEffectsV3' :: Board -> GameMonad (M.HashMap CardName Card)
+    resolveEffectsV3' board = do
+      let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers
 
-  unless (null pile) $ throwError "assertion failed: pile should be empty"
+      unless (null pile) $ throwError "assertion failed: pile should be empty"
 
-  return $ view resolvedCards newBoard
+      return $ view resolvedCards newBoard
 
 resolveLayer :: (Board, Pile) -> Layer -> (Board, Pile)
 resolveLayer (board, pile) layer =
-  let cs = view resolvedCards board in
-  let newEffects = concatMap (extractEffects layer) cs :: Pile in
-  let newPile = pile <> newEffects in
-  let (pile', peel) = peelLayer layer newPile in
-  let sortedPeel = sortOn (view peTimestamp) peel in
-
-  let newBoard = foldl applyEffects board sortedPeel in
-
+  let 
+    cs            = view resolvedCards board
+    newEffects    = concatMap (extractEffects layer) cs :: Pile
+    newPile       = pile <> newEffects :: Pile
+    (pile', peel) = peelLayer layer newPile
+    newBoard      = foldl applyEffects board . sortOn (view peTimestamp) $ peel
+  in
   (newBoard, pile')
 
   where
@@ -109,9 +109,8 @@ resolveLayer (board, pile) layer =
       let source = view peSource pe in
       let es = view peEffect pe in
       let cs = view peAppliesTo pe in
+      -- Re-fetch cards from board to ensure we have the most current version
       let rcs = mapMaybe (\c -> M.lookup (view cardName c) (view resolvedCards board)) cs :: [Card] in
-      -- for each card, run ze monad
-      -- place new card into resolve cards in board
       let newCards = map (f source es) rcs :: [Card] in
 
       over resolvedCards (M.union $ M.fromList $ map (\c -> (view cardName c, c)) newCards) board
