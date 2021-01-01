@@ -32,17 +32,16 @@ module Dovin.Builder (
   , withMinusOneCounters
   ) where
 
-import Control.Monad.Reader (ask, local)
-import Control.Monad.Identity (Identity)
-import qualified Data.HashMap.Strict as M
-import qualified Data.Set as S
-
 import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Types
 import Dovin.Helpers (getTimestamp)
 import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
+
+import Control.Monad.Reader (local)
+import qualified Data.HashMap.Strict as M
+import qualified Data.Set as S
 
 addCard :: CardName -> GameMonad ()
 addCard name = do

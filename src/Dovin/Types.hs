@@ -3,11 +3,10 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non, set)
-import Control.Monad.Reader (ReaderT, Reader, ask)
-import Control.Monad.Identity (runIdentity)
+import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non)
+import Control.Monad.Reader (ReaderT, Reader)
+import Control.Monad.Identity (runIdentity, Identity)
 import Control.Monad.Except (ExceptT)
-import Control.Monad.Identity (Identity)
 import Control.Monad.State (StateT)
 import Control.Monad.Writer (WriterT)
 import qualified Data.HashMap.Strict as M

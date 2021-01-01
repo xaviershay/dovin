@@ -3,17 +3,15 @@
 module Dovin.Helpers where
 
 import Dovin.Types
-import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Matchers
 import Dovin.Effects (resolveEffects)
 
-import Data.List (sort, sortOn)
+import Data.List (sort)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
-import Control.Lens (_1, ASetter, _Just)
-import Control.Monad.State (get)
-import Control.Monad.Reader (ask, runReader)
+import Control.Lens (ASetter, _Just)
+import Control.Monad.Reader (ask)
 
 import Text.Parsec
 
