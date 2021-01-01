@@ -27,6 +27,7 @@ module Dovin.Builder (
   , withCMC
   , withEffect
   , withEffectV3
+  , withEffectWhen
   , withLocation
   , withPlusOneCounters
   , withMinusOneCounters
@@ -40,7 +41,7 @@ import qualified Data.Set as S
 import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Helpers (resolveEffects, getTimestamp, matchNone)
+import Dovin.Helpers (resolveEffects, getTimestamp, matchNone, enabledInPlay)
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
@@ -118,13 +119,21 @@ withEffect applyCondition filter action =
 
 -- | Add an effect to the created card.
 withEffectV3 ::
+    EffectMonad CardMatcher
+ -> [LayeredEffectPart]
+ -> EffectName
+ -> GameMonad ()
+ -> GameMonad ()
+withEffectV3 = withEffectWhen enabledInPlay
+
+withEffectWhen ::
     EffectMonad Bool
  -> EffectMonad CardMatcher
  -> [LayeredEffectPart]
  -> EffectName
  -> GameMonad ()
  -> GameMonad ()
-withEffectV3 enabled appliesTo effect name =
+withEffectWhen enabled appliesTo effect name =
   local (over (envTemplate . cardPassiveEffects)
   (mkLayeredEffectPart combinedMatcher effect name:))
 
