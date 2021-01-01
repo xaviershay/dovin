@@ -1,5 +1,5 @@
 module Dovin
-  ( module Dovin.V2
+  ( module Dovin.V3
   ) where
 
-import Dovin.V2
+import Dovin.V3

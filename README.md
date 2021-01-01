@@ -30,12 +30,10 @@ module Solutions.Example where
 
 import Dovin
 
-main = run formatter solution
-
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 3
+    as Opponent $ setLife 3
 
     withLocation Hand $ addInstant "Plummet"
     withLocation Play $ do
@@ -46,9 +44,10 @@ solution = do
         withAttributes [flying, token] $ addCreature (4, 4) "Angel"
         withAttributes [flying]
           $ withEffect
-              matchInPlay
-              (matchOtherCreatures <> (const $ matchAttribute creature))
-              (pure . setAttribute hexproof)
+              (matchOtherCreatures <$> askSelf)
+              [ effectAddAbility hexproof
+              ]
+              "Other creatures gain hexproof"
           $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
   step "Plummet to destroy Shalai" $ do

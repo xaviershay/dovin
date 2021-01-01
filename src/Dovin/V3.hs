@@ -24,3 +24,15 @@ module Dovin.V3
 import Dovin.V2 hiding (withEffect, cardStrengthModifier)
 import Dovin.Builder (withEffect)
 import Dovin.Effects
+  ( effectPTSet
+  , effectPTSetF
+  , effectPTAdjust
+  , effectPTAdjustF
+  , effectAddAbility
+  , effectNoAbilities
+  , effectAddType
+  , enabledInPlay
+  , viewSelf
+  , askSelf
+  )
+

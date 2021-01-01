@@ -1,10 +1,17 @@
 {-# LANGUAGE TemplateHaskell #-}
+
+{-|
+Effects are continuous effects, such as "other creatures get +1/+1".
+
+They are typically added to a card using 'Dovin.Builder.withEffect' or 'Dovin.Actions.addEffect'.
+ -}
 module Dovin.Effects
   ( effectPTSet
   , effectPTSetF
   , effectPTAdjust
   , effectPTAdjustF
   , effectNoAbilities
+  , effectAddAbility
   , effectAddType
 
   , resolveEffects
@@ -37,61 +44,50 @@ data PileEntry = PileEntry
   }
 makeLenses ''PileEntry
 
--- EFFECT BUILDERS
---
--- These create 'LayeredEffectPart', to be used in effect definitions.
+-- | Constant variant of 'effectPTSetF'.
 effectPTSet :: (Int, Int) -> LayeredEffectPart
 effectPTSet = effectPTSetF . const . pure
 
+-- | Layer 7B effect to set the power and toughness of a creature.
 effectPTSetF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
 effectPTSetF f = LayeredEffectPart Layer7B $ \c -> do
                    pt <- f c
                    return $ set cardStrength (mkStrength pt) c
 
+-- | Constant variant of 'effectPTAdjustF'
 effectPTAdjust :: (Int, Int) -> LayeredEffectPart
 effectPTAdjust = effectPTAdjustF . const . pure
 
+-- | Layer 7C effect to adjust the power and toughness of a creature.
 effectPTAdjustF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
 effectPTAdjustF f = LayeredEffectPart Layer7C $ \c -> do
                    pt <- f c
                    return $ over cardStrength (mkStrength pt <>) c
 
+-- | Layer 6 effect to add an ability to a card. In practice, it adds adds a
+-- new 'CardAttribute'.
+effectAddAbility attr = LayeredEffectPart Layer6 (pure . over cardAttributes (S.insert attr))
+
+-- | Layer 6 effect to remove all abilities from a card. This doesn't
+-- temporary abilities added by 'addEffect'.
 effectNoAbilities = LayeredEffectPart Layer6 (pure . set cardPassiveEffects mempty)
 
+-- | Layer 4 effect to add a type to a card. Since card types are modeled
+-- explicitly, it instead adds a new 'CardAttribute'.
 effectAddType attr = LayeredEffectPart Layer4 (pure . over cardAttributes (S.insert attr))
 
--- EFFECT DEFINITION HELPERS
+-- | Effect enabled definition to apply when a card is in play.
 enabledInPlay :: EffectMonad Bool
 enabledInPlay = applyMatcher matchInPlay <$> askSelf
 
+-- | The card that is generating the effect being applied.
 askSelf :: EffectMonad Card
 askSelf = snd <$> ask
 
+-- | Apply a lens to 'askSelf'.
 viewSelf x = view x <$> askSelf
 
--- Unlike the previous effects system, V3 attempts to better mirror the
--- layering rules while also providing a more flexible API to create more types
--- of effects. Some notable constraints this requires solving for include:
---
--- * The set of cards an effect applies to needs to be fixed in the first layer
---   in which the effect would apply.
--- * Layers can create or remove effects in higher layers (e.g. removing all
---   abilities in layer 6). This means it is not possible to know all effects
---   that will be applied at the start of the algorithm, effects need to be
---   collected layer by layer.
---
--- This algorithm uses the concept of a "pile" of unapplied effects, that is
--- both added to and reduced at each layer.
---
--- 1. For every layer, all cards are checked for effects that would start
---    applying on that layer, and all parts of that effect are added to the
---    pile - alongside the set of cards to apply to. For example, "all
---    creatures are 0/1 and have no abilities" applies on both layers 6 and 7B
---    and it will be added to the pile when evaluating layer 6.
--- 2. All sub-effects that apply to the current layer are removed from the pile
---    and evaluated in timestamp order. (Note: dependencies are not implemented
---    yet.)
--- 3. After the final layer, the pile should be empty.
+-- | Internal algorithm to apply re-calculate the state of the board by applying all effects.
 resolveEffects :: GameMonad ()
 resolveEffects = do
   -- This just happens to be a convenient place to bump the timestamp. SBE
@@ -107,6 +103,30 @@ resetCards board = set resolvedCards (M.map unwrap . view cards $ board) board
   where
     unwrap (BaseCard card) = card
 
+-- Unlike the previous effects system, V3 attempts to better mirror the
+-- layering rules while also providing a more flexible API to create more
+-- types of effects. Some notable constraints this requires solving for
+-- include:
+--
+-- * The set of cards an effect applies to needs to be fixed in the first
+--   layer in which the effect would apply.
+-- * Layers can create or remove effects in higher layers (e.g. removing all
+--   abilities in layer 6). This means it is not possible to know all effects
+--   that will be applied at the start of the algorithm, effects need to be
+--   collected layer by layer.
+--
+-- This algorithm uses the concept of a "pile" of unapplied effects, that is
+-- both added to and reduced at each layer.
+--
+-- 1. For every layer, all cards are checked for effects that would start
+--    applying on that layer, and all parts of that effect are added to the
+--    pile - alongside the set of cards to apply to. For example, "all
+--    creatures are 0/1 and have no abilities" applies on both layers 6 and
+--    7B and it will be added to the pile when evaluating layer 6.
+-- 2. All sub-effects that apply to the current layer are removed from the
+--    pile and evaluated in timestamp order. (Note: dependencies are not
+--    implemented yet.)
+-- 3. After the final layer, the pile should be empty.
 applyEffects :: Board -> Board
 applyEffects board =
   let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers in
