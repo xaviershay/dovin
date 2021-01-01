@@ -33,6 +33,7 @@ module Dovin.Builder (
   ) where
 
 import Control.Monad.Reader (ask, local)
+import Control.Monad.Identity (Identity)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
@@ -109,7 +110,7 @@ withEffect ::
               -- apply. 'matchInPlay' is a typical value.
  -> (Card -> CardMatcher) -- ^ Given the current card, return a matcher that
                           -- matches cards that this affect applies to.
- -> (Card -> GameMonad Card) -- ^ Apply an effect to the given card.
+ -> (Card -> Identity Card) -- ^ Apply an effect to the given card.
  -> GameMonad ()
  -> GameMonad ()
 withEffect applyCondition filter action =

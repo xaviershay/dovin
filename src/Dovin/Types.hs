@@ -5,6 +5,7 @@ module Dovin.Types where
 
 import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non, set)
 import Control.Monad.Reader (ReaderT, Reader, ask)
+import Control.Monad.Identity (runIdentity)
 import Control.Monad.Except (ExceptT)
 import Control.Monad.Identity (Identity)
 import Control.Monad.State (StateT)
@@ -83,6 +84,11 @@ askSelf = snd <$> ask
 
 viewSelf x = view x <$> askSelf
 
+mkEffect ::
+  CardMatcher
+  -> (Card -> CardMatcher)
+  -> (Card -> Identity Card)
+  -> CardEffect
 mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
   -- matcher.
@@ -91,7 +97,7 @@ mkEffect enabled filter action = CardEffect
   -- card is affected by it.
   , _effectFilter = filter
   -- The action to apply to affected cards.
-  , _effectAction = action
+  , _effectAction = return . runIdentity . action
   }
 
 mkLayeredEffectPart enabled appliesTo effect name = LayeredEffectDefinition
