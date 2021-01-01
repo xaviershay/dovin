@@ -99,6 +99,3 @@ gameFinished = do
 
 getTimestamp :: GameMonad Timestamp
 getTimestamp = use currentTime
-
-askCards :: CardMatcher -> EffectMonad [Card]
-askCards matcher = filter (applyMatcher matcher) . map snd . M.toList . view resolvedCards . fst <$> ask

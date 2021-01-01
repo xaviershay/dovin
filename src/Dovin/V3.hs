@@ -34,5 +34,6 @@ import Dovin.Effects
   , enabledInPlay
   , viewSelf
   , askSelf
+  , askCards
   )
 

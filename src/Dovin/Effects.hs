@@ -19,6 +19,7 @@ module Dovin.Effects
   , enabledInPlay
 
   , viewSelf
+  , askCards
   , askSelf
   )
   where
@@ -86,6 +87,15 @@ askSelf = snd <$> ask
 
 -- | Apply a lens to 'askSelf'.
 viewSelf x = view x <$> askSelf
+
+-- | Return cards fitting the given matcher.
+askCards :: CardMatcher -> EffectMonad [Card]
+askCards matcher =
+  filter (applyMatcher matcher)
+  . M.elems
+  . view resolvedCards
+  . fst
+  <$> ask
 
 -- | Internal algorithm to apply re-calculate the state of the board by applying all effects.
 resolveEffects :: GameMonad ()
