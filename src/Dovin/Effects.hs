@@ -2,8 +2,8 @@
 module Dovin.Effects
   ( effectPTSet
   , effectPTSetF
-  , effectPTAdjustment
-  , effectPTAdjustmentF
+  , effectPTAdjust
+  , effectPTAdjustF
   , effectNoAbilities
   , effectAddType
 
@@ -48,11 +48,11 @@ effectPTSetF f = LayeredEffectPart Layer7B $ \c -> do
                    pt <- f c
                    return $ set cardStrength (mkStrength pt) c
 
-effectPTAdjustment :: (Int, Int) -> LayeredEffectPart
-effectPTAdjustment = effectPTAdjustmentF . const . pure
+effectPTAdjust :: (Int, Int) -> LayeredEffectPart
+effectPTAdjust = effectPTAdjustF . const . pure
 
-effectPTAdjustmentF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
-effectPTAdjustmentF f = LayeredEffectPart Layer7C $ \c -> do
+effectPTAdjustF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
+effectPTAdjustF f = LayeredEffectPart Layer7C $ \c -> do
                    pt <- f c
                    return $ over cardStrength (mkStrength pt <>) c
 
@@ -156,7 +156,7 @@ resolveCounters board =
           if p == 0 && t == 0 then
             Nothing
           else
-            Just $ effectPTAdjustment (p, t)
+            Just $ effectPTAdjust (p, t)
 
         dup x = (x, x)
 

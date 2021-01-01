@@ -37,7 +37,7 @@ solution = do
             return $ length dinos > 0
           )
           (matchCard <$> askSelf)
-          [ effectPTAdjustment (2, 2)
+          [ effectPTAdjust (2, 2)
           ]
           "+2/+2 so long as you control another dinosaur"
             $ addCreature (1, 1) "Drover of the Mighty"
@@ -86,7 +86,7 @@ solution = do
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        addEffect (effectPTAdjustment (-1, -1)) cn
+        addEffect (effectPTAdjust (-1, -1)) cn
 
     validate (matchLocation (Opponent, Graveyard)) "Drover of the Mighty"
 
@@ -104,7 +104,7 @@ solution = do
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        addEffect (effectPTAdjustment (-1, -1)) cn
+        addEffect (effectPTAdjust (-1, -1)) cn
 
     -- Active player triggers stack first
     validate (matchLocation (Active, Graveyard)) "Merfolk Trickster"
@@ -127,14 +127,14 @@ solution = do
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        addEffect (effectPTAdjustment (-1, -1)) cn
+        addEffect (effectPTAdjust (-1, -1)) cn
 
   step "Resolve -1/-1 for Trickster" $ do
     resolve "-1/-1 Trickster"
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        addEffect (effectPTAdjustment (-1, -1)) cn
+        addEffect (effectPTAdjust (-1, -1)) cn
 
   step "Return Trickster to play from Ghostform, targeting God-Eternal" $ do
     moveTo Play "Merfolk Trickster"

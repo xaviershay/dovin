@@ -9,7 +9,7 @@ some new card properties.
    play).
 * `withCMC` to set converted mana cost on cards.
 * `addEffect` to apply an effect to a card. In combination with
-  `effectPTAdjustment` this replaces altering `cardStrengthModifier` directly,
+  `effectPTAdjust` this replaces altering `cardStrengthModifier` directly,
   which is now removed.
 * Added a suite of `effect*` builders for effects.
 -}

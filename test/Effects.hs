@@ -23,7 +23,7 @@ test_Effects = testGroup "V3 effects" $
           withAttribute sliver $
             withEffect
               (pure $ matchAttribute sliver <> matchInPlay)
-              [ effectPTAdjustmentF . const $ do
+              [ effectPTAdjustF . const $ do
                   self <- askSelf
                   slivers <- length <$> askCards (
                                              matchAttribute sliver
@@ -75,7 +75,7 @@ test_Effects = testGroup "V3 effects" $
               return $ length dinos > 0
             )
             (matchCard <$> askSelf)
-            [ effectPTAdjustment (2, 2)
+            [ effectPTAdjust (2, 2)
             ]
             "+2/+2 so long as you control another dinosaur"
               $ addCreature (1, 1) "Drover of the Mighty"
@@ -101,7 +101,7 @@ test_Effects = testGroup "V3 effects" $
     --          ts <- viewSelf cardTargets
     --          return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
     --        )
-    --        [ effectPTAdjustment (3, 3)
+    --        [ effectPTAdjust (3, 3)
     --        , effectProtectionF (
     --            const $ do
     --              --owner <- viewSelf cardOwner
