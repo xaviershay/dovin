@@ -1,10 +1,10 @@
 name:                dovin
-version:             0.3
+version:             3.0
 github:              "xaviershay/dovin"
 license:             BSD3
 author:              "Xavier Shay"
 maintainer:          "contact@xaviershay.com"
-copyright:           "2019 Xavier Shay"
+copyright:           "2021 Xavier Shay"
 
 extra-source-files:
 - README.md
