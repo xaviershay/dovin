@@ -1,12 +1,12 @@
 module Effects where
 
-import TestPrelude.V2
+import TestPrelude.V3
 
 test_Effects = testGroup "V3 effects" $
   [ testGroup "assorted cards"
     [ prove "Effects only apply when enabled" $ do
         withLocation Hand $ do
-          withEffectV3
+          withEffect
             (pure $ matchAttribute creature)
             [ effectPTSet (1, 1)
             ]
@@ -21,7 +21,7 @@ test_Effects = testGroup "V3 effects" $
         let sliver = "sliver"
         withLocation Play $ do
           withAttribute sliver $
-            withEffectV3
+            withEffect
               (pure $ matchAttribute sliver <> matchInPlay)
               [ effectPTAdjustmentF . const $ do
                   self <- askSelf
@@ -96,7 +96,7 @@ test_Effects = testGroup "V3 effects" $
 
     , prove "Commander's Plate" $ do
         withLocation Play $
-          withEffectV3
+          withEffect
             (do
               ts <- viewSelf cardTargets
               return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
@@ -123,7 +123,7 @@ test_Effects = testGroup "V3 effects" $
     [ prove "Humble & Godhead of Awe" $ do
         withLocation Play $ do
           addCreature (2, 2) "Grizzly Bear"
-          withEffectV3
+          withEffect
             (matchOtherCreatures <$> askSelf)
             [ effectPTSet (1, 1)
             ]
@@ -144,7 +144,7 @@ test_Effects = testGroup "V3 effects" $
             throwError "Did not remove ability"
     , prove "Humility & Opalescence" $ do
         withLocation Play $ do
-          withCMC 4 $ withEffectV3
+          withCMC 4 $ withEffect
             (pure $ matchAttribute creature)
             [ effectPTSet (0, 1)
             , effectNoAbilities
@@ -152,7 +152,7 @@ test_Effects = testGroup "V3 effects" $
             "Each creature loses all abilities and is 0/1" $
               addEnchantment "Humility"
 
-          withCMC 4 $ withEffectV3
+          withCMC 4 $ withEffect
             (matchOther enchantment <$> askSelf)
             [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc))
             , effectType creature
@@ -166,14 +166,14 @@ test_Effects = testGroup "V3 effects" $
             throwError "Did not make Humility a 4/4"
     , prove "Opalescence & Humility" $ do
         withLocation Play $ do
-          withCMC 4 $ withEffectV3
+          withCMC 4 $ withEffect
             (matchOther enchantment <$> askSelf)
             [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectType creature
             ]
             "Other enchanments are creatures with P/T equal to CMC" $
               addEnchantment "Opalescence"
 
-          withCMC 4 $ withEffectV3
+          withCMC 4 $ withEffect
            (pure $ matchAttribute creature)
            [ effectPTSet (0, 1)
            , effectNoAbilities

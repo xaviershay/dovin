@@ -26,7 +26,6 @@ module Dovin.Builder (
   , withAttributes
   , withCMC
   , withEffect
-  , withEffectV3
   , withEffectWhen
   , withLocation
   , withPlusOneCounters
@@ -105,32 +104,23 @@ withAttributes attrs =
   local (over (envTemplate . cardAttributes) f
        . over (envTemplate . cardDefaultAttributes) f)
 
--- | Add an effect to the created card.
+-- | Add an effect to the created card. The effect will only apply when the
+-- card is in play.
 withEffect ::
-  CardMatcher -- ^ A matcher that must apply to this card for this affect to
-              -- apply. 'matchInPlay' is a typical value.
- -> (Card -> CardMatcher) -- ^ Given the current card, return a matcher that
-                          -- matches cards that this affect applies to.
- -> (Card -> Identity Card) -- ^ Apply an effect to the given card.
+    EffectMonad CardMatcher -- ^ The set of cards to apply the effect to
+ -> [LayeredEffectPart]     -- ^ The effect to apply
+ -> EffectName              -- ^ Human-readable description, cosmetic only.
  -> GameMonad ()
  -> GameMonad ()
-withEffect applyCondition filter action =
-  local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
+withEffect = withEffectWhen enabledInPlay
 
--- | Add an effect to the created card.
-withEffectV3 ::
-    EffectMonad CardMatcher
- -> [LayeredEffectPart]
- -> EffectName
- -> GameMonad ()
- -> GameMonad ()
-withEffectV3 = withEffectWhen enabledInPlay
-
+-- | A more flexible version of 'withEffect' that allows customization of then
+-- the effect should apply.
 withEffectWhen ::
-    EffectMonad Bool
- -> EffectMonad CardMatcher
- -> [LayeredEffectPart]
- -> EffectName
+    EffectMonad Bool        -- ^ Effect only applies when this returns true
+ -> EffectMonad CardMatcher -- ^ The set of cards to apply the effect to
+ -> [LayeredEffectPart]     -- ^ The effect to apply
+ -> EffectName              -- ^ Human-readable description, cosmetic only.
  -> GameMonad ()
  -> GameMonad ()
 withEffectWhen enabled appliesTo effect name =
@@ -147,10 +137,12 @@ withEffectWhen enabled appliesTo effect name =
       else
         return matchNone
 
+-- | Set the converted mana cost of the created card.
 withCMC :: Int -> GameMonad () -> GameMonad ()
 withCMC n =
   local (set (envTemplate . cardCmc) n)
 
+-- | Place the created card into a specific location.
 withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   p <- view envActor

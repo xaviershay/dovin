@@ -12,13 +12,14 @@ module Dovin.V1
   , activate
   , trigger
   , fork
+  , withEffect
   ) where
 
 import Dovin.Runner
 import Dovin.Actions hiding (validate, validateLife, activate, trigger, fork)
 import qualified Dovin.Actions
 import Dovin.Attributes
-import Dovin.Builder hiding (withLocation)
+import Dovin.Builder hiding (withLocation, withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
@@ -27,7 +28,8 @@ import Dovin.Types
 import Control.Monad (forM_)
 import Control.Monad.State (put, get)
 import Control.Monad.Reader (local)
-import Control.Lens (set, view)
+import Control.Lens (set, view, over)
+import Control.Monad.Identity (Identity)
 
 -- | Validate that a card matches a matcher.
 --
@@ -79,4 +81,16 @@ fork options = do
   forM_ options $ \m -> do
     m
     put $ set currentStep cs b
+
+-- | Add an effect to the created card.
+withEffect ::
+  CardMatcher -- ^ A matcher that must apply to this card for this affect to
+              -- apply. 'matchInPlay' is a typical value.
+ -> (Card -> CardMatcher) -- ^ Given the current card, return a matcher that
+                          -- matches cards that this affect applies to.
+ -> (Card -> Identity Card) -- ^ Apply an effect to the given card.
+ -> GameMonad ()
+ -> GameMonad ()
+withEffect applyCondition filter action =
+  local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
 

@@ -19,15 +19,17 @@ module Dovin.V2
   , module Dovin.Helpers
   , module Dovin.Types
   , view
+  , withEffect
   )
   where
 
 import Dovin.Runner
 import Dovin.Actions
 import qualified Dovin.V1
+import Dovin.V1 (withEffect)
 import Dovin.Prelude
 import Dovin.Attributes
-import Dovin.Builder
+import Dovin.Builder hiding (withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
