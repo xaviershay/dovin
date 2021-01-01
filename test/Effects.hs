@@ -92,31 +92,6 @@ test_Effects = testGroup "V3 effects" $
 
         unless (view cardStrength c == mkStrength (3, 3)) $
           throwError "Should be a 3/3"
-
-
-    --, prove "Commander's Plate" $ do
-    --    withLocation Play $
-    --      withEffect
-    --        (do
-    --          ts <- viewSelf cardTargets
-    --          return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
-    --        )
-    --        [ effectPTAdjust (3, 3)
-    --        , effectProtectionF (
-    --            const $ do
-    --              --owner <- viewSelf cardOwner
-    --              commanders <- askCards $ matchAttribute "commander" -- <> matchOwner owner
-
-    --              -- TODO: Need to invert color list!
-    --              let colors =   foldr (<>) mempty
-    --                           . map (view cardColors)
-    --                           $ commanders
-
-    --              return colors
-    --          )
-    --          ]
-    --        "+3/+3 and pro commander colors" $
-    --          addArtifact "Commander's Plate"
     ]
   -- https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
   , testGroup "effects (magic judges examples)"
