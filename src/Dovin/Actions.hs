@@ -1257,6 +1257,16 @@ setLife n = do
   actor <- view envActor
   assign (life . at actor) (Just n)
 
+-- | Adds an "until end of turn" effect to a card. Note in practice, since
+-- turns aren't modeled, the effect will stay around until the end of the
+-- solution.
+--
+-- > addEffect (effectPTSet 1 1) "Soldier"
+--
+-- [Effects]
+--
+--   * Adds a new "until end of turn" effect to the card with the current
+--   timestamp.
 addEffect :: LayeredEffectPart -> CardName -> GameMonad ()
 addEffect e cn = do
   card <- requireCard cn mempty
