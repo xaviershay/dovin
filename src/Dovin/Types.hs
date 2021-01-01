@@ -36,6 +36,7 @@ data CardEffect = CardEffect
   , _effectAction :: Card -> GameMonad Card
   }
 
+-- A monad for writing effect definitions.
 type EffectMonad a = Reader (Board, Card) a
 
 -- These layers line up to those specified in the official rules (613).
@@ -77,10 +78,6 @@ data LayeredEffectDefinition = LayeredEffectDefinition
   , _leName :: EffectName
   }
 
-askSelf :: EffectMonad Card
-askSelf = snd <$> ask
-
-viewSelf x = view x <$> askSelf
 
 mkEffect ::
   CardMatcher
@@ -335,36 +332,3 @@ emptyBoard = Board
                , _currentTime = 0
                }
 
-effectPTSet :: (Int, Int) -> LayeredEffectPart
-effectPTSet = effectPTSetF . const . pure
-
-effectPTSetF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
-effectPTSetF f = LayeredEffectPart Layer7B $ \c -> do
-                   pt <- f c
-                   return $ set cardStrength (mkStrength pt) c
-
-effectPTAdjustment :: (Int, Int) -> LayeredEffectPart
-effectPTAdjustment = effectPTAdjustmentF . const . pure
-
-effectPTAdjustmentF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
-effectPTAdjustmentF f = LayeredEffectPart Layer7C $ \c -> do
-                   pt <- f c
-                   return $ over cardStrength (mkStrength pt <>) c
-
-effectNoAbilities = LayeredEffectPart Layer6 (pure . set cardPassiveEffects mempty)
-
-effectType attr = LayeredEffectPart Layer4 (pure . over cardAttributes (S.insert attr))
-
-effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffectPart
-effectProtectionF f = LayeredEffectPart Layer6 $ \c -> do
-                        colors <- f c
-                        return c -- TODO
-
-type Pile = [PileEntry]
-data PileEntry = PileEntry
-  { _peSource :: Card
-  , _peTimestamp :: Timestamp
-  , _peEffect :: [LayeredEffectPart]
-  , _peAppliesTo :: [CardName]
-  }
-makeLenses ''PileEntry

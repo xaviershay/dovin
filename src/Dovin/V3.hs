@@ -16,8 +16,10 @@ some new card properties.
 module Dovin.V3
   ( module Dovin.V2
   , module Dovin.Builder
+  , module Dovin.Effects
   )
   where
 
 import Dovin.V2 hiding (withEffect, cardStrengthModifier)
 import Dovin.Builder (withEffect)
+import Dovin.Effects

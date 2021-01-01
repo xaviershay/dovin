@@ -94,29 +94,29 @@ test_Effects = testGroup "V3 effects" $
           throwError "Should be a 3/3"
 
 
-    , prove "Commander's Plate" $ do
-        withLocation Play $
-          withEffect
-            (do
-              ts <- viewSelf cardTargets
-              return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
-            )
-            [ effectPTAdjustment (3, 3)
-            , effectProtectionF (
-                const $ do
-                  --owner <- viewSelf cardOwner
-                  commanders <- askCards $ matchAttribute "commander" -- <> matchOwner owner
+    --, prove "Commander's Plate" $ do
+    --    withLocation Play $
+    --      withEffect
+    --        (do
+    --          ts <- viewSelf cardTargets
+    --          return $ foldl (\a v -> a `matchOr` (matchTarget v)) mempty ts
+    --        )
+    --        [ effectPTAdjustment (3, 3)
+    --        , effectProtectionF (
+    --            const $ do
+    --              --owner <- viewSelf cardOwner
+    --              commanders <- askCards $ matchAttribute "commander" -- <> matchOwner owner
 
-                  -- TODO: Need to invert color list!
-                  let colors =   foldr (<>) mempty
-                               . map (view cardColors)
-                               $ commanders
+    --              -- TODO: Need to invert color list!
+    --              let colors =   foldr (<>) mempty
+    --                           . map (view cardColors)
+    --                           $ commanders
 
-                  return colors
-              )
-              ]
-            "+3/+3 and pro commander colors" $
-              addArtifact "Commander's Plate"
+    --              return colors
+    --          )
+    --          ]
+    --        "+3/+3 and pro commander colors" $
+    --          addArtifact "Commander's Plate"
     ]
   -- https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
   , testGroup "effects (magic judges examples)"
@@ -155,7 +155,7 @@ test_Effects = testGroup "V3 effects" $
           withCMC 4 $ withEffect
             (matchOther enchantment <$> askSelf)
             [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc))
-            , effectType creature
+            , effectAddType creature
             ]
             "Other enchanments are creatures with P/T equal to CMC" $
               addEnchantment "Opalescence"
@@ -168,7 +168,7 @@ test_Effects = testGroup "V3 effects" $
         withLocation Play $ do
           withCMC 4 $ withEffect
             (matchOther enchantment <$> askSelf)
-            [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectType creature
+            [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectAddType creature
             ]
             "Other enchanments are creatures with P/T equal to CMC" $
               addEnchantment "Opalescence"

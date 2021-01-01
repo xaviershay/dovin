@@ -18,6 +18,7 @@ module Dovin.V2
   , module Dovin.Formatting
   , module Dovin.Helpers
   , module Dovin.Types
+  , module Dovin.Matchers
   , view
   , withEffect
   )
@@ -33,6 +34,7 @@ import Dovin.Builder hiding (withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
+import Dovin.Matchers
 import Dovin.Types hiding
   ( cards
   , stack

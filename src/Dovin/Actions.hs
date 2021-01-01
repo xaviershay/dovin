@@ -77,6 +77,7 @@ import           Dovin.Prelude
 import           Dovin.Types
 import           Dovin.Builder
 import Dovin.Monad
+import Dovin.Matchers
 
 import qualified Data.HashMap.Strict as M
 import Data.Maybe (listToMaybe)

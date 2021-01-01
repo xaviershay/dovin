@@ -6,6 +6,7 @@ module Dovin.V1
   , module Dovin.Formatting
   , module Dovin.Helpers
   , module Dovin.Types
+  , module Dovin.Matchers
   , validate
   , validateLife
   , withLocation
@@ -24,6 +25,7 @@ import Dovin.Formatting
 import Dovin.Helpers
 import Dovin.Monad
 import Dovin.Types
+import Dovin.Matchers
 
 import Control.Monad (forM_)
 import Control.Monad.State (put, get)
