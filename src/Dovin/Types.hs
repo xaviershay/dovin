@@ -69,10 +69,8 @@ type LayeredEffect = [LayeredEffectPart]
 -- can generated different effects affecting different cards depending on the
 -- state of the board.
 data LayeredEffectDefinition = LayeredEffectDefinition
-  -- ^ Whether or not to apply this effect.
-  { _leEnabled :: EffectMonad Bool
   -- ^ Filter to determine which cards are affected by this effect, if enabled.
-  , _leAppliesTo :: EffectMonad CardMatcher
+  { _leAppliesTo :: EffectMonad CardMatcher
   -- ^ The actions to apply to affected cards.
   , _leEffect :: LayeredEffect
   -- ^ A human readable description of the effect. Optional.
@@ -100,9 +98,8 @@ mkEffect enabled filter action = CardEffect
   , _effectAction = return . runIdentity . action
   }
 
-mkLayeredEffectPart enabled appliesTo effect name = LayeredEffectDefinition
-  { _leEnabled = enabled
-  , _leAppliesTo = appliesTo
+mkLayeredEffectPart appliesTo effect name = LayeredEffectDefinition
+  { _leAppliesTo = appliesTo
   , _leEffect = effect
   , _leName = name
   }

@@ -40,7 +40,7 @@ import qualified Data.Set as S
 import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Helpers (resolveEffects, getTimestamp)
+import Dovin.Helpers (resolveEffects, getTimestamp, matchNone)
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
@@ -126,7 +126,17 @@ withEffectV3 ::
  -> GameMonad ()
 withEffectV3 enabled appliesTo effect name =
   local (over (envTemplate . cardPassiveEffects)
-  (mkLayeredEffectPart enabled appliesTo effect name:))
+  (mkLayeredEffectPart combinedMatcher effect name:))
+
+  where
+    combinedMatcher :: EffectMonad CardMatcher
+    combinedMatcher = do
+      isEnabled <- enabled
+
+      if isEnabled then
+        appliesTo
+      else
+        return matchNone
 
 withCMC :: Int -> GameMonad () -> GameMonad ()
 withCMC n =

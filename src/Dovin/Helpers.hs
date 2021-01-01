@@ -133,7 +133,6 @@ resolveLayer (board, pile) layer =
       let
         passiveEffects =
           map toPileEntry
-          . filter isEnabled
           . view cardPassiveEffects
           $ c
         abilityEffects =
@@ -154,9 +153,6 @@ resolveLayer (board, pile) layer =
 
       where
         extractLayer (LayeredEffectPart l _) = l
-
-        isEnabled :: LayeredEffectDefinition -> Bool
-        isEnabled ld = runReader (view leEnabled ld) (board, c)
 
         toPileEntry :: LayeredEffectDefinition -> PileEntry
         toPileEntry ld =
@@ -317,6 +313,8 @@ matchController player = CardMatcher ("has controller " <> show player) $
 
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
+
+matchNone = CardMatcher "never match" (const False)
 
 matchCard :: Card -> CardMatcher
 matchCard = matchName . view cardName
