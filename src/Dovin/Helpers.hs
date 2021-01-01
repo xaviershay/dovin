@@ -5,8 +5,8 @@ module Dovin.Helpers where
 import Dovin.Types
 import Dovin.Attributes
 import Dovin.Prelude
-import Dovin.Effects (resolveEffectsV3)
 import Dovin.Matchers
+import Dovin.Effects (resolveEffects)
 
 import Data.List (sort, sortOn)
 import qualified Data.HashMap.Strict as M
@@ -45,51 +45,6 @@ requireCard name f = do
         Right () -> return card
         Left msg ->
           throwError $ name <> " does not match requirements: " <> msg
-
-resolveEffects :: GameMonad ()
-resolveEffects = do
-  board <- get
-  cs <- resolveEffects' board
-  assign resolvedCards cs
-  modifying currentTime (+ 1)
-  resolveEffectsV3
-
-resolveEffects' :: Board -> GameMonad (M.HashMap CardName Card)
-resolveEffects' board = foldM f mempty (M.toList $ view cards board)
-  where
-    f a (cn, c) = do
-                    card <- applyEffects c
-                    return (M.insert cn card a)
-
-    applyEffects :: BaseCard -> GameMonad Card
-    applyEffects (BaseCard card) = do
-      cs <- map unwrap . M.elems <$> use cards
-
-      let allEffects =
-            concatMap
-              (\c -> map (\e -> (e, c)) . view cardEffects $ c)
-              cs
-
-      let enabledEffects =
-            filter
-              (\(e, c) -> applyMatcher (view effectEnabled e) c)
-              allEffects
-
-      let applicableEffects =
-            filter
-              (\(e, c) -> applyMatcher (view effectFilter e c) card)
-              enabledEffects
-
-      card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
-
-      return card'
-
-      where
-        applyEffect2 :: Card -> CardEffect -> GameMonad Card
-        applyEffect2 card e = view effectAction e card
-
-        unwrap :: BaseCard -> Card
-        unwrap (BaseCard card) = card
 
 allCards :: GameMonad [Card]
 allCards = M.elems <$> use resolvedCards

@@ -40,9 +40,9 @@ import qualified Data.Set as S
 import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Helpers (resolveEffects, getTimestamp)
+import Dovin.Helpers (getTimestamp)
 import Dovin.Matchers (matchNone)
-import Dovin.Effects (enabledInPlay)
+import Dovin.Effects (resolveEffects, enabledInPlay)
 
 addCard :: CardName -> GameMonad ()
 addCard name = do

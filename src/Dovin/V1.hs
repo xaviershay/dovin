@@ -23,15 +23,15 @@ import Dovin.Attributes
 import Dovin.Builder hiding (withLocation, withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
-import Dovin.Monad
 import Dovin.Types
 import Dovin.Matchers
+import Dovin.Effects (askSelf)
 
 import Control.Monad (forM_)
 import Control.Monad.State (put, get)
 import Control.Monad.Reader (local)
-import Control.Lens (set, view, over)
-import Control.Monad.Identity (Identity)
+import Control.Lens (set, view)
+import Control.Monad.Identity (Identity, runIdentity)
 
 -- | Validate that a card matches a matcher.
 --
@@ -93,6 +93,10 @@ withEffect ::
  -> (Card -> Identity Card) -- ^ Apply an effect to the given card.
  -> GameMonad ()
  -> GameMonad ()
-withEffect applyCondition filter action =
-  local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
+withEffect applyCondition matcher action = do
+  let applyConditionV3 = applyMatcher applyCondition <$> askSelf
+  let matcherV3 = matcher <$> askSelf
+  let actionV3 = [LayeredEffectPart LayerOther (pure . runIdentity . action)]
+  let name = "legacy V2 effect"
 
+  withEffectWhen applyConditionV3 matcherV3 actionV3 name

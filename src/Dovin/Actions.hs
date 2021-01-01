@@ -76,8 +76,9 @@ import           Dovin.Helpers
 import           Dovin.Prelude
 import           Dovin.Types
 import           Dovin.Builder
-import Dovin.Monad
-import Dovin.Matchers
+import           Dovin.Monad
+import           Dovin.Matchers
+import           Dovin.Effects (resolveEffects)
 
 import qualified Data.HashMap.Strict as M
 import Data.Maybe (listToMaybe)

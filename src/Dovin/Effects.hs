@@ -7,7 +7,7 @@ module Dovin.Effects
   , effectNoAbilities
   , effectAddType
 
-  , resolveEffectsV3
+  , resolveEffects
 
   , enabledInPlay
 
@@ -24,7 +24,7 @@ import Control.Lens (makeLenses, over, view, set)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Control.Monad.Reader (ask, runReader)
-import Control.Monad.State (get)
+import Control.Monad.State (modify')
 import Data.Maybe (mapMaybe, catMaybes)
 import Data.List (sortOn)
 
@@ -92,25 +92,32 @@ viewSelf x = view x <$> askSelf
 --    and evaluated in timestamp order. (Note: dependencies are not implemented
 --    yet.)
 -- 3. After the final layer, the pile should be empty.
-resolveEffectsV3 :: GameMonad ()
-resolveEffectsV3 = do
-  -- Convert counters to effects
-  modifying id resolveCounters
-  board <- get
-  cs <- resolveEffectsV3' board
-  assign resolvedCards cs
+resolveEffects :: GameMonad ()
+resolveEffects = do
+  -- This just happens to be a convenient place to bump the timestamp. SBE
+  -- handling might be a better spot though.
+  modifying currentTime (+ 1)
 
+  modify' resetCards
+  modify' resolveCounters
+  modify' applyEffects
+
+resetCards :: Board -> Board
+resetCards board = set resolvedCards (M.map unwrap . view cards $ board) board
   where
-    resolveEffectsV3' :: Board -> GameMonad (M.HashMap CardName Card)
-    resolveEffectsV3' board = do
-      let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers
+    unwrap (BaseCard card) = card
 
-      unless (null pile) $ throwError "assertion failed: pile should be empty"
+applyEffects :: Board -> Board
+applyEffects board =
+  let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers in
 
-      return $ view resolvedCards newBoard
+  if null pile then
+    newBoard
+  else
+    error "assertion failed: pile should be empty"
 
 -- Convert card counters and legacy strength modifiers into V3 effects. Note
--- that counter timestamps are not implemented, card timestamps are used
+-- that since counter timestamps are not implemented, card timestamps are used
 -- instead.
 resolveCounters :: Board -> Board
 resolveCounters board =
@@ -131,7 +138,7 @@ resolveCounters board =
             . map (\f -> f card)
             $ [ mkPTEffect . dup . view cardPlusOneCounters
               , mkPTEffect . dup . view cardMinusOneCounters
-              , mkPTEffect . toTuple .view cardStrengthModifier
+              , mkPTEffect . toTuple . view cardStrengthModifier
               ]
       in
 
