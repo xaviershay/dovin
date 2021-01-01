@@ -26,14 +26,11 @@ module Dovin.V2
 
 import Dovin.Runner
 import Dovin.Actions
-import qualified Dovin.V1
 import Dovin.V1 (withEffect)
-import Dovin.Prelude
 import Dovin.Attributes
 import Dovin.Builder hiding (withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
-import Dovin.Monad
 import Dovin.Matchers
 import Dovin.Types hiding
   ( cards

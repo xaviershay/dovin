@@ -117,7 +117,7 @@ test_Effects = testGroup "V3 effects" $
         withLocation Play $ do
           withCMC 4 $ withEffect
             (matchOther enchantment <$> askSelf)
-            [ effectPTSetF (\c -> let cmc = view cardCmc c inreturn (cmc, cmc))
+            [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc))
             , effectAddType creature
             ]
             "Other enchanments are creatures with P/T equal to CMC" $
