@@ -141,6 +141,7 @@ data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffectPart]
 data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
+  , _cardOwner :: Player
   , _cardDefaultAttributes :: CardAttributes
   , _cardAttributes :: CardAttributes
   , _cardStrength :: CardStrength
@@ -201,6 +202,7 @@ data Env = Env
   { _envTemplate :: Card
   , _envSBAEnabled :: Bool
   , _envActor :: Player
+  , _envOwner :: Maybe Player
   }
 
 type StepIdentifier = (Maybe String, Int)
@@ -238,9 +240,6 @@ mkStep id label state = Step
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
 cardLocation = location
-
-cardOwner :: Control.Lens.Lens' Card Player
-cardOwner = cardLocation . _1
 
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
@@ -289,6 +288,7 @@ emptyEnv = Env
   { _envTemplate = emptyCard
   , _envSBAEnabled = True
   , _envActor = Active
+  , _envOwner = Nothing
   }
 
 mkStrength (p, t) = CardStrength p t
@@ -297,6 +297,7 @@ mkCard name location =
   Card
     { _cardName = name
     , _location = location
+    , _cardOwner = fst location
     , _cardDefaultAttributes = mempty
     , _cardColors = mempty
     , _cardAttributes = mempty

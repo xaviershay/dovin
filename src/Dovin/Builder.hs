@@ -28,6 +28,7 @@ module Dovin.Builder (
   , withEffect
   , withEffectWhen
   , withLocation
+  , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
   ) where
@@ -40,6 +41,7 @@ import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
 import Control.Monad.Reader (local)
+import Control.Lens (_1)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
@@ -52,7 +54,12 @@ addCard name = do
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
-      modifying cards (M.insert name (BaseCard $ set cardName name . set cardTimestamp now $ template))
+      owner <- view envOwner
+      modifying cards (M.insert name (BaseCard
+        $ set cardName name
+        . set cardTimestamp now
+        . set cardOwner (maybe (view (cardLocation . _1) template) id owner)
+        $ template))
       resolveEffects
 
 addAura :: CardName -> GameMonad ()
@@ -149,6 +156,11 @@ withLocation loc m = do
   p <- view envActor
 
   local (set (envTemplate . cardLocation) (p, loc)) m
+
+-- | Set the owner for the created card. If not specified, it will default to
+-- the owner of the card location.
+withOwner :: Player -> GameMonad () -> GameMonad ()
+withOwner owner = local (set envOwner (Just owner))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

@@ -1,7 +1,6 @@
 module Solutions.WarOfTheSpark2 where
 
 import Dovin.V3
-import Dovin.Prelude
 
 dinosaur = "dinosaur"
 

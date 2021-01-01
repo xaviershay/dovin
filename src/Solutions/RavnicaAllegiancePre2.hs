@@ -1,11 +1,6 @@
 module Solutions.RavnicaAllegiancePre2 where
 
 import Dovin.V2
-import Dovin.Prelude
-
-import Data.List (delete)
-import Control.Lens
-import Debug.Trace
 
 solution :: GameMonad ()
 solution = do

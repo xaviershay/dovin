@@ -12,6 +12,7 @@ some new card properties.
   `effectPTAdjust` this replaces altering `cardStrengthModifier` directly,
   which is now removed.
 * Added a suite of `effect*` builders for effects.
+* Added `cardOwner` property to cards, and `withOwner` fluid builder to set it.
 -}
 module Dovin.V3
   ( module Dovin.V2
