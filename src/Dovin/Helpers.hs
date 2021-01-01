@@ -82,19 +82,7 @@ resolveEffects' board = foldM f mempty (M.toList $ view cards board)
 
       card' <- foldM (\c (e, _) -> applyEffect2 c e) card applicableEffects
 
-      -- TODO: Should be handled in Layer7C in V3 effects system
-      let plusModifier = let n = view cardPlusOneCounters card' in
-                              mkStrength (n, n)
-      let minusModifier = let n = view cardMinusOneCounters card' in
-                              mkStrength (-n, -n)
-
-      let strengthModifier = view cardStrengthModifier card'
-
-      return
-        $ over
-            cardStrength
-            ((strengthModifier <> plusModifier <> minusModifier) <>)
-            card'
+      return card'
 
       where
         applyEffect2 :: Card -> CardEffect -> GameMonad Card

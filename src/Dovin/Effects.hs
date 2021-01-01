@@ -25,7 +25,7 @@ import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Control.Monad.Reader (ask, runReader)
 import Control.Monad.State (get)
-import Data.Maybe (mapMaybe)
+import Data.Maybe (mapMaybe, catMaybes)
 import Data.List (sortOn)
 
 type Pile = [PileEntry]
@@ -94,6 +94,8 @@ viewSelf x = view x <$> askSelf
 -- 3. After the final layer, the pile should be empty.
 resolveEffectsV3 :: GameMonad ()
 resolveEffectsV3 = do
+  -- Convert counters to effects
+  modifying id resolveCounters
   board <- get
   cs <- resolveEffectsV3' board
   assign resolvedCards cs
@@ -107,9 +109,53 @@ resolveEffectsV3 = do
 
       return $ view resolvedCards newBoard
 
+-- Convert card counters and legacy strength modifiers into V3 effects. Note
+-- that counter timestamps are not implemented, card timestamps are used
+-- instead.
+resolveCounters :: Board -> Board
+resolveCounters board =
+  let
+    newCards = M.map countersToEffect . view resolvedCards $ board
+  in
+
+  set resolvedCards newCards board
+
+  where
+    unwrap (BaseCard card) = card
+
+    countersToEffect :: Card -> Card
+    countersToEffect card =
+      let es =
+            map (AbilityEffect (view cardTimestamp card) EndOfTurn . replicate 1)
+            . catMaybes
+            . map (\f -> f card)
+            $ [ mkPTEffect . dup . view cardPlusOneCounters
+              , mkPTEffect . dup . view cardMinusOneCounters
+              , mkPTEffect . toTuple .view cardStrengthModifier
+              ]
+      in
+
+      over
+        cardAbilityEffects
+        (es <>)
+        card
+
+      where
+        toTuple (CardStrength p t) = (p, t)
+        mkPTEffect :: (Int, Int) -> Maybe LayeredEffectPart
+        mkPTEffect (p, t) =
+          -- This is an optimization to not create a large number of no-op
+          -- effects.
+          if p == 0 && t == 0 then
+            Nothing
+          else
+            Just $ effectPTAdjustment (p, t)
+
+        dup x = (x, x)
+
 resolveLayer :: (Board, Pile) -> Layer -> (Board, Pile)
 resolveLayer (board, pile) layer =
-  let 
+  let
     cs            = view resolvedCards board
     newEffects    = concatMap (extractEffects layer) cs :: Pile
     newPile       = pile <> newEffects :: Pile
