@@ -7,7 +7,11 @@ some new card properties.
 * `withEffectWhen` added as a version of `withEffect` that allows customization
    of then the effect should apply (by default they apply when card is in
    play).
-* added `withCMC` to set converted mana cost on cards.
+* `withCMC` to set converted mana cost on cards.
+* `addEffect` to apply an effect to a card. In combination with
+  `effectPTAdjustment` this replaces altering `cardStrengthModifier` directly,
+  which is now removed.
+* Added a suite of `effect*` builders for effects.
 -}
 module Dovin.V3
   ( module Dovin.V2
@@ -15,5 +19,5 @@ module Dovin.V3
   )
   where
 
-import Dovin.V2 hiding (withEffect)
+import Dovin.V2 hiding (withEffect, cardStrengthModifier)
 import Dovin.Builder (withEffect)

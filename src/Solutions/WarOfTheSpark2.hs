@@ -1,10 +1,9 @@
 module Solutions.WarOfTheSpark2 where
 
-import Dovin.V2
+import Dovin.V3
 import Dovin.Prelude
 
 dinosaur = "dinosaur"
-tricked = "tricked"
 
 solution :: GameMonad ()
 solution = do
@@ -28,17 +27,23 @@ solution = do
     as Opponent $ do
       withLocation Play $ do
         addCreature (3, 2) "Midnight Reaper"
-        addCreature (1, 1) "Drover of the Mighty"
+        withEffectWhen
+          (do
+            controller <- viewSelf cardOwner
+            dinos <- askCards $ matchAttribute dinosaur
+                             <> matchInPlay
+                             <> matchController controller
 
-        -- HACK: Model Drover's passive ability as an ability of Zetalpa. Don't
-        -- currently have a way of checking _other_ cards to figure out if
-        -- effect applies.
-        withEffect
-          matchInPlay
-          (pure $ matchName "Drover of the Mighty" <> missingAttribute tricked)
-          (pure . over cardStrengthModifier (mkStrength (2, 2) <>)) $
-            withAttributes [indestructible] $
-              addCreature (4, 8) "Zetalpa, Primal Dawn"
+            return $ length dinos > 0
+          )
+          (matchCard <$> askSelf)
+          [ effectPTAdjustment (2, 2)
+          ]
+          "+2/+2 so long as you control another dinosaur"
+            $ addCreature (1, 1) "Drover of the Mighty"
+
+        withAttributes [indestructible, dinosaur] $
+          addCreature (4, 8) "Zetalpa, Primal Dawn"
         addCreature (5, 5) "God-Eternal Rhonas"
 
   step "Cast Merfolk Trickster, targeting Drover" $ do
@@ -48,7 +53,7 @@ solution = do
     cast "UU" "Merfolk Trickster" >> resolveTop
 
     target "Drover of the Mighty"
-    gainAttribute tricked "Drover of the Mighty"
+    addEffect effectNoAbilities "Drover of the Mighty"
     tap "Drover of the Mighty"
 
   step "Cast Kaya's Ghostform on Merfolk Trickster" $ do
@@ -81,7 +86,7 @@ solution = do
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        modifyCard cardStrengthModifier (mkStrength (-1, -1) <>) cn
+        addEffect (effectPTAdjustment (-1, -1)) cn
 
     validate (matchLocation (Opponent, Graveyard)) "Drover of the Mighty"
 
@@ -99,7 +104,7 @@ solution = do
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        modifyCard cardStrengthModifier (mkStrength (-1, -1) <>) cn
+        addEffect (effectPTAdjustment (-1, -1)) cn
 
     -- Active player triggers stack first
     validate (matchLocation (Active, Graveyard)) "Merfolk Trickster"
@@ -122,21 +127,21 @@ solution = do
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        modifyCard cardStrengthModifier (mkStrength (-1, -1) <>) cn
+        addEffect (effectPTAdjustment (-1, -1)) cn
 
   step "Resolve -1/-1 for Trickster" $ do
     resolve "-1/-1 Trickster"
 
     withStateBasedActions $ do
       forCards (matchInPlay <> matchAttribute creature <> invert (matchName "Massacre Girl")) $ \cn -> do
-        modifyCard cardStrengthModifier (mkStrength (-1, -1) <>) cn
+        addEffect (effectPTAdjustment (-1, -1)) cn
 
   step "Return Trickster to play from Ghostform, targeting God-Eternal" $ do
     moveTo Play "Merfolk Trickster"
 
     target "God-Eternal Rhonas"
     tap "God-Eternal Rhonas"
-    gainAttribute tricked "God-Eternal Rhonas"
+    addEffect effectNoAbilities "God-Eternal Rhonas"
 
   step "Attack with all original creatures, opponent can only block 1 and can't kill it" $ do
     attackWith ["Flux Channeler", "Rigging Runner", "Spellgorger Weird"]
