@@ -1,17 +1,18 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Dovin.Formatting where
 
+import Dovin.Helpers
+import Dovin.Matchers
+import Dovin.Monad
+import Dovin.Prelude
+import Dovin.Types
+
 import Control.Monad.Writer (Writer, execWriter, tell)
 
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.List (intercalate, sort, sortBy, nub)
 import Data.Ord (comparing)
-
-import Dovin.Helpers
-import Dovin.Monad
-import Dovin.Prelude
-import Dovin.Types
 
 type FormatMonad = Writer [(String, GameMonad String)]
 

@@ -1,7 +1,6 @@
 module Solutions.RavnicaAllegiance5 where
 
 import Dovin.V2
-import Dovin.Prelude
 
 tapWithFreyalise mana card = do
   validate matchInPlay "Song of Freyalise"

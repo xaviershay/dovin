@@ -27,6 +27,7 @@ module Dovin.Actions (
   -- * Uncategorized
   , activate
   , activatePlaneswalker
+  , addEffect
   , attackWith
   , combatDamage
   , copySpell
@@ -75,7 +76,9 @@ import           Dovin.Helpers
 import           Dovin.Prelude
 import           Dovin.Types
 import           Dovin.Builder
-import Dovin.Monad
+import           Dovin.Monad
+import           Dovin.Matchers
+import           Dovin.Effects (resolveEffects)
 
 import qualified Data.HashMap.Strict as M
 import Data.Maybe (listToMaybe)
@@ -760,6 +763,8 @@ copySpell newName targetName = do
     stack
     ((:) newName)
 
+  resolveEffects
+
 -- | Applies damage from a source to a target.
 --
 -- > damage (const 2) (targetPlayer Opponent) "Shock"
@@ -797,9 +802,9 @@ damage f t source = action "damage" $ do
     throwError $ "damage must be positive, was " <> show dmg
 
   damage' dmg t c
-
   when (hasAttribute lifelink c) $
     modifying (life . at (fst . view location $ c) . non 0) (+ dmg)
+  resolveEffects
 
   where
     damage' dmg (TargetPlayer t) c =
@@ -954,6 +959,7 @@ remove :: CardName -> GameMonad ()
 remove cn = do
   modifying cards (M.delete cn)
   modifying stack (filter (/= cn))
+  resolveEffects
 
 -- | Remove mana from the pool. Colored mana will be removed first, then extra
 -- mana of any type will be removed to match the colorless required.
@@ -1227,6 +1233,7 @@ gainLife amount = do
   modifying
     (life . at actor . non 0)
     (+ amount)
+  resolveEffects
 
 -- | Decrements life total for current actor.
 --
@@ -1249,3 +1256,19 @@ setLife :: Int -> GameMonad ()
 setLife n = do
   actor <- view envActor
   assign (life . at actor) (Just n)
+
+-- | Adds an "until end of turn" effect to a card. Note in practice, since
+-- turns aren't modeled, the effect will stay around until the end of the
+-- solution.
+--
+-- > addEffect (effectPTSet 1 1) "Soldier"
+--
+-- [Effects]
+--
+--   * Adds a new "until end of turn" effect to the card with the current
+--   timestamp.
+addEffect :: LayeredEffectPart -> CardName -> GameMonad ()
+addEffect e cn = do
+  now <- getTimestamp
+
+  modifyCard cardAbilityEffects (AbilityEffect now EndOfTurn [e]:) cn

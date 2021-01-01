@@ -24,29 +24,43 @@ module Dovin.Builder (
   , as
   , withAttribute
   , withAttributes
+  , withCMC
   , withEffect
+  , withEffectWhen
   , withLocation
+  , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
   ) where
 
-import Control.Monad.Reader (ask, local)
-import qualified Data.HashMap.Strict as M
-import qualified Data.Set as S
-
 import Dovin.Attributes
---import Dovin.Actions
 import Dovin.Prelude
 import Dovin.Types
+import Dovin.Helpers (getTimestamp)
+import Dovin.Matchers (matchNone)
+import Dovin.Effects (resolveEffects, enabledInPlay)
+
+import Control.Monad.Reader (local)
+import Control.Lens (_1)
+import qualified Data.HashMap.Strict as M
+import qualified Data.Set as S
 
 addCard :: CardName -> GameMonad ()
 addCard name = do
   card <- use $ cards . at name
+  now <- getTimestamp
+
   case card of
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
-      modifying cards (M.insert name (BaseCard $ set cardName name template))
+      owner <- view envOwner
+      modifying cards (M.insert name (BaseCard
+        $ set cardName name
+        . set cardTimestamp now
+        . set cardOwner (maybe (view (cardLocation . _1) template) id owner)
+        $ template))
+      resolveEffects
 
 addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name
@@ -98,23 +112,55 @@ withAttributes attrs =
   local (over (envTemplate . cardAttributes) f
        . over (envTemplate . cardDefaultAttributes) f)
 
--- | Add an effect to the created card.
+-- | Add an effect to the created card. The effect will only apply when the
+-- card is in play.
 withEffect ::
-  CardMatcher -- ^ A matcher that must apply to this card for this affect to
-              -- apply. 'matchInPlay' is a typical value.
- -> (Card -> CardMatcher) -- ^ Given the current card, return a matcher that
-                          -- matches cards that this affect applies to.
- -> (Card -> GameMonad Card) -- ^ Apply an effect to the given card.
+    EffectMonad CardMatcher -- ^ The set of cards to apply the effect to
+ -> [LayeredEffectPart]     -- ^ The effect to apply
+ -> EffectName              -- ^ Human-readable description, cosmetic only.
  -> GameMonad ()
  -> GameMonad ()
-withEffect applyCondition filter action =
-  local (over (envTemplate . cardEffects) (mkEffect applyCondition filter action:))
+withEffect = withEffectWhen enabledInPlay
 
+-- | A more flexible version of 'withEffect' that allows customization of then
+-- the effect should apply.
+withEffectWhen ::
+    EffectMonad Bool        -- ^ Effect only applies when this returns true
+ -> EffectMonad CardMatcher -- ^ The set of cards to apply the effect to
+ -> [LayeredEffectPart]     -- ^ The effect to apply
+ -> EffectName              -- ^ Human-readable description, cosmetic only.
+ -> GameMonad ()
+ -> GameMonad ()
+withEffectWhen enabled appliesTo effect name =
+  local (over (envTemplate . cardPassiveEffects)
+  (mkLayeredEffectPart combinedMatcher effect name:))
+
+  where
+    combinedMatcher :: EffectMonad CardMatcher
+    combinedMatcher = do
+      isEnabled <- enabled
+
+      if isEnabled then
+        appliesTo
+      else
+        return matchNone
+
+-- | Set the converted mana cost of the created card.
+withCMC :: Int -> GameMonad () -> GameMonad ()
+withCMC n =
+  local (set (envTemplate . cardCmc) n)
+
+-- | Place the created card into a specific location.
 withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   p <- view envActor
 
   local (set (envTemplate . cardLocation) (p, loc)) m
+
+-- | Set the owner for the created card. If not specified, defaults to the
+-- owner of the card location.
+withOwner :: Player -> GameMonad () -> GameMonad ()
+withOwner owner = local (set envOwner (Just owner))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

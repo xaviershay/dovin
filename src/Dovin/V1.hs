@@ -6,28 +6,32 @@ module Dovin.V1
   , module Dovin.Formatting
   , module Dovin.Helpers
   , module Dovin.Types
+  , module Dovin.Matchers
   , validate
   , validateLife
   , withLocation
   , activate
   , trigger
   , fork
+  , withEffect
   ) where
 
 import Dovin.Runner
 import Dovin.Actions hiding (validate, validateLife, activate, trigger, fork)
 import qualified Dovin.Actions
 import Dovin.Attributes
-import Dovin.Builder hiding (withLocation)
+import Dovin.Builder hiding (withLocation, withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
-import Dovin.Monad
 import Dovin.Types
+import Dovin.Matchers
+import Dovin.Effects (askSelf)
 
 import Control.Monad (forM_)
 import Control.Monad.State (put, get)
 import Control.Monad.Reader (local)
 import Control.Lens (set, view)
+import Control.Monad.Identity (Identity, runIdentity)
 
 -- | Validate that a card matches a matcher.
 --
@@ -80,3 +84,19 @@ fork options = do
     m
     put $ set currentStep cs b
 
+-- | Add an effect to the created card.
+withEffect ::
+  CardMatcher -- ^ A matcher that must apply to this card for this affect to
+              -- apply. 'matchInPlay' is a typical value.
+ -> (Card -> CardMatcher) -- ^ Given the current card, return a matcher that
+                          -- matches cards that this affect applies to.
+ -> (Card -> Identity Card) -- ^ Apply an effect to the given card.
+ -> GameMonad ()
+ -> GameMonad ()
+withEffect applyCondition matcher action = do
+  let applyConditionV3 = applyMatcher applyCondition <$> askSelf
+  let matcherV3 = matcher <$> askSelf
+  let actionV3 = [LayeredEffectPart LayerOther (pure . runIdentity . action)]
+  let name = "legacy V2 effect"
+
+  withEffectWhen applyConditionV3 matcherV3 actionV3 name

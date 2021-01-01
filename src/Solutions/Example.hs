@@ -16,9 +16,10 @@ solution = do
         withAttributes [flying, token] $ addCreature (4, 4) "Angel"
         withAttributes [flying]
           $ withEffect
-              matchInPlay
-              (matchOtherCreatures <> (const $ matchAttribute creature))
-              (pure . setAttribute hexproof)
+              (matchOtherCreatures <$> askSelf)
+              [ effectAddAbility hexproof
+              ]
+              "Other creatures gain hexproof"
           $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
   step "Plummet to destroy Shalai" $ do

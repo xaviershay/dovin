@@ -18,18 +18,28 @@ module Dovin.V2
   , module Dovin.Formatting
   , module Dovin.Helpers
   , module Dovin.Types
+  , module Dovin.Matchers
   , view
+  , withEffect
   )
   where
 
 import Dovin.Runner
 import Dovin.Actions
-import qualified Dovin.V1
-import Dovin.Prelude
+import Dovin.V1 (withEffect)
 import Dovin.Attributes
-import Dovin.Builder
+import Dovin.Builder hiding (withEffect)
 import Dovin.Formatting
 import Dovin.Helpers
-import Dovin.Monad
-import Dovin.Types
+import Dovin.Matchers
+import Dovin.Types hiding
+  ( cards
+  , stack
+  , deck
+  , life
+  , manaPool
+  , phase
+  , currentStep
+  , resolvedCards
+  )
 import Control.Lens (view)

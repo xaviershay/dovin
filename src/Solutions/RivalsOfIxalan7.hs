@@ -23,7 +23,7 @@ solution = do
             (    matchLocation . view cardLocation
               <> const (matchAttribute creature)
             )
-            (pure . over cardStrengthModifier (mkStrength (1, 1) <>))
+            (pure . over cardStrength (mkStrength (1, 1) <>))
         $ addCreature (2, 2) "Tah-Crop Elite"
 
     withLocation (Active, Hand) $ do

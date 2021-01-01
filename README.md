@@ -21,7 +21,7 @@ them as you would in a real game of paper magic.
 
 I've only added actions "as needed" to solve problems, so the built-in
 functions are rather incomplete right now. It is straightforward to add more
-though. See `src/Dovin/V2.hs` in conjuction with `src/Dovin/Actions.hs`.
+though. See `src/Dovin/V3.hs` in conjuction with `src/Dovin/Actions.hs`.
 
 ## Example
 
@@ -30,12 +30,10 @@ module Solutions.Example where
 
 import Dovin
 
-main = run formatter solution
-
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
-    setLife Opponent 3
+    as Opponent $ setLife 3
 
     withLocation Hand $ addInstant "Plummet"
     withLocation Play $ do
@@ -46,9 +44,10 @@ solution = do
         withAttributes [flying, token] $ addCreature (4, 4) "Angel"
         withAttributes [flying]
           $ withEffect
-              matchInPlay
-              (matchOtherCreatures <> (const $ matchAttribute creature))
-              (pure . setAttribute hexproof)
+              (matchOtherCreatures <$> askSelf)
+              [ effectAddAbility hexproof
+              ]
+              "Other creatures gain hexproof"
           $ addCreature (3, 4) "Shalai, Voice of Plenty"
 
   step "Plummet to destroy Shalai" $ do
@@ -111,8 +110,8 @@ solutions for published Possibility Storm puzzles!)
   interactions.
 * `UltimateMasters` shows how to track opponent actions.
 * `ChannelFireball` automatically calculates High Tide mana.
-* `WarOfTheSpark2` shows off a hack for effects that depend on attributes of
-  other cards (hopefully will have a better fix in API soon!)
+* `WarOfTheSpark2` shows how to define effects that depend on attributes of
+  other cards.
 
 ## Development
 
