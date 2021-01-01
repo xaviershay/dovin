@@ -21,7 +21,7 @@ them as you would in a real game of paper magic.
 
 I've only added actions "as needed" to solve problems, so the built-in
 functions are rather incomplete right now. It is straightforward to add more
-though. See `src/Dovin/V2.hs` in conjuction with `src/Dovin/Actions.hs`.
+though. See `src/Dovin/V3.hs` in conjuction with `src/Dovin/Actions.hs`.
 
 ## Example
 
