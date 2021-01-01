@@ -66,13 +66,15 @@ data LayeredEffectPart = LayeredEffectPart Layer (Card -> EffectMonad Card)
 type LayeredEffect = [LayeredEffectPart]
 
 -- An effect definition best matches up to the text describing it on a card. It
--- can generated different effects affecting different cards depending on the
+-- can generate different effects affecting different cards depending on the
 -- state of the board.
 data LayeredEffectDefinition = LayeredEffectDefinition
-  {
-  _leAppliesTo :: EffectMonad CardMatcher -- ^ Filter to determine which cards are affected by this effect, if enabled.
+  { _leAppliesTo :: EffectMonad CardMatcher -- ^ Filter to determine which
+                                            -- cards are affected by this
+                                            -- effect, if enabled.
   , _leEffect :: LayeredEffect -- ^ The actions to apply to affected cards.
-  , _leName :: EffectName -- ^ A human readable description of the effect. Optional.
+  , _leName :: EffectName      -- ^ A human readable description of the effect.
+                               -- Optional.
   }
 
 
@@ -257,6 +259,8 @@ cardToughness f parent = fmap
     setToughness t (CardStrength p _) = CardStrength p t
     toughness (CardStrength _ t) = t
 
+cardController :: Control.Lens.Lens' Card Player
+cardController = cardLocation . _1
 
 manaPoolFor p = manaPool . at p . non mempty
 

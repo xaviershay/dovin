@@ -55,7 +55,7 @@ test_Effects = testGroup "V3 effects" $
         withLocation Play $ do
           withEffectWhen
             (do
-              controller <- viewSelf cardOwner
+              controller <- viewSelf cardController
               dinos <- askCards $ matchAttribute dinosaur
                                <> matchInPlay
                                <> matchController controller

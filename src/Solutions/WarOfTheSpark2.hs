@@ -28,7 +28,7 @@ solution = do
         addCreature (3, 2) "Midnight Reaper"
         withEffectWhen
           (do
-            controller <- viewSelf cardOwner
+            controller <- viewSelf cardController
             dinos <- askCards $ matchAttribute dinosaur
                              <> matchInPlay
                              <> matchController controller

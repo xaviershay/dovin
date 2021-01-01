@@ -157,8 +157,8 @@ withLocation loc m = do
 
   local (set (envTemplate . cardLocation) (p, loc)) m
 
--- | Set the owner for the created card. If not specified, it will default to
--- the owner of the card location.
+-- | Set the owner for the created card. If not specified, defaults to the
+-- owner of the card location.
 withOwner :: Player -> GameMonad () -> GameMonad ()
 withOwner owner = local (set envOwner (Just owner))
 

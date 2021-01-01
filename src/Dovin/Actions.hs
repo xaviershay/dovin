@@ -1269,9 +1269,6 @@ setLife n = do
 --   timestamp.
 addEffect :: LayeredEffectPart -> CardName -> GameMonad ()
 addEffect e cn = do
-  card <- requireCard cn mempty
   now <- getTimestamp
 
-  let ae = AbilityEffect now EndOfTurn [e]
-
-  modifyCard cardAbilityEffects (\es -> ae:es) cn
+  modifyCard cardAbilityEffects (AbilityEffect now EndOfTurn [e]:) cn
