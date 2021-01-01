@@ -67,6 +67,14 @@ matchToughness :: Int -> CardMatcher
 matchToughness n = labelMatch ("toughness = " <> show n) $ CardMatcher ""
   ((== n) . view cardToughness) <> matchAttribute creature
 
+matchPower :: Int -> CardMatcher
+matchPower n = labelMatch ("power = " <> show n) $ CardMatcher ""
+  ((== n) . view cardPower) <> matchAttribute creature
+
+matchStrength :: (Int, Int) -> CardMatcher
+matchStrength (p, t) = labelMatch ("P/T = " <> show p <> "/" <> show t) $
+  matchPower p <> matchToughness t
+
 matchTarget :: Target -> CardMatcher
 matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
   ((==) t . TargetCard . view cardName)

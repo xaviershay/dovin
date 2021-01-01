@@ -13,10 +13,8 @@ test_Effects = testGroup "V3 effects" $
             "Creatures are 1/1" $ do
               addCreature (4, 4) "Some Creature"
 
-          c <- requireCard "Some Creature" mempty
+          validate (matchStrength (4, 4)) "Some Creature"
 
-          unless (view cardStrength c == mkStrength (4, 4)) $
-            throwError "Applied effect when disabled"
     , prove "Sliver Legion" $ do
         let sliver = "sliver"
         withLocation Play $ do
@@ -35,24 +33,14 @@ test_Effects = testGroup "V3 effects" $
               "All Slivers get +1/+1 for each other Sliver"
                 $ addCreature (7, 7) "Sliver Legion"
 
-          c <- requireCard "Sliver Legion" mempty
-
-          unless (view cardStrength c == mkStrength (7, 7)) $
-            throwError "No other slivers yet, should be 7/7"
+          validate (matchStrength (7, 7)) "Sliver Legion"
 
           withLocation Play $ do
             withAttribute sliver $ addCreature (2, 2) "Sliver 1"
             withAttribute sliver $ addCreature (2, 2) "Sliver 2"
 
-          c <- requireCard "Sliver Legion" mempty
-
-          unless (view cardStrength c == mkStrength (9, 9)) $
-            throwError "Should get +2/+2 from other slivers"
-
-          c <- requireCard "Sliver 1" mempty
-
-          unless (view cardStrength c == mkStrength (4, 4)) $
-            throwError "Should get +2/+2 from other slivers"
+          validate (matchStrength (9, 9)) "Sliver Legion"
+          validate (matchStrength (4, 4)) "Sliver 1"
 
     , prove "Drover of the Mighty" $ do
         let dinosaur = "dinosaur"
@@ -80,18 +68,12 @@ test_Effects = testGroup "V3 effects" $
             "+2/+2 so long as you control another dinosaur"
               $ addCreature (1, 1) "Drover of the Mighty"
 
-        c <- requireCard "Drover of the Mighty" mempty
-
-        unless (view cardStrength c == mkStrength (1, 1)) $
-          throwError "Should still be a 1/1, no dinos"
+        validate (matchStrength (1, 1)) "Drover of the Mighty"
 
         withLocation Play $ do
           withAttribute dinosaur $ addCreature (4, 4) "Dinosaur"
 
-        c <- requireCard "Drover of the Mighty" mempty
-
-        unless (view cardStrength c == mkStrength (3, 3)) $
-          throwError "Should be a 3/3"
+        validate (matchStrength (3, 3)) "Drover of the Mighty"
     ]
   -- https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
   , testGroup "effects (magic judges examples)"
@@ -105,18 +87,12 @@ test_Effects = testGroup "V3 effects" $
             "Other creatures are 1/1" $ do
               addCreature (4, 4) "Godhead of Awe"
 
-          c <- requireCard "Grizzly Bear" mempty
-
-          unless (view cardStrength c == mkStrength (1, 1)) $
-            throwError "Did not apply 1/1 effect"
+          validate (matchStrength (1, 1)) "Grizzly Bear"
 
           addEffect (effectPTSet (0, 1)) "Godhead of Awe"
           addEffect (effectNoAbilities) "Godhead of Awe"
 
-          c <- requireCard "Grizzly Bear" mempty
-
-          unless (view cardStrength c == mkStrength (2, 2)) $
-            throwError "Did not remove ability"
+          validate (matchStrength (2, 2)) "Grizzly Bear"
     , prove "Humility & Opalescence" $ do
         withLocation Play $ do
           withCMC 4 $ withEffect
@@ -135,15 +111,14 @@ test_Effects = testGroup "V3 effects" $
             "Other enchanments are creatures with P/T equal to CMC" $
               addEnchantment "Opalescence"
 
-          c <- requireCard "Humility" mempty
+          validate (matchStrength (4, 4)) "Humility"
 
-          unless (view cardStrength c == mkStrength (4, 4)) $
-            throwError "Did not make Humility a 4/4"
     , prove "Opalescence & Humility" $ do
         withLocation Play $ do
           withCMC 4 $ withEffect
             (matchOther enchantment <$> askSelf)
-            [ effectPTSetF (\c -> let cmc = view cardCmc c in return (cmc, cmc)) , effectAddType creature
+            [ effectPTSetF (\c -> let cmc = view cardCmc c inreturn (cmc, cmc))
+            , effectAddType creature
             ]
             "Other enchanments are creatures with P/T equal to CMC" $
               addEnchantment "Opalescence"
@@ -156,10 +131,6 @@ test_Effects = testGroup "V3 effects" $
            "Each creature loses all abilities and is 0/1" $
              addEnchantment "Humility"
 
-
-          c <- requireCard "Humility" mempty
-
-          unless (view cardStrength c == mkStrength (0, 1)) $
-            throwError "Did not make Humility a 0/1"
+          validate (matchStrength (0, 1)) "Humility"
     ]
   ]
