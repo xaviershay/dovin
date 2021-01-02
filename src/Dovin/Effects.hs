@@ -248,7 +248,7 @@ applyEffectsAtLayer layer (board, pile) =
   swap . runState (catMaybes <$> mapM (applyEntry layer) pile) $ board
 
   where
-    -- Apply (and remove) any effect parts (may be done) in the entry for the
+    -- Apply (and remove) any effect parts (may be none) in the entry for the
     -- current layer. If this is the first time a part would apply for this
     -- effect, also resolve the CardMatcher to determine the set of cards to
     -- apply to.
