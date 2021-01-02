@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo
+echo "To filter tests, use tasty command line args, e.g.:"
+echo ':set args -p "Name of test"'
+echo
+
+exec stack ghci --test --main-is dovin:test:dovin-test $@

@@ -1,7 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 {-|
-Effects are continuous effects, such as "other creatures get +1/+1".
+Effects are continuous effects, such as "other creatures get +1/+1". Note that
+dependencies (613.8) are not implemented, and must be emulated with correct
+timestamps if needed.
 
 They are typically added to a card using 'Dovin.Builder.withEffect' or 'Dovin.Actions.addEffect'.
  -}
@@ -32,16 +34,17 @@ import Control.Lens (makeLenses, over, view, set)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Control.Monad.Reader (ask, runReader)
-import Control.Monad.State (modify')
+import Control.Monad.State (modify', runState, State, get)
 import Data.Maybe (mapMaybe, catMaybes)
-import Data.List (sortOn)
+import Data.List (sortOn, partition)
+import Data.Tuple (swap)
 
 type Pile = [PileEntry]
 data PileEntry = PileEntry
   { _peSource :: Card
   , _peTimestamp :: Timestamp
   , _peEffect :: [LayeredEffectPart]
-  , _peAppliesTo :: [CardName]
+  , _peAppliesTo :: Either (EffectMonad CardMatcher) [CardName]
   }
 makeLenses ''PileEntry
 
@@ -139,7 +142,10 @@ resetCards board = set resolvedCards (M.map unwrap . view cards $ board) board
 -- 3. After the final layer, the pile should be empty.
 applyEffects :: Board -> Board
 applyEffects board =
-  let (newBoard, pile) = foldl resolveLayer (board, mempty) allLayers in
+  let
+    f accum v = applyEffectsAtLayer v . collectNewEffectsAtLayer v $ accum
+    (newBoard, pile) = foldl f (board, mempty) allLayers
+  in
 
   if null pile then
     newBoard
@@ -190,59 +196,24 @@ resolveCounters board =
 
         dup x = (x, x)
 
-resolveLayer :: (Board, Pile) -> Layer -> (Board, Pile)
-resolveLayer (board, pile) layer =
-  let
-    cs            = view resolvedCards board
-    newEffects    = concatMap (extractEffects layer) cs :: Pile
-    newPile       = pile <> newEffects :: Pile
-    (pile', peel) = peelLayer layer newPile
-    newBoard      = foldl applyEffects board . sortOn (view peTimestamp) $ peel
-  in
-  (newBoard, pile')
+collectNewEffectsAtLayer :: Layer -> (Board, Pile) -> (Board, Pile)
+collectNewEffectsAtLayer layer (board, pile) =
+  (
+    board,
+    sortOn (view peTimestamp) . (pile <>) . concatMap (extractCardEffects layer) . view resolvedCards $ board
+  )
 
   where
-    -- Take a PileEntry and apply it to the board state. It is assumed that it
-    -- has already been filtered to a single layer.
-    applyEffects :: Board -> PileEntry -> Board
-    applyEffects board pe =
-      let
-        cs = mapMaybe (\cn -> M.lookup cn (view resolvedCards board))
-             . view peAppliesTo
-             $ pe :: [Card]
-        newCards = map
-                     (applyEffectParts (view peSource pe) (view peEffect pe))
-                     cs
-      in
-
-      over
-        resolvedCards
-        (M.union . M.fromList . map (\c -> (view cardName c, c)) $ newCards)
-        board
-
-    applyEffectParts source es target =
-      foldl
-        (\t (LayeredEffectPart _ effect) ->
-          runReader (effect t) (board, source))
-        target
-        es
-
     -- Find all effects on a card that begin applying at the given layer.
-    extractEffects :: Layer -> Card -> Pile
-    extractEffects layer c =
+    extractCardEffects :: Layer -> Card -> Pile
+    extractCardEffects layer c =
       let
         passiveEffects =
-          map toPileEntry
+          map ldToPileEntry
           . view cardPassiveEffects
           $ c
         abilityEffects =
-          map (\(AbilityEffect t _ es) ->
-            PileEntry {
-              _peSource = c,
-              _peTimestamp = t,
-              _peEffect = es,
-              _peAppliesTo = [view cardName c]
-            })
+            map aeToPileEntry
           . view cardAbilityEffects
           $ c
       in
@@ -252,35 +223,104 @@ resolveLayer (board, pile) layer =
         (passiveEffects <> abilityEffects)
 
       where
-        extractLayer (LayeredEffectPart l _) = l
+        aeToPileEntry :: AbilityEffect -> PileEntry
+        aeToPileEntry (AbilityEffect t _ es) =
+          PileEntry {
+            _peSource = c,
+            _peTimestamp = t,
+            _peEffect = es,
+            _peAppliesTo = Right [view cardName c]
+          }
 
-        toPileEntry :: LayeredEffectDefinition -> PileEntry
-        toPileEntry ld =
-          let
-            matcher = runReader (view leAppliesTo ld) (board, c)
-            cs' =
-              filter
-                (applyMatcher matcher)
-                (M.elems . view resolvedCards $ board)
-          in
-
+        ldToPileEntry :: LayeredEffectDefinition -> PileEntry
+        ldToPileEntry ld =
           PileEntry {
             _peSource = c,
             _peTimestamp = view cardTimestamp c,
             _peEffect = view leEffect ld,
-            _peAppliesTo = map (view cardName) cs'
+            _peAppliesTo = Left (view leAppliesTo ld)
           }
 
--- Return two piles, the second including every effect part that applies at
--- this layer, the first with all the remaining. Removes any entries that no
--- longer have any effect parts remaining to apply.
-peelLayer :: Layer -> Pile -> (Pile, Pile)
-peelLayer layer pile =
-  (f not pile, f id pile)
-  where
-    f g =
-      filter (not . null . view peEffect)
-      . map (over peEffect (filter $ g . isLayer layer))
+-- Apply all effects in the pile to the board for the given layer.
+applyEffectsAtLayer :: Layer -> (Board, Pile) -> (Board, Pile)
+applyEffectsAtLayer layer (board, pile) =
+  -- Iterate over all pile entries and attempt to apply/reduce them
+  swap . runState (catMaybes <$> mapM (applyEntry layer) pile) $ board
 
-    isLayer :: Layer -> LayeredEffectPart -> Bool
-    isLayer l1 (LayeredEffectPart l2 _) = l1 == l2
+  where
+    -- Apply (and remove) any effect parts (may be none) in the entry for the
+    -- current layer. If this is the first time a part would apply for this
+    -- effect, also resolve the CardMatcher to determine the set of cards to
+    -- apply to.
+    --
+    -- The use of State monad here is perhaps a little weird, but was the best
+    -- I could come with to structure the code.
+    applyEntry :: Layer -> PileEntry -> State Board (Maybe PileEntry)
+    applyEntry layer pe = do
+      -- Split the remaining entry effects into those that apply in the current
+      -- layer, and those that don't.
+      let (parts, remainder) = partition (isLayer layer) (view peEffect pe)
+
+      if null parts then
+        -- If no parts apply at current layer, there is nothing to be done.
+        return (Just pe)
+      else do
+        board <- get
+
+        let effectEnv = (board, view peSource pe)
+
+        -- If the entire effect hasn't previously decided which set of cards to
+        -- apply to, it does so here.
+        let cns = either (resolveAppliesTo effectEnv) id (view peAppliesTo pe)
+
+        -- Look up the affected cards in the current board state.
+        let cs = mapMaybe (\cn -> M.lookup cn (view resolvedCards board)) cns
+
+        when (length cs /= length cns)
+          -- Since SBEs don't apply while we are applying effects, there should
+          -- be no opportunity for a card to be removed.
+          (error "assertion failed: effected card did not exist on board")
+
+        -- Apply the effect part to the matched cards
+        let newCs = map (applyEffectParts effectEnv parts) cs
+
+        -- Update the board state with the newly updated cards.
+        modifying
+          resolvedCards
+          (M.union . M.fromList . indexBy (view cardName) $ newCs)
+
+        return $
+          if null remainder then
+            Nothing
+          else
+            Just
+            -- The set of cards needs to be cached here for use by future
+            -- parts. It should not be recalculated per 613.6.
+            . set peAppliesTo (Right cns)
+            -- We also remove the applied parts (the current layer) from the
+            -- effect.
+            . set peEffect remainder
+            $ pe
+
+    resolveAppliesTo :: EffectMonadEnv -> EffectMonad CardMatcher -> [CardName]
+    resolveAppliesTo (board, source) m =
+        map (view cardName)
+      . filter (applyMatcher $ runReader m (board, source))
+      . M.elems
+      . view resolvedCards
+      $ board
+
+    applyEffectParts :: EffectMonadEnv -> [LayeredEffectPart] -> Card -> Card
+    applyEffectParts env es target =
+      foldl
+        (\t (LayeredEffectPart _ eff) -> runReader (eff t) env)
+        target
+        es
+
+indexBy :: (a -> b) -> [a] -> [(b, a)]
+indexBy f = map ((,) <$> f <*> id)
+
+extractLayer (LayeredEffectPart l _) = l
+
+isLayer :: Layer -> LayeredEffectPart -> Bool
+isLayer l p = l == extractLayer p
