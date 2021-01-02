@@ -31,7 +31,8 @@ module Dovin.Builder (
   , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
-  , withTarget
+  , withCardTarget
+  , withColors
   ) where
 
 import Dovin.Attributes
@@ -164,8 +165,12 @@ withOwner :: Player -> GameMonad () -> GameMonad ()
 withOwner = local . set envOwner . Just
 
 -- | Set the target for the created card.
-withTarget :: Target -> GameMonad () -> GameMonad ()
-withTarget target = local (over (envTemplate . cardTargets) ((:) target))
+withCardTarget :: CardName -> GameMonad () -> GameMonad ()
+withCardTarget target = local (over (envTemplate . cardTargets) ((:) (TargetCard target)))
+
+withColors :: [Color] -> GameMonad () -> GameMonad ()
+withColors cs m =
+  local (set (envTemplate . cardColors) (S.fromList cs)) m
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

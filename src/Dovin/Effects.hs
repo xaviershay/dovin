@@ -15,6 +15,7 @@ module Dovin.Effects
   , effectNoAbilities
   , effectAddAbility
   , effectAddType
+  , effectProtectionF
 
   , resolveEffects
 
@@ -79,6 +80,11 @@ effectNoAbilities = LayeredEffectPart Layer6 (pure . set cardPassiveEffects memp
 -- | Layer 4 effect to add a type to a card. Since card types are modeled
 -- explicitly, it instead adds a new 'CardAttribute'.
 effectAddType attr = LayeredEffectPart Layer4 (pure . over cardAttributes (S.insert attr))
+
+effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffectPart
+effectProtectionF f = LayeredEffectPart Layer6 $ \c -> do
+                        cs <- f c
+                        return $ over cardProtection (cs <>) c
 
 -- | Effect enabled definition to apply when a card is in play.
 enabledInPlay :: EffectMonad Bool

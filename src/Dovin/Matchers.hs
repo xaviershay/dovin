@@ -55,10 +55,20 @@ matchOther attribute card =
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view (location . _1)
 
+matchOwner player = CardMatcher ("has owner " <> show player) $
+  (==) player . view cardOwner
+
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
 
+matchProtection :: Color -> CardMatcher
+matchProtection color = CardMatcher ("protection from " <> show color) $
+  (S.member color) . view cardProtection
+
 matchNone = CardMatcher "never match" (const False)
+
+matchAll :: CardMatcher
+matchAll = labelMatch "match all" mempty
 
 matchCard :: Card -> CardMatcher
 matchCard = matchName . view cardName

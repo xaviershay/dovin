@@ -31,6 +31,7 @@ import Dovin.Effects
   , effectAddAbility
   , effectNoAbilities
   , effectAddType
+  , effectProtectionF
   , enabledInPlay
   , viewSelf
   , askSelf

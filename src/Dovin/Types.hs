@@ -14,8 +14,12 @@ import Data.Hashable (Hashable)
 import qualified Data.Set as S
 import GHC.Generics
 
-data Color = Red | Green | Blue | Black | White deriving (Show, Eq, Ord)
+data Color = Red | Green | Blue | Black | White
+  deriving (Show, Eq, Ord, Enum, Bounded)
 type Colors = S.Set Color
+
+allColors :: Colors
+allColors = S.fromList [minBound..maxBound]
 
 type CardName = String
 type CardAttribute = String
@@ -152,6 +156,7 @@ data Card = Card
   , _cardEffects :: [CardEffect]
   , _cardCmc :: Int
   , _cardColors :: Colors
+  , _cardProtection :: Colors
   , _cardTargets :: [Target]
 
   , _cardTimestamp :: Timestamp
@@ -320,6 +325,7 @@ mkCard name location =
     , _cardAbilityEffects = mempty
     , _cardTimestamp = 0
     , _cardOwner = fst location
+    , _cardProtection = mempty
     }
 
 opposing :: Player -> Player
