@@ -75,6 +75,21 @@ test_Effects = testGroup "V3 effects" $
 
         validate (matchStrength (3, 3)) "Drover of the Mighty"
     ]
+  , testGroup "Comprehensive rules, 613.6"
+    [ prove "Non-creature artifacts" $ do
+        withLocation Play $ do
+          addArtifact "Artifact"
+
+          withEffect
+            (pure $ matchAttribute artifact <> invert (matchAttribute creature))
+            [ effectAddType creature
+            , effectPTSet (2, 2)
+            ]
+            "All non-creature artifacts become 2/2 artifact creatures" $
+              addEnchantment "Enchantment"
+
+        validate (matchStrength (2, 2)) "Artifact"
+    ]
   -- https://blogs.magicjudges.org/ftw/l2-prep/rules-and-policy/continuous-effects/
   , testGroup "effects (magic judges examples)"
     [ prove "Humble & Godhead of Awe" $ do

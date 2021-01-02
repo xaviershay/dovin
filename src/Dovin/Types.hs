@@ -36,7 +36,8 @@ data CardEffect = CardEffect
   }
 
 -- A monad for writing effect definitions.
-type EffectMonad a = Reader (Board, Card) a
+type EffectMonadEnv = (Board, Card)
+type EffectMonad a = Reader EffectMonadEnv a
 
 -- These layers line up to those specified in the official rules (613).
 data Layer =
