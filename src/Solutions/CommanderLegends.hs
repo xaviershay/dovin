@@ -115,11 +115,20 @@ solution = do
     trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
     -- TODO: validate player being attacked has most life
 
-    withAttributes [token, tapped, attacking, flying] $ addCreature (4, 4) "Angel 1"
+    withLocation Play
+      $ withAttributes [token, tapped, attacking, flying]
+      $ addCreature (4, 4) "Angel 1"
 
-    forCards (matchAttribute attacking) $ \cn -> do
-      -- TODO Correct colors from blockers
-      validate (matchAttribute flying `matchOr` matchProtection Black) cn
+    forCards (matchController (OpponentN 3) <> matchCanBlock) $ \blocker -> do
+      blockerColors <- view cardColors <$> requireCard blocker mempty
+
+      forCards (matchAttribute attacking) $
+        validate
+          (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
+    forCards (matchAttribute attacking) $
+      combatDamageTo (TargetPlayer $ OpponentN 3) []
+
+    validateLife 31 (OpponentN 3)
 
 attach cn tn = do
   c <- requireCard cn $ matchInPlay
@@ -135,6 +144,16 @@ attributes = attributeFormatter $ do
   attribute "life #3" $ countLife (OpponentN 3)
 
 formatter _ = attributes <> boardFormatter
+
+matchCanBlock =
+  matchInPlay <> matchAttribute creature <> missingAttribute tapped
+
+matchProtectionAny =
+  foldr
+    matchOr
+    matchNone
+  . map matchProtection
+  . S.toList
 
 -- copy of 'attackWith', but allow haste-y attacking if a different player
 -- controls Frenzied Saddlebrute

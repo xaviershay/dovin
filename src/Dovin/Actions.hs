@@ -30,6 +30,7 @@ module Dovin.Actions (
   , addEffect
   , attackWith
   , combatDamage
+  , combatDamageTo
   , copySpell
   , damage
   , destroy
@@ -689,7 +690,15 @@ attackWith cs = do
 --   * If attacker has 'trample', any remaining damage is dealt to opposing
 --     player.
 combatDamage :: [CardName] -> CardName -> GameMonad ()
-combatDamage blockerNames attackerName = do
+combatDamage blockers attacker = do
+  actor <- view envActor
+
+  combatDamageTo (targetPlayer . opposing $ actor) blockers attacker
+
+-- | Equivalent to 'combatDamage' but can assign left-over damage to an
+-- alternative target than the opposing player.
+combatDamageTo :: Target -> [CardName] -> CardName -> GameMonad ()
+combatDamageTo target blockerNames attackerName = do
   actor <- view envActor
   attacker <- requireCard attackerName
     $ matchInPlay <> matchAttribute attacking <> matchController actor
@@ -705,7 +714,7 @@ combatDamage blockerNames attackerName = do
 
   if hasAttribute trample attacker || null blockers then
     -- Assign leftover damage to opponent
-    damage (const rem) (targetPlayer . opposing $ actor) attackerName
+    damage (const rem) target attackerName
   else
     -- Assign any leftover damage to final blocker
     maybe
