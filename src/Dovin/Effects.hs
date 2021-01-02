@@ -1,7 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 {-|
-Effects are continuous effects, such as "other creatures get +1/+1".
+Effects are continuous effects, such as "other creatures get +1/+1". Note that
+dependencies (613.8) are not implemented, and must be emulated with correct
+timestamps if needed.
 
 They are typically added to a card using 'Dovin.Builder.withEffect' or 'Dovin.Actions.addEffect'.
  -}
