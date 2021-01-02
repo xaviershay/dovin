@@ -290,17 +290,17 @@ applyEffectsAtLayer layer (board, pile) =
           (M.union . M.fromList . indexBy (view cardName) $ newCs)
 
         return $
-          case remainder of
-            [] -> Nothing
-            xs ->
-              Just
-              -- The set of cards needs to be cached here for use by future
-              -- parts. It should not be recalculated per 613.6.
-              . set peAppliesTo (Right cns)
-              -- We also remove the applied parts (the current layer) from the
-              -- effect.
-              . set peEffect xs
-              $ pe
+          if null remainder then
+            Nothing
+          else
+            Just
+            -- The set of cards needs to be cached here for use by future
+            -- parts. It should not be recalculated per 613.6.
+            . set peAppliesTo (Right cns)
+            -- We also remove the applied parts (the current layer) from the
+            -- effect.
+            . set peEffect remainder
+            $ pe
 
     resolveAppliesTo :: EffectMonadEnv -> EffectMonad CardMatcher -> [CardName]
     resolveAppliesTo (board, source) m =
