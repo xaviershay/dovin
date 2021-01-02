@@ -115,9 +115,10 @@ solutions for published Possibility Storm puzzles!)
 
 ## Development
 
-    bin/dev  # Launch an interactive REPL
-    bin/test # Runs all tests and lints
-    bin/run  # Runs all solutions
+    bin/dev       # Launch an interactive REPL
+    bin/test      # Runs all tests and lints
+    bin/test-repl # Run tests from interactive REPL (use `main`)
+    bin/run       # Runs all solutions
 
 New actions go into `Dovin.Actions`. They must:
 
