@@ -132,5 +132,27 @@ test_Effects = testGroup "V3 effects" $
              addEnchantment "Humility"
 
           validate (matchStrength (0, 1)) "Humility"
+    , prove "Conspiracy & Life and Limb" $ do
+        withLocation Play $ do
+          let saproling = "saproling"
+
+          withEffect
+            (pure $ matchAttribute creature)
+            [ effectAddType saproling
+            ]
+            "Creatures are saprolings" $
+              addEnchantment "Life and Limb"
+
+          withEffect
+            (pure $ matchAttribute saproling)
+            [ effectAddType land
+            , effectPTSet (1, 1)
+            ]
+            "Forests and saprolings are 1/1 saprolings and lands" $
+              addEnchantment "Conspiracy"
+
+          addCreature (2, 2) "Gutter Skulk"
+
+          validate (matchAttribute land) "Gutter Skulk"
     ]
   ]
