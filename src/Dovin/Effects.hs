@@ -267,11 +267,11 @@ applyEffectsAtLayer layer (board, pile) =
       else do
         board <- get
 
-        let env = (board, view peSource pe)
+        let effectEnv = (board, view peSource pe)
 
         -- If the entire effect hasn't previously decided which set of cards to
         -- apply to, it does so here.
-        let cns = either (resolveAppliesTo env) id (view peAppliesTo pe)
+        let cns = either (resolveAppliesTo effectEnv) id (view peAppliesTo pe)
 
         -- Look up the affected cards in the current board state.
         let cs = mapMaybe (\cn -> M.lookup cn (view resolvedCards board)) cns
@@ -282,7 +282,7 @@ applyEffectsAtLayer layer (board, pile) =
           (error "assertion failed: effected card did not exist on board")
 
         -- Apply the effect part to the matched cards
-        let newCs = map (applyEffectParts env parts) cs
+        let newCs = map (applyEffectParts effectEnv parts) cs
 
         -- Update the board state with the newly updated cards.
         modifying
