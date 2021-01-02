@@ -27,8 +27,9 @@ solution = do
     as (OpponentN 3) $ do
       withLocation Play $ do
         addCreature (4, 4) "Sengir, the Dark Baron"
-        withColors [Black, Green, Blue] $
-          addCreature (2, 4) "Archelos, Lagoon Mystic"
+        withColors [Black, Green, Blue]
+          $ withAttribute commander
+          $ addCreature (2, 4) "Archelos, Lagoon Mystic"
 
     as Active $ do
       withLocation Hand $ do
@@ -57,20 +58,26 @@ solution = do
                 . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
               [ effectPTAdjust (3, 3)
               , effectProtectionF (const $ do
-                  controller <- viewSelf cardController
+                  controller <- viewSelf cardOwner
                   commanders <- askCards
                     (matchController controller <> matchAttribute commander)
 
                   let colors =
                         foldl S.union mempty (map (view cardColors) commanders)
   
-
                   return (S.difference allColors colors)
               )
               ]
               "Equipped gets +3/+3 and pro colors NOT in commander colors"
               $ addArtifact "Commander's Plate"
-        withCardTarget "Commander's Plate" $ addAura "Confiscate"
+        withCardTarget "Commander's Plate"
+          $ withEffect
+              ((foldr (\cn m -> matchName cn `matchOr` m) matchNone
+                . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
+              [ effectSetControllerF (const $ viewSelf cardOwner)
+              ]
+              "Gain control of target"
+          $ addAura "Confiscate"
         withCardTarget "Ardenn, Intrepid Archaeologist"
           $ withEffect
               -- TODO: Tidy all this up
@@ -109,6 +116,7 @@ solution = do
     attach "Commander's Plate" "Port Razer"
     attach "Seraphic Greatsword" "Port Razer"
 
+  step "Attack with Port Razer & Malcolm" $ do
     attackPlayerWith (OpponentN 3) 
       [ "Port Razer", "Malcolm, Keen-Eyed Navigator" ]
 
@@ -129,6 +137,16 @@ solution = do
       combatDamageTo (TargetPlayer $ OpponentN 3) []
 
     validateLife 31 (OpponentN 3)
+
+    trigger "Another combat phase" "Port Razer" >> resolveTop
+
+    transitionToForced BeginCombat
+
+  step "Second combat, move Confiscate & Greatsword to Archon" $ do
+    trigger "Ardenn Attach" "Ardenn, Intrepid Archaeologist" >> resolveTop
+
+    attach "Confiscate" "Archon of Coronation"
+    attach "Seraphic Greatsword" "Archon of Coronation"
 
 attach cn tn = do
   c <- requireCard cn $ matchInPlay
