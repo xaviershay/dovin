@@ -5,8 +5,7 @@ import Dovin.Attributes (creature)
 import Dovin.Types
 
 import qualified Data.Set as S
-import Data.List (foldl')
-import Control.Lens (_1)
+import Data.List (foldl', intercalate)
 
 -- CARD MATCHERS
 --
@@ -86,17 +85,25 @@ matchStrength :: (Int, Int) -> CardMatcher
 matchStrength (p, t) = labelMatch ("P/T = " <> show p <> "/" <> show t) $
   matchPower p <> matchToughness t
 
+-- Match all cards that have a the supplied target. Note this is distinct from
+-- "all cards that match a target". Use a name matcher for that after
+-- unwrapping the target.
 matchTarget :: Target -> CardMatcher
 matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
   (elem t . view cardTargets)
 
+-- Matcher combinator for matching any of the given parameters with a specific
+-- matcher. The example matches card that have protection from Blue or Red:
+--
+-- > matchAny matchProtection [Blue, Red]
 matchAny :: (a -> CardMatcher) -> [a] -> CardMatcher
-matchAny f = foldl' (flip matchOr) matchNone . map f
+matchAny f = foldl' (flip matchOr) (labelMatch "" matchNone) . map f
 
 missingAttribute = invert . matchAttribute
 
 (CardMatcher d1 f) `matchOr` (CardMatcher d2 g) =
-    CardMatcher (d1 <> " or " <> d2) $ \c -> f c || g c
+    CardMatcher (intercalate " or " . filter (not . null) $ [d1, d2])
+      $  \c -> f c || g c
 
 invert :: CardMatcher -> CardMatcher
 invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f
