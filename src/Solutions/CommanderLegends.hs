@@ -3,7 +3,7 @@ import Dovin.V3
 
 import Data.Maybe (mapMaybe)
 
-import Control.Monad (forM_)
+import Control.Monad (forM_, foldM, when)
 import Control.Monad.Except (catchError, throwError)
 import Control.Lens (modifying, at, non, use, assign, Lens')
 
@@ -11,6 +11,7 @@ import qualified Data.Set as S
 import qualified Data.HashMap.Strict as M
 
 commander = "commander"
+pirate = "pirate"
 
 solution :: GameMonad ()
 solution = do
@@ -58,7 +59,8 @@ solution = do
 
     as Active $ do
       withZone Hand $ do
-        withAttribute flying $ addCreature (2, 2) "Malcolm, Keen-Eyed Navigator"
+        withAttributes [pirate, flying]
+          $ addCreature (2, 2) "Malcolm, Keen-Eyed Navigator"
         addInstant "Soul's Fire"
         addInstant "Wrong Turn"
 
@@ -72,7 +74,7 @@ solution = do
         addLands 2 "Mountain"
         addLands 2 "Plains"
 
-        addCreature (4, 4) "Port Razer"
+        withAttribute pirate $ addCreature (4, 4) "Port Razer"
         withAttribute commander
           $ withColors [White]
           $ addCreature (2, 2) "Ardenn, Intrepid Archaeologist"
@@ -128,8 +130,7 @@ solution = do
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
-    resolveTop
-    withZone Play $ addArtifact "Treasure 1"
+    resolveMalcolmTrigger
 
     resolveTop
     forCards (matchInPlay <> matchController Active) $ \cn -> do
@@ -158,15 +159,11 @@ solution = do
       , "Malcolm, Keen-Eyed Navigator"
       ]
 
-
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
   step "Create treasures from Malcomn's trigger" $ do
-    resolve "Treasures"
-    -- TODO: Automatically figure out how many there should be, or validate
-    withZone Play $ addArtifact "Treasure 2"
-    withZone Play $ addArtifact "Treasure 3"
+    resolveMalcolmTrigger
 
   step "Cast Wrong Turn to give Archon back to P1" $ do
     tapForMana "U" "Treasure 1"
@@ -216,10 +213,7 @@ solution = do
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
   step "Create treasures from Malcomn's trigger (unused)" $ do
-    -- TODO: Automatically figure out how many there should be, or validate
-    resolve "Treasures"
-    withZone Play $ withAttribute token $ addArtifact "Treasure 4"
-    withZone Play $ withAttribute token $ addArtifact "Treasure 5"
+    resolveMalcolmTrigger
 
   step "Untap and another combat phase from Port Razer's trigger" $ do
     resolve "Another combat phase"
@@ -249,6 +243,21 @@ solution = do
       [ "Angel 3"
       ]
 
+resolveMalcolmTrigger = do
+  resolve "Treasures"
+  n <- use malcolmCounter
+
+  forM_ (replicate n undefined) . const $ do
+    modifying treasureCounter (+ 1)
+
+    n <- use treasureCounter
+
+    let name = "Treasure " <> show n
+
+    withZone Play $ withAttribute token $ addArtifact name
+
+  assign malcolmCounter 0
+
 attach cn tn = do
   c <- requireCard cn $ matchInPlay
 
@@ -277,13 +286,9 @@ attackPlayerTo opponent expectedLife attackers = do
 
     let mostLife = opLife == maxLife
 
-    swordAttacking <- (
-      do
-        requireCard "Seraphic Greatsword" $
-          matchAny matchTarget (map TargetCard attackers)
-
-        pure True
-      ) `catchError` const (pure False)
+    swordAttacking <- check
+                        (matchAny matchTarget (map TargetCard attackers))
+                        "Seraphic Greatsword"
 
     if mostLife && swordAttacking then do
       trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
@@ -312,17 +317,25 @@ attackPlayerTo opponent expectedLife attackers = do
 
   forM_ finalAttackers $ combatDamageTo (TargetPlayer opponent) []
 
+  malcolmTrigger <-
+    foldM
+      (\a cn -> (||) a <$> check (matchAttribute pirate) cn)
+      False
+      finalAttackers
+
+  when malcolmTrigger (modifying malcolmCounter (+ 1))
+
   validateLife expectedLife opponent
 
 -- copy of 'attackWith', but allow haste-y attacking if a different player
 -- controls Frenzied Saddlebrute
 attackPlayerWith :: Player -> [CardName] -> GameMonad ()
 attackPlayerWith player cs = do
-  hasteMatcher <-
-    (do
-      validate (matchInPlay <> invert (matchController player)) "Frenzied Saddlebrute"
-      return matchAll
-    ) `catchError` (const . return $ matchAttribute haste)
+  saddlebruteBackdoor <- check
+                           (matchInPlay <> invert (matchController player))
+                           "Frenzied Saddlebrute"
+  let hasteMatcher =
+        if saddlebruteBackdoor then matchAll else matchAttribute haste
 
   forM_ cs $ \cn -> do
     c <- requireCard cn
@@ -340,8 +353,17 @@ attackPlayerWith player cs = do
       (gainAttribute tapped)
     gainAttribute attacking cn
 
+check matcher cn =
+  (requireCard cn matcher >> pure True) `catchError` const (pure False)
+
 angelCounter :: Control.Lens.Lens' Board Int
 angelCounter = counters . at "angels" . non 0
+
+treasureCounter :: Control.Lens.Lens' Board Int
+treasureCounter = counters . at "treasure" . non 0
+
+malcolmCounter :: Control.Lens.Lens' Board Int
+malcolmCounter = counters . at "malcolm" . non 0
 
 allPlayers = [Active, OpponentN 1, OpponentN 2, OpponentN 3]
 
