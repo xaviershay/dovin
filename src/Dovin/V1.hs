@@ -55,7 +55,11 @@ validateLife = flip Dovin.Actions.validateLife
 
 -- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
-withLocation loc = local (set (envTemplate . cardLocation) loc)
+withLocation (p, loc) = local (
+      set (envTemplate . cardLocation) (p, loc)
+    . set (envTemplate . cardController) p
+    . set (envTemplate . cardZone) loc
+  )
 
 activate mana targetName = do
   card <- requireCard targetName mempty

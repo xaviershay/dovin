@@ -28,6 +28,7 @@ module Dovin.Builder (
   , withEffect
   , withEffectWhen
   , withLocation
+  , withZone
   , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
@@ -42,8 +43,10 @@ import Dovin.Helpers (getTimestamp)
 import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
+import Debug.Trace
+
 import Control.Monad.Reader (local)
-import Control.Lens (_1)
+import Control.Lens (_1, _2)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
@@ -60,7 +63,7 @@ addCard name = do
       modifying cards (M.insert name (BaseCard
         $ set cardName name
         . set cardTimestamp now
-        . set cardOwner (maybe (view (cardLocation . _1) template) id owner)
+        -- . set cardOwner (maybe (view (cardLocation . _1) template) id owner)
         $ template))
       resolveEffects
 
@@ -98,7 +101,11 @@ addSorcery name = withAttribute sorcery $ addCard name
 
 -- | Perform action as the specified player.
 as :: Player -> GameMonad () -> GameMonad ()
-as = local . set envActor
+as p = local (
+    set envActor p
+    . set (envTemplate . cardController) p
+    . set (envTemplate . cardOwner) p
+  )
 
 -- | Add an attribute to the created card, as identified by a string.
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
@@ -157,7 +164,19 @@ withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   p <- view envActor
 
-  local (set (envTemplate . cardLocation) (p, loc)) m
+  local (
+        set (envTemplate . cardLocation) (p, loc)
+      . set (envTemplate . cardController) p
+      . set (envTemplate . cardZone) (trace (show loc) loc)
+    ) m
+
+-- | Place the created card into a specific zone.
+withZone :: Zone -> GameMonad () -> GameMonad ()
+withZone n =
+  local (
+      set (envTemplate . cardZone) n
+    . set (envTemplate . cardLocation . _2) n
+    )
 
 -- | Set the owner for the created card. If not specified, defaults to the
 -- owner of the card location.

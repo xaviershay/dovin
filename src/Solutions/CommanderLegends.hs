@@ -1,5 +1,4 @@
-module Solutions.CommanderLegends where
-
+module Solutions.CommanderLegends where 
 import Dovin.V3
 
 import Data.Maybe (mapMaybe)
@@ -21,27 +20,27 @@ solution = do
     as (OpponentN 3) $ setLife 46
 
     as (OpponentN 2) $ do
-      withLocation Play $
+      withZone Play $
         addCreature (5, 4) "Frenzied Saddlebrute"
 
     as (OpponentN 3) $ do
-      withLocation Play $ do
+      withZone Play $ do
         addCreature (4, 4) "Sengir, the Dark Baron"
         withColors [Black, Green, Blue]
           $ withAttribute commander
           $ addCreature (2, 4) "Archelos, Lagoon Mystic"
 
     as Active $ do
-      withLocation Hand $ do
+      withZone Hand $ do
         withAttribute flying $ addCreature (2, 2) "Malcolm, Keen-Eyed Navigator"
         addInstant "Soul's Fire"
 
-      withLocation Command $ do
+      withZone Command $ do
         withAttribute commander
           $ withColors [Red, Blue]
           $ addCreature (4, 4) "Kraum, Ludevic's Opus"
 
-      withLocation Play $ do
+      withZone Play $ do
         addLands 2 "Island"
         addLands 2 "Mountain"
         addLands 2 "Plains"
@@ -51,14 +50,14 @@ solution = do
           $ withColors [White]
           $ addCreature (2, 2) "Ardenn, Intrepid Archaeologist"
 
-        withOwner (OpponentN 3)
+        as (OpponentN 3)
           $ withEffect
               -- TODO: Tidy all this up
               ((foldr (\cn m -> matchName cn `matchOr` m) matchNone
                 . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
               [ effectPTAdjust (3, 3)
               , effectProtectionF (const $ do
-                  controller <- viewSelf cardOwner
+                  controller <- viewSelf cardController
                   commanders <- askCards
                     (matchController controller <> matchAttribute commander)
 
@@ -71,12 +70,12 @@ solution = do
               "Equipped gets +3/+3 and pro colors NOT in commander colors"
               $ addArtifact "Commander's Plate"
         withCardTarget "Commander's Plate"
-          $ withEffect
-              ((foldr (\cn m -> matchName cn `matchOr` m) matchNone
-                . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
-              [ effectSetControllerF (const $ viewSelf cardOwner)
-              ]
-              "Gain control of target"
+           $ withEffect
+               ((foldr (\cn m -> matchName cn `matchOr` m) matchNone
+                 . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
+               [ effectControlF (const $ viewSelf cardController)
+               ]
+               "Gain control of target"
           $ addAura "Confiscate"
         withCardTarget "Ardenn, Intrepid Archaeologist"
           $ withEffect
@@ -161,7 +160,7 @@ attributes = attributeFormatter $ do
   attribute "life #2" $ countLife (OpponentN 2)
   attribute "life #3" $ countLife (OpponentN 3)
 
-formatter _ = attributes <> boardFormatter
+formatter _ = attributes <> boardFormatter2
 
 matchCanBlock =
   matchInPlay <> matchAttribute creature <> missingAttribute tapped

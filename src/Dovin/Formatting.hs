@@ -8,6 +8,7 @@ import Dovin.Prelude
 import Dovin.Types
 
 import Control.Monad.Writer (Writer, execWriter, tell)
+import Control.Lens (alongside)
 
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
@@ -110,6 +111,26 @@ boardFormatter board =
     cs = let Right value = execMonad board allCards in value
     formatLocation (Active, Stack) = stackFormatter
     formatLocation l = cardFormatter (show l) (matchLocation l)
+
+dup x = (x, x)
+
+boardFormatter2 :: Formatter
+boardFormatter2 board =
+  let
+    allLocations = nub . sort . map (view (alongside cardController cardZone) . dup) $ cs
+  in
+
+  let formatters = map
+                     formatLocation
+                     allLocations in
+
+  mconcat formatters board
+
+  where
+    cs = let Right value = execMonad board allCards in value
+    formatLocation (Active, Stack) = stackFormatter
+    formatLocation (controller, zone) = cardFormatter (show (controller, zone))
+      (matchController controller <> matchZone zone)
 
 attribute :: Show a => String -> GameMonad a -> FormatMonad ()
 attribute label m = tell [(label, show <$> m)]

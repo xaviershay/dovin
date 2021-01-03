@@ -3,6 +3,7 @@ import Control.Lens (view)
 import Dovin.Types (stepNumber)
 
 import qualified Solutions.ChannelFireball
+import qualified Solutions.CommanderLegends
 import qualified Solutions.Core19_9
 import qualified Solutions.Dominaria5
 import qualified Solutions.Example
@@ -23,6 +24,7 @@ import qualified Solutions.WarOfTheSpark2
 
 all = [
   ("ChannelFireball", Solutions.ChannelFireball.solution, Solutions.ChannelFireball.formatter),
+  ("CommanderLegends", Solutions.CommanderLegends.solution, Solutions.CommanderLegends.formatter),
   ("Core19_9", Solutions.Core19_9.solution, Solutions.Core19_9.formatter . view stepNumber),
   ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter . view stepNumber),
   ("Example", Solutions.Example.solution, Solutions.Example.formatter),

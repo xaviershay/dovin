@@ -31,6 +31,7 @@ type ManaString = String
 data Location = Hand | Graveyard | Play | Stack | Exile | Deck | Command
   deriving (Show, Eq, Ord)
 
+type Zone = Location
 -- The original CardEffect type. This is deprecated as of V3, replaced by
 -- LayeredEffect.
 data CardEffect = CardEffect
@@ -147,6 +148,8 @@ data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
   , _cardOwner :: Player
+  , _cardController :: Player
+  , _cardZone :: Zone
   , _cardDefaultAttributes :: CardAttributes
   , _cardAttributes :: CardAttributes
   , _cardStrength :: CardStrength
@@ -265,9 +268,6 @@ cardToughness f parent = fmap
     setToughness t (CardStrength p _) = CardStrength p t
     toughness (CardStrength _ t) = t
 
-cardController :: Control.Lens.Lens' Card Player
-cardController = cardLocation . _1
-
 manaPoolFor p = manaPool . at p . non mempty
 
 -- I can't figure out the right type signature for manaPoolFor, so instead
@@ -325,6 +325,8 @@ mkCard name location =
     , _cardAbilityEffects = mempty
     , _cardTimestamp = 0
     , _cardOwner = fst location
+    , _cardController = fst location
+    , _cardZone = Play
     , _cardProtection = mempty
     }
 

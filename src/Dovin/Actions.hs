@@ -512,7 +512,7 @@ move from to name = action "move" $ do
   c <- requireCard name $ matchLocation from
 
   when (from == to) $
-    throwError "cannot move to same location"
+    throwError $ "cannot move to same location: " <> show from
 
   when (snd to == Stack) $
     throwError "cannot move directly to stack"
@@ -543,8 +543,9 @@ move from to name = action "move" $ do
       moveTo Exile name
   else if snd from == Play && snd to == Graveyard && view cardPlusOneCounters c == 0 && hasAttribute undying c then
     modifyCardDeprecated name cardPlusOneCounters (+ 1)
-  else
+  else do
     modifyCardDeprecated name location (const to)
+    modifyCardDeprecated name cardZone (const (snd to))
 
 -- | Target a permanent.
 --
