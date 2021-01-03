@@ -29,7 +29,6 @@ module Dovin.Builder (
   , withEffectWhen
   , withLocation
   , withZone
-  , withOwner
   , withPlusOneCounters
   , withMinusOneCounters
   , withCardTarget
@@ -57,7 +56,6 @@ addCard name = do
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
-      owner <- view envOwner
       modifying cards (M.insert name (BaseCard
         $ set cardName name
         . set cardTimestamp now
@@ -101,7 +99,6 @@ as :: Player -> GameMonad () -> GameMonad ()
 as p = local (
     set envActor p
     . set (envTemplate . cardController) p
-    . set (envTemplate . cardOwner) p
   )
 
 -- | Add an attribute to the created card, as identified by a string.
@@ -174,11 +171,6 @@ withZone n =
       set (envTemplate . cardZone) n
     . set (envTemplate . cardLocation . _2) n
     )
-
--- | Set the owner for the created card. If not specified, defaults to the
--- owner of the card location.
-withOwner :: Player -> GameMonad () -> GameMonad ()
-withOwner = local . set envOwner . Just
 
 -- | Set the target for the created card.
 withCardTarget :: CardName -> GameMonad () -> GameMonad ()

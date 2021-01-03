@@ -154,7 +154,6 @@ data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffectPart]
 data Card = Card
   { _cardName :: CardName
   , _location :: (Player, Location)
-  , _cardOwner :: Player
   , _cardController :: Player
   , _cardZone :: Zone
   , _cardDefaultAttributes :: CardAttributes
@@ -218,7 +217,6 @@ data Env = Env
   { _envTemplate :: Card
   , _envSBAEnabled :: Bool
   , _envActor :: Player
-  , _envOwner :: Maybe Player
   }
 
 type StepIdentifier = (Maybe String, Int)
@@ -303,11 +301,6 @@ emptyEnv = Env
   { _envTemplate = emptyCard
   , _envSBAEnabled = True
   , _envActor = Active
-  -- This is a bit of a hack for allowing us to default the owner to the
-  -- location if none was specified. Ideally, the type of cardOwner in the
-  -- template would be a Maybe, but that would require duplicating the Card
-  -- type which doesn't seem worth it.
-  , _envOwner = Nothing
   }
 
 mkStrength (p, t) = CardStrength p t
@@ -331,7 +324,6 @@ mkCard name location =
     , _cardPassiveEffects = mempty
     , _cardAbilityEffects = mempty
     , _cardTimestamp = 0
-    , _cardOwner = fst location
     , _cardController = fst location
     , _cardZone = Play
     , _cardProtection = mempty

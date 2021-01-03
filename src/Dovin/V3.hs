@@ -18,6 +18,7 @@ module Dovin.V3
   ( module Dovin.V2
   , module Dovin.Builder
   , module Dovin.Effects
+  , withOwner
   )
   where
 
@@ -40,3 +41,6 @@ import Dovin.Effects
   , askCards
   )
 
+-- | Now a no-op, removed in subsequent versions. Was unused.
+withOwner :: Player -> GameMonad () -> GameMonad ()
+withOwner = return . const (return ())

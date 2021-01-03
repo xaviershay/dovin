@@ -59,9 +59,6 @@ matchOther attribute card =
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view cardController
 
-matchOwner player = CardMatcher ("has owner " <> show player) $
-  (==) player . view cardOwner
-
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
 
