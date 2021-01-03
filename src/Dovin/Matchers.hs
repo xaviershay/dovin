@@ -88,9 +88,9 @@ matchStrength :: (Int, Int) -> CardMatcher
 matchStrength (p, t) = labelMatch ("P/T = " <> show p <> "/" <> show t) $
   matchPower p <> matchToughness t
 
-matchTarget :: Target -> CardMatcher
+matchTarget :: CardName -> CardMatcher
 matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
-  ((==) t . TargetCard . view cardName)
+  (elem (TargetCard t) . view cardTargets)
 
 missingAttribute = invert . matchAttribute
 

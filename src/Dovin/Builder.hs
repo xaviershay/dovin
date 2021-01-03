@@ -43,8 +43,6 @@ import Dovin.Helpers (getTimestamp)
 import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
-import Debug.Trace
-
 import Control.Monad.Reader (local)
 import Control.Lens (_1, _2)
 import qualified Data.HashMap.Strict as M
@@ -167,7 +165,7 @@ withLocation loc m = do
   local (
         set (envTemplate . cardLocation) (p, loc)
       . set (envTemplate . cardController) p
-      . set (envTemplate . cardZone) (trace (show loc) loc)
+      . set (envTemplate . cardZone) loc
     ) m
 
 -- | Place the created card into a specific zone.

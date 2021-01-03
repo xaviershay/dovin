@@ -1,20 +1,21 @@
-module Solutions.CommanderLegends where 
+module Solutions.CommanderLegends where
 import Dovin.V3
 
 import Data.Maybe (mapMaybe)
 
-import Debug.Trace
-
 import Control.Monad (forM_)
 import Control.Monad.Except (catchError, throwError)
+import Control.Lens (modifying, at, non, use, assign, Lens')
 
 import qualified Data.Set as S
+import qualified Data.HashMap.Strict as M
 
 commander = "commander"
 
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
+    as Active $ setLife 10
     as (OpponentN 1) $ setLife 29
     as (OpponentN 2) $ setLife 23
     as (OpponentN 3) $ setLife 46
@@ -72,7 +73,7 @@ solution = do
 
                   let colors =
                         foldl S.union mempty (map (view cardColors) commanders)
-  
+
                   return (S.difference allColors colors)
               )
               ]
@@ -127,26 +128,8 @@ solution = do
   step "Attack with Port Razer & Malcolm" $ do
     transitionTo DeclareAttackers
 
-    attackPlayerWith (OpponentN 3) 
+    attackPlayerTo (OpponentN 3) 31
       [ "Port Razer", "Malcolm, Keen-Eyed Navigator" ]
-
-    trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
-    -- TODO: validate player being attacked has most life
-
-    withLocation Play
-      $ withAttributes [token, tapped, attacking, flying]
-      $ addCreature (4, 4) "Angel 1"
-
-    forCards (matchController (OpponentN 3) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forCards (matchAttribute attacking) $
-        validate
-          (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-    forCards (matchAttribute attacking) $
-      combatDamageTo (TargetPlayer $ OpponentN 3) []
-
-    validateLife 31 (OpponentN 3)
 
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
@@ -171,55 +154,18 @@ solution = do
   step "Attack P1 with Ardenn" $ do
     transitionTo DeclareAttackers
 
-    -- Technically out of order, but simplies things a bit
-    trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
-    -- TODO: validate player being attacked has most life
-
-    withLocation Play
-      $ withAttributes [token, tapped, attacking, flying]
-      $ addCreature (4, 4) "Angel 2"
-
-    let attackingP1 = [ "Ardenn, Intrepid Archaeologist" ]
-    let attackingP2 = [ "Port Razer" ]
-    let attackingP3 =
-          [ "Archon of Coronation"
-          , "Angel 1"
-          , "Angel 2"
-          , "Malcolm, Keen-Eyed Navigator"
-          ]
-
-    attackPlayerWith (OpponentN 1) attackingP1
-    attackPlayerWith (OpponentN 2) attackingP2
-    attackPlayerWith (OpponentN 3) attackingP3
-
-    forCards (matchController (OpponentN 1) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP1 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forCards (matchController (OpponentN 2) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP2 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forCards (matchController (OpponentN 3) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP3 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forM_ attackingP1 $ combatDamageTo (TargetPlayer $ OpponentN 1) []
-    forM_ attackingP2 $ combatDamageTo (TargetPlayer $ OpponentN 2) []
-    forM_ attackingP3 $ combatDamageTo (TargetPlayer $ OpponentN 3) []
+    attackPlayerTo (OpponentN 1) 27
+      [ "Ardenn, Intrepid Archaeologist" ]
+    attackPlayerTo (OpponentN 2) 16
+      [ "Port Razer" ]
+    attackPlayerTo (OpponentN 3) 14
+      [ "Archon of Coronation"
+      , "Angel 1"
+      , "Malcolm, Keen-Eyed Navigator"
+      ]
 
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
-
-    validateLife 27 (OpponentN 1)
-    validateLife 16 (OpponentN 2)
-    validateLife 14 (OpponentN 3)
 
   step "Resolve combat triggers" $ do
     -- TODO: Automatically figure out how many there should be, or validate
@@ -257,59 +203,19 @@ solution = do
   step "Third combat" $ do
     transitionTo DeclareAttackers
 
-    -- Technically out of order, but simplies things a bit
-    trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
-    -- TODO: validate player being attacked has most life
-
-    withLocation Play
-      $ withAttributes [token, tapped, attacking, flying]
-      $ addCreature (4, 4) "Angel 3"
-
-    let attackingP1 =
-          [ "Port Razer"
-          , "Frenzied Saddlebrute"
-          , "Ardenn, Intrepid Archaeologist"
-          , "Angel 3"
-          ]
-    let attackingP2 = [ ]
-    let attackingP3 =
-          [ "Angel 1"
-          , "Angel 2"
-          , "Malcolm, Keen-Eyed Navigator"
-          ]
-
-    attackPlayerWith (OpponentN 1) attackingP1
-    attackPlayerWith (OpponentN 2) attackingP2
-    attackPlayerWith (OpponentN 3) attackingP3
-
-    forCards (matchController (OpponentN 1) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP1 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forCards (matchController (OpponentN 2) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP2 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forCards (matchController (OpponentN 3) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP3 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forM_ attackingP1 $ combatDamageTo (TargetPlayer $ OpponentN 1) []
-    forM_ attackingP2 $ combatDamageTo (TargetPlayer $ OpponentN 2) []
-    forM_ attackingP3 $ combatDamageTo (TargetPlayer $ OpponentN 3) []
+    attackPlayerTo (OpponentN 1) 7
+      [ "Port Razer"
+      , "Frenzied Saddlebrute"
+      , "Ardenn, Intrepid Archaeologist"
+      ]
+    attackPlayerTo (OpponentN 3) 4
+      [ "Angel 1"
+      , "Angel 2"
+      , "Malcolm, Keen-Eyed Navigator"
+      ]
 
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
-
-    validateLife 7 (OpponentN 1)
-    validateLife 16 (OpponentN 2)
-    validateLife 4 (OpponentN 3)
 
   step "Resolve combat triggers" $ do
     -- TODO: Automatically figure out how many there should be, or validate
@@ -331,64 +237,22 @@ solution = do
   step "Fourth combat" $ do
     transitionTo DeclareAttackers
 
-    -- Technically out of order, but simplies things a bit
-    trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
-    -- TODO: validate player being attacked has most life
-
-    withLocation Play
-      $ withAttributes [token, tapped, attacking, flying]
-      $ addCreature (4, 4) "Angel 4"
-
-    let attackingP1 =
-          [ "Frenzied Saddlebrute"
-          , "Ardenn, Intrepid Archaeologist"
-          ]
-    let attackingP2 =
-          [ "Angel 1"
-          , "Angel 2"
-          , "Angel 4"
-          , "Malcolm, Keen-Eyed Navigator"
-          ]
-    let attackingP3 =
-          [ "Angel 3"
-          ]
-
-    attackPlayerWith (OpponentN 1) attackingP1
-    attackPlayerWith (OpponentN 2) attackingP2
-    attackPlayerWith (OpponentN 3) attackingP3
-
-    forCards (matchController (OpponentN 1) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP1 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forCards (matchController (OpponentN 2) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP2 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forCards (matchController (OpponentN 3) <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
-
-      forM_ attackingP3 $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
-
-    forM_ attackingP1 $ combatDamageTo (TargetPlayer $ OpponentN 1) []
-    forM_ attackingP2 $ combatDamageTo (TargetPlayer $ OpponentN 2) []
-    forM_ attackingP3 $ combatDamageTo (TargetPlayer $ OpponentN 3) []
-
-    trigger "Another combat phase" "Port Razer"
-    trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
-
-    validateLife 0 (OpponentN 1)
-    validateLife 0 (OpponentN 2)
-    validateLife 0 (OpponentN 3)
+    attackPlayerTo (OpponentN 1) 0
+      [ "Frenzied Saddlebrute"
+      , "Ardenn, Intrepid Archaeologist"
+      ]
+    attackPlayerTo (OpponentN 2) 0
+      [ "Angel 1"
+      , "Angel 2"
+      , "Malcolm, Keen-Eyed Navigator"
+      ]
+    attackPlayerTo (OpponentN 3) 0
+      [ "Angel 3"
+      ]
 
 attach cn tn = do
   c <- requireCard cn $ matchInPlay
-  
+
   validate matchInPlay tn
 
   modifyCard cardTargets (const [TargetCard tn]) cn
@@ -412,6 +276,57 @@ matchProtectionAny =
     matchNone
   . map matchProtection
   . S.toList
+
+attackPlayerTo :: Player -> Int -> [CardName] -> GameMonad ()
+attackPlayerTo opponent expectedLife attackers = do
+    attackPlayerWith opponent attackers
+
+    finalAttackers <- do
+      opLife <- countLife opponent
+      maxLife <- maximum <$> mapM countLife allPlayers
+
+      let mostLife = opLife == maxLife
+
+      swordAttacking <- (
+        do
+          requireCard "Seraphic Greatsword"
+            (foldr matchOr matchNone . map matchTarget $ attackers)
+          pure True
+        ) `catchError` const (pure False)
+
+      if mostLife && swordAttacking then do
+        trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
+
+        modifying angelCounter (+ 1)
+
+        n <- use angelCounter
+
+        let name = "Angel " <> show n
+
+        withLocation Play
+          $ withAttributes [token, tapped, attacking, flying]
+          $ addCreature (4, 4) name
+
+        return (name:attackers)
+      else
+        return attackers
+
+    -- Check if player has most life
+    -- Check if sword attached to any of attackers
+    -- If yes, create a new angel
+    -- Addd to attackers array
+
+    --requireCard "Seraphic Greatsword"
+
+    forCards (matchController opponent <> matchCanBlock) $ \blocker -> do
+      blockerColors <- view cardColors <$> requireCard blocker mempty
+
+      forM_ finalAttackers $
+        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
+
+    forM_ finalAttackers $ combatDamageTo (TargetPlayer opponent) []
+
+    validateLife expectedLife opponent
 
 -- copy of 'attackWith', but allow haste-y attacking if a different player
 -- controls Frenzied Saddlebrute
@@ -438,3 +353,8 @@ attackPlayerWith player cs = do
       -- Can't use 'tap' here because it checks summoning sickness.
       (gainAttribute tapped)
     gainAttribute attacking cn
+
+angelCounter :: Control.Lens.Lens' Board Int
+angelCounter = counters . at "angels" . non 0
+
+allPlayers = [Active, OpponentN 1, OpponentN 2, OpponentN 3]

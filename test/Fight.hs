@@ -2,8 +2,6 @@ module Fight where
 
 import TestPrelude
 
-import Debug.Trace
-
 test_Fight = testGroup "fight"
   [ prove "adds damage to both creatures" $ do
       withLocation (Active, Play) $ addCreature (2, 4) "Angel 1"
@@ -22,10 +20,6 @@ test_Fight = testGroup "fight"
       "in play" $ do
         withLocation (Active, Graveyard) $ addCreature (2, 4) "Angel 1"
         withLocation (Active, Play) $ addCreature (3, 4) "Angel 2"
-
-        c <- requireCard "Angel 1" matchInPlay
-
-        traceM (show $ view cardLocation c)
 
         fight "Angel 1" "Angel 2"
   , refute
