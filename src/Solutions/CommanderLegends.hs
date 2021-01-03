@@ -6,7 +6,7 @@ import Data.Maybe (mapMaybe)
 import Debug.Trace
 
 import Control.Monad (forM_)
-import Control.Monad.Except (catchError)
+import Control.Monad.Except (catchError, throwError)
 
 import qualified Data.Set as S
 
@@ -19,9 +19,17 @@ solution = do
     as (OpponentN 2) $ setLife 23
     as (OpponentN 3) $ setLife 46
 
-    as (OpponentN 2) $ do
+    as (OpponentN 1) $ do
       withZone Play $
-        addCreature (5, 4) "Frenzied Saddlebrute"
+        withAttribute flying
+        $ addCreature (5, 5) "Archon of Coronation"
+
+    as (OpponentN 2) $ do
+      withZone Play $ do
+        withColors [Red]
+          $ addCreature (5, 4) "Frenzied Saddlebrute"
+        withColors [Red, White]
+          $ addCreature (7, 5) "Dargo, the Shipwrecker"
 
     as (OpponentN 3) $ do
       withZone Play $ do
@@ -116,6 +124,8 @@ solution = do
     attach "Seraphic Greatsword" "Port Razer"
 
   step "Attack with Port Razer & Malcolm" $ do
+    transitionTo DeclareAttackers
+
     attackPlayerWith (OpponentN 3) 
       [ "Port Razer", "Malcolm, Keen-Eyed Navigator" ]
 
@@ -139,16 +149,73 @@ solution = do
 
     trigger "Another combat phase" "Port Razer" >> resolveTop
 
+    forCards (matchInPlay <> matchController Active) $ \cn -> do
+      loseAttribute attacking cn
+      loseAttribute tapped cn
+
     transitionToForced BeginCombat
 
   step "Second combat, move Confiscate & Greatsword to Archon" $ do
     trigger "Ardenn Attach" "Ardenn, Intrepid Archaeologist" >> resolveTop
 
     attach "Confiscate" "Archon of Coronation"
+    gainAttribute summoned "Archon of Coronation"
     attach "Seraphic Greatsword" "Archon of Coronation"
+
+  step "Attack P1 with Ardenn" $ do
+    transitionTo DeclareAttackers
+
+    -- Technically out of order, but simplies things a bit
+    trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
+    -- TODO: validate player being attacked has most life
+
+    withLocation Play
+      $ withAttributes [token, tapped, attacking, flying]
+      $ addCreature (4, 4) "Angel 2"
+
+    let attackingP1 = [ "Ardenn, Intrepid Archaeologist" ]
+    let attackingP2 = [ "Port Razer" ]
+    let attackingP3 =
+          [ "Archon of Coronation"
+          , "Angel 1"
+          , "Angel 2"
+          , "Malcolm, Keen-Eyed Navigator"
+          ]
+
+    attackPlayerWith (OpponentN 1) attackingP1
+    attackPlayerWith (OpponentN 2) attackingP2
+    attackPlayerWith (OpponentN 3) attackingP3
+
+    forCards (matchController (OpponentN 1) <> matchCanBlock) $ \blocker -> do
+      blockerColors <- view cardColors <$> requireCard blocker mempty
+
+      forM_ attackingP1 $
+        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
+
+    forCards (matchController (OpponentN 2) <> matchCanBlock) $ \blocker -> do
+      blockerColors <- view cardColors <$> requireCard blocker mempty
+
+      forM_ attackingP2 $
+        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
+
+    forCards (matchController (OpponentN 3) <> matchCanBlock) $ \blocker -> do
+      blockerColors <- view cardColors <$> requireCard blocker mempty
+
+      forM_ attackingP3 $
+        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
+
+    forM_ attackingP1 $ combatDamageTo (TargetPlayer $ OpponentN 1) []
+    forM_ attackingP2 $ combatDamageTo (TargetPlayer $ OpponentN 2) []
+    forM_ attackingP3 $ combatDamageTo (TargetPlayer $ OpponentN 3) []
+
+    validateLife 27 (OpponentN 1)
+    validateLife 16 (OpponentN 2)
+    validateLife 14 (OpponentN 3)
 
 attach cn tn = do
   c <- requireCard cn $ matchInPlay
+  
+  validate matchInPlay tn
 
   modifyCard cardTargets (const [TargetCard tn]) cn
 
@@ -176,8 +243,6 @@ matchProtectionAny =
 -- controls Frenzied Saddlebrute
 attackPlayerWith :: Player -> [CardName] -> GameMonad ()
 attackPlayerWith player cs = do
-  transitionTo DeclareAttackers
-
   hasteMatcher <-
     (do
       validate (matchInPlay <> invert (matchController player)) "Frenzied Saddlebrute"
