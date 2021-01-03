@@ -56,7 +56,6 @@ solution = do
           "Attached gets +3/+3 and pro colors NOT in commander colors"
           $ addArtifact "Commander's Plate"
 
-
     as Active $ do
       withZone Hand $ do
         withAttribute flying $ addCreature (2, 2) "Malcolm, Keen-Eyed Navigator"
@@ -119,12 +118,13 @@ solution = do
     attach "Commander's Plate" "Port Razer"
     attach "Seraphic Greatsword" "Port Razer"
 
-  step "Attack with Port Razer & Malcolm" $ do
+  step "Attack P3 with Port Razer & Malcolm" $ do
     transitionTo DeclareAttackers
 
     attackPlayerTo (OpponentN 3) 31
       [ "Port Razer", "Malcolm, Keen-Eyed Navigator" ]
 
+  step "Resolve combat triggers to untap attackers and creature treasure" $ do
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
@@ -145,7 +145,7 @@ solution = do
     gainAttribute summoned "Archon of Coronation"
     attach "Seraphic Greatsword" "Archon of Coronation"
 
-  step "Attack P1 with Ardenn" $ do
+  step "Attack P1 with Ardenn, P2 with Razer, P3 with Arcon and Malcolm" $ do
     transitionTo DeclareAttackers
 
     attackPlayerTo (OpponentN 1) 27
@@ -158,15 +158,17 @@ solution = do
       , "Malcolm, Keen-Eyed Navigator"
       ]
 
+
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
-  step "Resolve combat triggers" $ do
-    -- TODO: Automatically figure out how many there should be, or validate
+  step "Create treasures from Malcomn's trigger" $ do
     resolve "Treasures"
+    -- TODO: Automatically figure out how many there should be, or validate
     withZone Play $ addArtifact "Treasure 2"
     withZone Play $ addArtifact "Treasure 3"
 
+  step "Cast Wrong Turn to give Archon back to P1" $ do
     tapForMana "U" "Treasure 1"
     tapForMana "U" "Treasure 2"
     tapForMana "U" "Treasure 3"
@@ -180,7 +182,9 @@ solution = do
     addEffect (effectControl (OpponentN 1)) "Archon of Coronation"
     gainAttribute summoned "Archon of Coronation"
 
+  step "Untap and another combat phase from Port Razer's trigger" $ do
     resolve "Another combat phase"
+
     forCards (matchInPlay <> matchController Active) $ \cn -> do
       loseAttribute attacking cn
       loseAttribute tapped cn
@@ -194,7 +198,7 @@ solution = do
     gainAttribute summoned "Frenzied Saddlebrute"
     attach "Seraphic Greatsword" "Frenzied Saddlebrute"
 
-  step "Third combat" $ do
+  step "Attack P1 with Razer, Ardenn & Saddlebrute, P3 with Angels & Malcolm" $ do
     transitionTo DeclareAttackers
 
     attackPlayerTo (OpponentN 1) 7
@@ -211,12 +215,13 @@ solution = do
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
-  step "Resolve combat triggers" $ do
+  step "Create treasures from Malcomn's trigger (unused)" $ do
     -- TODO: Automatically figure out how many there should be, or validate
     resolve "Treasures"
-    withZone Play $ addArtifact "Treasure 4"
-    withZone Play $ addArtifact "Treasure 5"
+    withZone Play $ withAttribute token $ addArtifact "Treasure 4"
+    withZone Play $ withAttribute token $ addArtifact "Treasure 5"
 
+  step "Untap and another combat phase from Port Razer's trigger" $ do
     resolve "Another combat phase"
     forCards (matchInPlay <> matchController Active) $ \cn -> do
       loseAttribute attacking cn
@@ -228,7 +233,7 @@ solution = do
     trigger "Ardenn Attach" "Ardenn, Intrepid Archaeologist" >> resolveTop
     attach "Seraphic Greatsword" "Angel 1"
 
-  step "Fourth combat" $ do
+  step "Attack P1 with Ardenn & Saddlebrute, P3 with angel, P2 with rest" $ do
     transitionTo DeclareAttackers
 
     attackPlayerTo (OpponentN 1) 0
@@ -345,4 +350,30 @@ attributes = attributeFormatter $ do
   attribute "life #2" $ countLife (OpponentN 2)
   attribute "life #3" $ countLife (OpponentN 3)
 
-formatter _ = attributes <> boardFormatter2
+playFormatter player = cardFormatter (show player <> " play (ex. lands)")
+ (matchController player <> invert (matchAttribute land) <> matchZone Play)
+
+attackFormatter = cardFormatter "attackers"
+ (matchController Active <> matchAttribute attacking)
+
+playFormatters = foldr (<>) mempty . map playFormatter
+
+formatter step = case view stepNumber step of
+  1 -> attributes <> boardFormatter2
+  3 -> playFormatters [Active, OpponentN 3]
+  5 -> attributes <> attackFormatter <> playFormatter (OpponentN 3)
+  8 -> attributes
+         <> attackFormatter
+         <> playFormatters [OpponentN 1, OpponentN 2, OpponentN 3]
+  9 -> cardFormatter "artifacts"
+         $ matchInPlay <> matchController Active <> matchAttribute artifact
+  10 -> playFormatter Active <> playFormatter (OpponentN 1)
+  13 -> attributes
+          <> attackFormatter
+          <> playFormatters [OpponentN 1, OpponentN 3]
+  15 -> playFormatter Active
+  14 -> mempty
+  17 -> attributes
+          <> attackFormatter
+          <> playFormatters [OpponentN 1, OpponentN 2, OpponentN 3]
+  _ -> playFormatter Active

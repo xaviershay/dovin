@@ -15,8 +15,15 @@ import qualified Data.Set as S
 import GHC.Generics
 
 data Color = Red | Green | Blue | Black | White
-  deriving (Show, Eq, Ord, Enum, Bounded)
+  deriving (Eq, Ord, Enum, Bounded)
 type Colors = S.Set Color
+
+instance Show Color where
+  show Red = "R"
+  show Green = "G"
+  show Blue = "U"
+  show Black = "B"
+  show White = "W"
 
 allColors :: Colors
 allColors = S.fromList [minBound..maxBound]
