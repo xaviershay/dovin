@@ -42,6 +42,7 @@ solution = do
       withZone Hand $ do
         withAttribute flying $ addCreature (2, 2) "Malcolm, Keen-Eyed Navigator"
         addInstant "Soul's Fire"
+        addInstant "Wrong Turn"
 
       withZone Command $ do
         withAttribute commander
@@ -147,8 +148,13 @@ solution = do
 
     validateLife 31 (OpponentN 3)
 
-    trigger "Another combat phase" "Port Razer" >> resolveTop
+    trigger "Another combat phase" "Port Razer"
+    trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
+    resolveTop
+    withZone Play $ addArtifact "Treasure 1"
+
+    resolveTop
     forCards (matchInPlay <> matchController Active) $ \cn -> do
       loseAttribute attacking cn
       loseAttribute tapped cn
@@ -208,9 +214,38 @@ solution = do
     forM_ attackingP2 $ combatDamageTo (TargetPlayer $ OpponentN 2) []
     forM_ attackingP3 $ combatDamageTo (TargetPlayer $ OpponentN 3) []
 
+    trigger "Another combat phase" "Port Razer"
+    trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
+
     validateLife 27 (OpponentN 1)
     validateLife 16 (OpponentN 2)
     validateLife 14 (OpponentN 3)
+
+  step "Resolve combat triggers" $ do
+    -- TODO: Automatically figure out how many there should be, or validate
+    resolve "Treasures"
+    withZone Play $ addArtifact "Treasure 2"
+    withZone Play $ addArtifact "Treasure 3"
+
+    tapForMana "U" "Treasure 1"
+    tapForMana "U" "Treasure 2"
+    tapForMana "U" "Treasure 3"
+
+    sacrifice "Treasure 1"
+    sacrifice "Treasure 2"
+    sacrifice "Treasure 3"
+
+    cast "2U" "Wrong Turn" >> resolveTop
+
+    addEffect (effectControl (OpponentN 1)) "Archon of Coronation"
+    gainAttribute summoned "Archon of Coronation"
+
+    resolve "Another combat phase"
+    forCards (matchInPlay <> matchController Active) $ \cn -> do
+      loseAttribute attacking cn
+      loseAttribute tapped cn
+
+    transitionToForced BeginCombat
 
 attach cn tn = do
   c <- requireCard cn $ matchInPlay

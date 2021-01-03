@@ -32,6 +32,7 @@ import Dovin.Effects
   , effectNoAbilities
   , effectAddType
   , effectProtectionF
+  , effectControl
   , effectControlF
   , enabledInPlay
   , viewSelf

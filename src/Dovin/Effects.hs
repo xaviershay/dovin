@@ -16,6 +16,7 @@ module Dovin.Effects
   , effectAddAbility
   , effectAddType
   , effectProtectionF
+  , effectControl
   , effectControlF
 
   , resolveEffects
@@ -86,6 +87,8 @@ effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffectPart
 effectProtectionF f = LayeredEffectPart Layer6 $ \c -> do
                         cs <- f c
                         return $ over cardProtection (cs <>) c
+
+effectControl = effectControlF . const . pure
 
 effectControlF :: (Card -> EffectMonad Player) -> LayeredEffectPart
 effectControlF f = LayeredEffectPart Layer2 $ \c -> do
