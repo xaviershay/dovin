@@ -135,8 +135,6 @@ boardFormatter board =
     formatLocation (Active, Stack) = stackFormatter
     formatLocation l = cardFormatter (show l) (matchLocation l)
 
-dup x = (x, x)
-
 boardFormatter2 :: Formatter
 boardFormatter2 board =
   let

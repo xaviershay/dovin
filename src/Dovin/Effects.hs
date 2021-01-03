@@ -209,8 +209,6 @@ resolveCounters board =
           else
             Just $ effectPTAdjust (p, t)
 
-        dup x = (x, x)
-
 collectNewEffectsAtLayer :: Layer -> (Board, Pile) -> (Board, Pile)
 collectNewEffectsAtLayer layer (board, pile) =
   (

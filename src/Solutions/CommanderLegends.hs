@@ -4,14 +4,10 @@ import Dovin.V3
 import Data.Maybe (mapMaybe)
 
 import Control.Monad (forM_, foldM, when)
-import Control.Monad.Except (catchError, throwError)
+import Control.Monad.Except (catchError)
 import Control.Lens (modifying, at, non, use, assign, Lens')
 
 import qualified Data.Set as S
-import qualified Data.HashMap.Strict as M
-
-commander = "commander"
-pirate = "pirate"
 
 solution :: GameMonad ()
 solution = do
@@ -51,7 +47,7 @@ solution = do
               let colors =
                     foldl S.union mempty (map (view cardColors) commanders)
 
-              return (S.difference allColors colors)
+              return $ S.difference allColors colors
           )
           ]
           "Attached gets +3/+3 and pro colors NOT in commander colors"
@@ -361,6 +357,9 @@ malcolmCounter :: Control.Lens.Lens' Board Int
 malcolmCounter = counters . at "malcolm" . non 0
 
 allPlayers = [Active, OpponentN 1, OpponentN 2, OpponentN 3]
+
+commander = "commander"
+pirate = "pirate"
 
 attributes = attributeFormatter $ do
   attribute "life #1" $ countLife (OpponentN 1)

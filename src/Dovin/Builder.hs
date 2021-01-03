@@ -44,7 +44,7 @@ import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
 import Control.Monad.Reader (local)
-import Control.Lens (_1, _2)
+import Control.Lens (_2)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
@@ -61,7 +61,6 @@ addCard name = do
       modifying cards (M.insert name (BaseCard
         $ set cardName name
         . set cardTimestamp now
-        -- . set cardOwner (maybe (view (cardLocation . _1) template) id owner)
         $ template))
       resolveEffects
 
