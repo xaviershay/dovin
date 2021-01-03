@@ -5,6 +5,7 @@ import Dovin.Attributes (creature)
 import Dovin.Types
 
 import qualified Data.Set as S
+import Data.List (foldl')
 import Control.Lens (_1)
 
 -- CARD MATCHERS
@@ -41,7 +42,7 @@ matchAttribute attr = CardMatcher ("has attribute " <> attr) $
   S.member attr . view cardAttributes
 
 matchAttributes :: [CardAttribute] -> CardMatcher
-matchAttributes = foldr ((<>) . matchAttribute) mempty
+matchAttributes = foldl' (flip $ (<>) . matchAttribute) mempty
 
 matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
@@ -88,9 +89,12 @@ matchStrength :: (Int, Int) -> CardMatcher
 matchStrength (p, t) = labelMatch ("P/T = " <> show p <> "/" <> show t) $
   matchPower p <> matchToughness t
 
-matchTarget :: CardName -> CardMatcher
+matchTarget :: Target -> CardMatcher
 matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
-  (elem (TargetCard t) . view cardTargets)
+  (elem t . view cardTargets)
+
+matchAny :: (a -> CardMatcher) -> [a] -> CardMatcher
+matchAny f = foldl' (flip matchOr) matchNone . map f
 
 missingAttribute = invert . matchAttribute
 

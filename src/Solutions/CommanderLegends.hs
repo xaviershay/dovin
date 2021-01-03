@@ -39,6 +39,24 @@ solution = do
           $ withAttribute commander
           $ addCreature (2, 4) "Archelos, Lagoon Mystic"
 
+        withEffect
+          matchAttached
+          [ effectPTAdjust (3, 3)
+          , effectProtectionF (const $ do
+              controller <- viewSelf cardController
+              commanders <- askCards
+                (matchController controller <> matchAttribute commander)
+
+              let colors =
+                    foldl S.union mempty (map (view cardColors) commanders)
+
+              return (S.difference allColors colors)
+          )
+          ]
+          "Attached gets +3/+3 and pro colors NOT in commander colors"
+          $ addArtifact "Commander's Plate"
+
+
     as Active $ do
       withZone Hand $ do
         withAttribute flying $ addCreature (2, 2) "Malcolm, Keen-Eyed Navigator"
@@ -60,45 +78,21 @@ solution = do
           $ withColors [White]
           $ addCreature (2, 2) "Ardenn, Intrepid Archaeologist"
 
-        as (OpponentN 3)
-          $ withEffect
-              -- TODO: Tidy all this up
-              ((foldr (\cn m -> matchName cn `matchOr` m) matchNone
-                . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
-              [ effectPTAdjust (3, 3)
-              , effectProtectionF (const $ do
-                  controller <- viewSelf cardController
-                  commanders <- askCards
-                    (matchController controller <> matchAttribute commander)
-
-                  let colors =
-                        foldl S.union mempty (map (view cardColors) commanders)
-
-                  return (S.difference allColors colors)
-              )
-              ]
-              "Equipped gets +3/+3 and pro colors NOT in commander colors"
-              $ addArtifact "Commander's Plate"
         withCardTarget "Commander's Plate"
            $ withEffect
-               ((foldr (\cn m -> matchName cn `matchOr` m) matchNone
-                 . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
+              matchAttached
                [ effectControlF (const $ viewSelf cardController)
                ]
                "Gain control of target"
           $ addAura "Confiscate"
+
         withCardTarget "Ardenn, Intrepid Archaeologist"
           $ withEffect
-              -- TODO: Tidy all this up
-              ((foldr
-                (\cn m -> matchName cn `matchOr` m)
-                (matchName "")
-                . mapMaybe extractCardTarget) <$> viewSelf cardTargets)
+              matchAttached
               [ effectPTAdjust (2, 2)
               ]
-              "Equipped gets +2/+2"
+              "Attached gets +2/+2"
               $ addArtifact "Seraphic Greatsword"
-
 
   step "Cast Malcolm" $ do
     tapForMana "U" "Island 1"
@@ -257,76 +251,63 @@ attach cn tn = do
 
   modifyCard cardTargets (const [TargetCard tn]) cn
 
-extractCardTarget (TargetCard cn) = Just cn
-extractCardTarget _ = Nothing
-
-attributes = attributeFormatter $ do
-  attribute "life #1" $ countLife (OpponentN 1)
-  attribute "life #2" $ countLife (OpponentN 2)
-  attribute "life #3" $ countLife (OpponentN 3)
-
-formatter _ = attributes <> boardFormatter2
-
 matchCanBlock =
   matchInPlay <> matchAttribute creature <> missingAttribute tapped
 
-matchProtectionAny =
-  foldr
-    matchOr
-    matchNone
-  . map matchProtection
-  . S.toList
+matchAttached :: EffectMonad CardMatcher
+matchAttached =
+  matchAny matchName . mapMaybe extractCardTarget <$> viewSelf cardTargets
+
+  where
+    extractCardTarget (TargetCard cn) = Just cn
+    extractCardTarget _ = Nothing
 
 attackPlayerTo :: Player -> Int -> [CardName] -> GameMonad ()
 attackPlayerTo opponent expectedLife attackers = do
-    attackPlayerWith opponent attackers
+  attackPlayerWith opponent attackers
 
-    finalAttackers <- do
-      opLife <- countLife opponent
-      maxLife <- maximum <$> mapM countLife allPlayers
+  finalAttackers <- do
+    opLife <- countLife opponent
+    maxLife <- maximum <$> mapM countLife allPlayers
 
-      let mostLife = opLife == maxLife
+    let mostLife = opLife == maxLife
 
-      swordAttacking <- (
-        do
-          requireCard "Seraphic Greatsword"
-            (foldr matchOr matchNone . map matchTarget $ attackers)
-          pure True
-        ) `catchError` const (pure False)
+    swordAttacking <- (
+      do
+        requireCard "Seraphic Greatsword" $
+          matchAny matchTarget (map TargetCard attackers)
 
-      if mostLife && swordAttacking then do
-        trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
+        pure True
+      ) `catchError` const (pure False)
 
-        modifying angelCounter (+ 1)
+    if mostLife && swordAttacking then do
+      trigger "Attacking angel" "Seraphic Greatsword" >> resolveTop
 
-        n <- use angelCounter
+      modifying angelCounter (+ 1)
 
-        let name = "Angel " <> show n
+      n <- use angelCounter
 
-        withLocation Play
-          $ withAttributes [token, tapped, attacking, flying]
-          $ addCreature (4, 4) name
+      let name = "Angel " <> show n
 
-        return (name:attackers)
-      else
-        return attackers
+      withLocation Play
+        $ withAttributes [token, tapped, attacking, flying]
+        $ addCreature (4, 4) name
 
-    -- Check if player has most life
-    -- Check if sword attached to any of attackers
-    -- If yes, create a new angel
-    -- Addd to attackers array
+      return (name:attackers)
+    else
+      return attackers
 
-    --requireCard "Seraphic Greatsword"
+  forCards (matchController opponent <> matchCanBlock) $ \blocker -> do
+    blockerColors <-
+      S.toList . view cardColors <$> requireCard blocker mempty
 
-    forCards (matchController opponent <> matchCanBlock) $ \blocker -> do
-      blockerColors <- view cardColors <$> requireCard blocker mempty
+    forM_ finalAttackers $
+      validate $ matchAttribute flying `matchOr`
+                 matchAny matchProtection blockerColors
 
-      forM_ finalAttackers $
-        validate (matchAttribute flying `matchOr` matchProtectionAny blockerColors)
+  forM_ finalAttackers $ combatDamageTo (TargetPlayer opponent) []
 
-    forM_ finalAttackers $ combatDamageTo (TargetPlayer opponent) []
-
-    validateLife expectedLife opponent
+  validateLife expectedLife opponent
 
 -- copy of 'attackWith', but allow haste-y attacking if a different player
 -- controls Frenzied Saddlebrute
@@ -358,3 +339,10 @@ angelCounter :: Control.Lens.Lens' Board Int
 angelCounter = counters . at "angels" . non 0
 
 allPlayers = [Active, OpponentN 1, OpponentN 2, OpponentN 3]
+
+attributes = attributeFormatter $ do
+  attribute "life #1" $ countLife (OpponentN 1)
+  attribute "life #2" $ countLife (OpponentN 2)
+  attribute "life #3" $ countLife (OpponentN 3)
+
+formatter _ = attributes <> boardFormatter2
