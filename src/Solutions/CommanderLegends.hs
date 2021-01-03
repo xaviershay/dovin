@@ -259,6 +259,8 @@ attach cn tn = do
 matchCanBlock =
   matchInPlay <> matchAttribute creature <> missingAttribute tapped
 
+-- TODO: This probably belongs in core, let's find some other uses first
+-- though.
 matchAttached :: EffectMonad CardMatcher
 matchAttached =
   matchAny matchName . mapMaybe extractCardTarget <$> viewSelf cardTargets
@@ -344,6 +346,8 @@ attackPlayerWith player cs = do
       (gainAttribute tapped)
     gainAttribute attacking cn
 
+-- TODO: This probably belongs in core, but let's find some other use cases for
+-- it first.
 check matcher cn =
   (requireCard cn matcher >> pure True) `catchError` const (pure False)
 
