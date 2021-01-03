@@ -122,28 +122,14 @@ formatCard c =
 
 boardFormatter :: Formatter
 boardFormatter board =
-  let allLocations = nub . sort . map (view location) $ cs in
-
-  let formatters = map
-                     formatLocation
-                     allLocations in
-
-  mconcat formatters board
-
-  where
-    cs = let Right value = execMonad board allCards in value
-    formatLocation (Active, Stack) = stackFormatter
-    formatLocation l = cardFormatter (show l) (matchLocation l)
-
-boardFormatter2 :: Formatter
-boardFormatter2 board =
   let
-    allLocations = nub . sort . map (view (alongside cardController cardZone) . dup) $ cs
-  in
+    allLocations =
+      nub . sort . map (view (alongside cardController cardZone) . dup) $ cs
 
-  let formatters = map
-                     formatLocation
-                     allLocations in
+    formatters = map
+                   formatLocation
+                   allLocations
+  in
 
   mconcat formatters board
 

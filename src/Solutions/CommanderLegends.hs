@@ -375,7 +375,7 @@ attackFormatter = cardFormatter "attackers"
 playFormatters = foldr (<>) mempty . map playFormatter
 
 formatter step = case view stepNumber step of
-  1 -> attributes <> boardFormatter2
+  1 -> attributes <> boardFormatter
   3 -> playFormatters [Active, OpponentN 3]
   5 -> attributes <> attackFormatter <> playFormatter (OpponentN 3)
   8 -> attributes
