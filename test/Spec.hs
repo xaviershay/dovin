@@ -22,7 +22,7 @@ test_Test = testGroup "Actions"
           validateBoardEquals (manaPoolFor Opponent) mempty
     , refute
         "requires card to be in hand"
-        "Zombie does not match requirements: in location (Active,Hand)" $ do
+        "Zombie does not match requirements: in zone Hand" $ do
           withLocation (Active, Play) $ addCreature (1, 1) "Zombie"
           cast "" "Zombie"
     ]

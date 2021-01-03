@@ -4,7 +4,7 @@ machine while verifying applicable properties. The all run inside a
 'GameMonad'.
 
 Actions will modify the state as specified by the effects listed in their
-documentation. If any of the validation steps fail away, the proof will fail.
+documentation. If any of the validation steps fail, the proof will fail.
 Actions are /not/ atomic: if one fails, some effects may have already been
 applied.
 -}
@@ -13,7 +13,7 @@ module Dovin.Actions (
   , fork
   -- * Casting
   , cast
-  , castFromLocation
+  , castFromZone
   , counter
   , flashback
   , jumpstart
@@ -23,7 +23,7 @@ module Dovin.Actions (
   , splice
   , tapForMana
   , target
-  , targetInLocation
+  , targetInZone
   -- * Uncategorized
   , activate
   , activatePlaneswalker
@@ -50,6 +50,7 @@ module Dovin.Actions (
   , triggerMentor
   , with
   -- * Validations
+  , check
   , validate
   , validateCanCastSorcery
   , validateLife
@@ -113,7 +114,7 @@ addMana amount = do
     (manaPoolFor p)
     (parseMana amount <>)
 
--- | Casts a card from actor's hand. See 'castFromLocation' for specification.
+-- | Casts a card from actor's hand. See 'castFromZone' for specification.
 --
 -- > cast "R" "Shock"
 --
@@ -121,38 +122,37 @@ addMana amount = do
 --
 --   * Card exists in hand.
 cast :: ManaPool -> CardName -> GameMonad ()
-cast mana cn = do
-  actor <- view envActor
-  castFromLocation (actor, Hand) mana cn
+cast = castFromZone Hand
 
 -- | Move a card to the stack, spending the specified mana. If not tracking
 -- mana, use the empty string to cast for no mana. Typically you will want to
 -- 'resolve' after casting. For the common case of casting from hand, see
 -- 'cast'. See 'spendMana' for additional mana validations and effects.
 --
--- > castFromLocation "1B" "Oathsworn Vampire" >> resolveTop
+-- > castFromZone Graveyard "1B" "Oathsworn Vampire" >> resolveTop
 --
 -- [Validates]:
 --
---   * Card exists in location.
+--   * Card exists in zone.
 --   * If not an instant or has flash, see 'validateCanCastSorcery` for extra
 --     validations.
 --
 -- [Effects]:
 --
+--   * Mana removed from pool.
 --   * Card moved to top of stack.
 --   * Counter 'storm' incremented if card has 'instant' or 'sorcery'
 --     attribute.
-castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
-castFromLocation loc mana name = action "castFromLocation" $ do
+castFromZone :: Zone -> ManaPool -> CardName -> GameMonad ()
+castFromZone loc mana name = action "castFromZone" $ do
   card <- requireCard name mempty
 
-  validate (matchLocation loc) name
+  validate (matchZone loc) name
   unless
     (hasAttribute instant card || hasAttribute flash card)
     validateCanCastSorcery
 
-  modifyCard (location . _2) (const Stack) name
+  modifyCard cardZone (const Stack) name
 
   card <- requireCard name mempty
 
@@ -182,9 +182,8 @@ castFromLocation loc mana name = action "castFromLocation" $ do
 --   * Card is moved to graveyard. (See 'move' for alternate effects.)
 counter :: CardName -> GameMonad ()
 counter expectedName = do
-  actor <- view envActor
   c <- requireCard expectedName $
-            labelMatch "on stack" (matchLocation (actor, Stack))
+            labelMatch "on stack" (matchZone Stack)
          <> invert (          matchAttribute triggered
                     `matchOr` matchAttribute activated)
 
@@ -195,7 +194,7 @@ counter expectedName = do
     (Data.List.delete expectedName)
 
 -- | Cast a card from actor's graveyard, exiling it when it leaves
--- the stack. See 'castFromLocation' for further specification.
+-- the stack. See 'castFromZone' for further specification.
 --
 -- > flashback "R" "Shock"
 --
@@ -217,14 +216,12 @@ counter expectedName = do
 --   * Card gains 'exileWhenLeaveStack'.
 flashback :: ManaPool -> CardName -> GameMonad ()
 flashback mana castName = do
-  actor <- view envActor
-  spendMana mana
-  castFromLocation (actor, Graveyard) "" castName
+  castFromZone Graveyard mana castName
   gainAttribute exileWhenLeaveStack castName
 
 -- | Cast a card from active player's graveyard, discarding a card in
 -- addition to its mana cost, exiling it when it leaves the stack. See
--- 'castFromLocation' for further specification.
+-- 'castFromZone' for further specification.
 --
 -- > jumpstart "R" "Mountain" "Shock"
 --
@@ -239,10 +236,8 @@ flashback mana castName = do
 --   * Discard card moved to graveyard.
 jumpstart :: ManaPool -> CardName -> CardName -> GameMonad ()
 jumpstart mana discardName castName = do
-  actor <- view envActor
-  spendMana mana
   discard discardName
-  castFromLocation (actor, Graveyard) "" castName
+  castFromZone Graveyard mana castName
   gainAttribute exileWhenLeaveStack castName
 
 -- | Resolves a card on the stack.
@@ -371,9 +366,9 @@ splice target cost name = action "splice" $ do
   actor <- view envActor
 
   validate (matchAttribute arcane) target
-  validate (matchLocation (actor, Stack)) target
+  validate (matchZone Stack) target
     `catchError` const (throwError $ target <> " not on stack")
-  validate (matchLocation (actor, Hand)) name
+  validate (matchController actor <> matchZone Hand) name
     `catchError` const (throwError $ name <> " not in hand")
   spendMana cost
 
@@ -436,13 +431,11 @@ trigger triggerName sourceName = do
       sourceName
       (  matchController actor
       <> labelMatch "in play or graveyard" (
-           matchLocation (actor, Play)
-           `matchOr`
-           matchLocation (actor, Graveyard)
+           matchAny matchZone [Play, Graveyard]
          )
       )
 
-  withLocation Stack $ withAttribute triggered $ addCard triggerName
+  withZone Stack . withAttribute triggered $ addCard triggerName
 
   modifying
     stack
@@ -479,7 +472,9 @@ triggerMentor targetName sourceName = do
 with :: CardName -> (CardName -> GameMonad ()) -> GameMonad ()
 with x f = f x
 
--- | Move a card from one location to another.
+-- | Move a card from one location to another. This should not be used
+-- directly, but is included here for common documentation of validations and
+-- effects.
 --
 -- > move (Opponent, Play) (Active, Play) "Angel"
 --
@@ -544,7 +539,7 @@ move from to name = action "move" $ do
   else if snd from == Play && snd to == Graveyard && view cardPlusOneCounters c == 0 && hasAttribute undying c then
     modifyCardDeprecated name cardPlusOneCounters (+ 1)
   else do
-    modifyCardDeprecated name location (const to)
+    modifyCardDeprecated name cardController (const (fst to))
     modifyCardDeprecated name cardZone (const (snd to))
 
 -- | Target a permanent.
@@ -558,7 +553,7 @@ target name = do
   actor <- view envActor
   card  <- requireCard name matchInPlay
 
-  let controller = view (cardLocation . _1) card
+  let controller = view cardController card
 
   unless (actor == controller) $
     validate (missingAttribute hexproof) name
@@ -568,8 +563,8 @@ target name = do
 -- [Validates]
 --
 --   * Card is in zone.
-targetInLocation :: CardLocation -> CardName -> GameMonad ()
-targetInLocation zone = validate (matchLocation zone)
+targetInZone :: Zone -> CardName -> GameMonad ()
+targetInZone zone = validate (matchZone zone)
 
 -- | Activate an ability of a permanent. See 'spendMana' for additional mana
 -- validations and effects. Typically you will want to `resolve` after
@@ -593,15 +588,13 @@ activate stackName mana targetName = do
       targetName
       (  matchController actor
       <> labelMatch "in play or graveyard" (
-           matchLocation (actor, Play)
-           `matchOr`
-           matchLocation (actor, Graveyard)
+           matchAny matchZone [Play, Graveyard]
          )
       )
 
   spendMana mana
 
-  withLocation Stack $ withAttribute activated $ addCard stackName
+  withLocation Stack . withAttribute activated $ addCard stackName
 
   modifying
     stack
@@ -758,10 +751,7 @@ combatDamageTo target blockerNames attackerName = do
 --
 --   * New card is on top of stack.
 copySpell newName targetName = do
-  card <- requireCard targetName (labelMatch "on stack" $
-                      matchLocation (Active, Stack)
-            `matchOr` matchLocation (Opponent, Stack)
-          )
+  card <- requireCard targetName (labelMatch "on stack" (matchZone Stack))
 
   let newCard = setAttribute copy . set cardName newName $ card
 
@@ -813,7 +803,7 @@ damage f t source = action "damage" $ do
 
   damage' dmg t c
   when (hasAttribute lifelink c) $
-    modifying (life . at (fst . view location $ c) . non 0) (+ dmg)
+    modifying (life . at (view cardController $ c) . non 0) (+ dmg)
   resolveEffects
 
   where
@@ -945,7 +935,7 @@ modifyStrength strength cn = do
 
   modifyCard cardStrengthModifier (mkStrength strength <>) cn
 
--- | Move card to location with same controller.
+-- | Move card to a new zone with same controller.
 --
 -- > moveTo Graveyard "Forest"
 --
@@ -955,9 +945,9 @@ modifyStrength strength cn = do
 --
 -- [Effects]:
 --
---     * Card is moved to location.
+--     * Card is moved to zone.
 --     * See 'move' for possible alternate effects, depending on card
-moveTo :: Location -> CardName -> GameMonad ()
+moveTo :: Zone -> CardName -> GameMonad ()
 moveTo dest cn = do
   c <- requireCard cn mempty
 
@@ -1043,6 +1033,13 @@ untap name = do
   validate (matchInPlay <> matchAttribute tapped) name
 
   loseAttribute tapped name
+
+-- | Returns a boolean whether the card matches the matcher or not. Usually you
+-- should use 'validate', but this is helpful for more dynamic scenarios or
+-- when parameterizing solutions.
+check :: CardMatcher -> CardName -> GameMonad Bool
+check matcher cn =
+  (validate matcher cn >> pure True) `catchError` const (pure False)
 
 -- | Validate that a card matches a matcher.
 --
@@ -1184,11 +1181,7 @@ runStateBasedActions = do
           modifyCard cardMinusOneCounters (const m1') cn
           incrementCounter
 
-        let matchStack =
-                       matchLocation (Active, Stack)
-             `matchOr` matchLocation (Opponent, Stack)
-
-        when (applyMatcher (invert matchStack) c) $
+        when (applyMatcher (invert (matchZone Stack)) c) $
           when (hasAttribute copy c) $
             remove cn >> incrementCounter
 

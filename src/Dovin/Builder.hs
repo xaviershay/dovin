@@ -43,7 +43,6 @@ import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
 import Control.Monad.Reader (local)
-import Control.Lens (_2)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
@@ -159,20 +158,16 @@ withLocation loc m = do
   p <- view envActor
 
   local (
-        set (envTemplate . cardLocation) (p, loc)
-      . set (envTemplate . cardController) p
+        set (envTemplate . cardController) p
       . set (envTemplate . cardZone) loc
     ) m
 
 -- | Place the created card into a specific zone.
 withZone :: Zone -> GameMonad () -> GameMonad ()
 withZone n =
-  local (
-      set (envTemplate . cardZone) n
-    . set (envTemplate . cardLocation . _2) n
-    )
+  local (set (envTemplate . cardZone) n)
 
--- | Set the target for the created card.
+-- | Add a target to the created card.
 withCardTarget :: CardName -> GameMonad () -> GameMonad ()
 withCardTarget target = local (over (envTemplate . cardTargets) ((:) (TargetCard target)))
 

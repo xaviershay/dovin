@@ -10,7 +10,6 @@ import Dovin.Types
 import Control.Monad.Writer (Writer, execWriter, tell)
 import Control.Lens (alongside)
 
-import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.List (intercalate, sort, sortBy, nub)
 import Data.Ord (comparing)

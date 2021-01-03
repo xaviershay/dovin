@@ -19,14 +19,14 @@ module Dovin.V2
   , module Dovin.Helpers
   , module Dovin.Types
   , module Dovin.Matchers
-  , view
-  , withEffect
+  , module Dovin.V1
+  , module Control.Lens
   )
   where
 
 import Dovin.Runner
 import Dovin.Actions
-import Dovin.V1 (withEffect)
+import Dovin.V1 (withEffect, targetInLocation)
 import Dovin.Attributes
 import Dovin.Builder hiding (withEffect)
 import Dovin.Formatting

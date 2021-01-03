@@ -1,5 +1,5 @@
 module Solutions.CommanderLegends where
-import Dovin.V3
+import Dovin.V4
 
 import Data.Maybe (mapMaybe)
 
@@ -292,7 +292,7 @@ attackPlayerTo opponent expectedLife attackers = do
 
       let name = "Angel " <> show n
 
-      withLocation Play
+      withZone Play
         $ withAttributes [token, tapped, attacking, flying]
         $ addCreature (4, 4) name
 
@@ -345,11 +345,6 @@ attackPlayerWith player cs = do
       -- Can't use 'tap' here because it checks summoning sickness.
       (gainAttribute tapped)
     gainAttribute attacking cn
-
--- TODO: This probably belongs in core, but let's find some other use cases for
--- it first.
-check matcher cn =
-  (requireCard cn matcher >> pure True) `catchError` const (pure False)
 
 angelCounter :: Control.Lens.Lens' Board Int
 angelCounter = counters . at "angels" . non 0

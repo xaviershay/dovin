@@ -14,6 +14,8 @@ module Dovin.V1
   , trigger
   , fork
   , withEffect
+  , castFromLocation
+  , targetInLocation
   ) where
 
 import Dovin.Runner
@@ -104,3 +106,10 @@ withEffect applyCondition matcher action = do
   let name = "legacy V2 effect"
 
   withEffectWhen applyConditionV3 matcherV3 actionV3 name
+
+castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
+castFromLocation (player, zone) mana =
+  as player . castFromZone zone mana
+
+targetInLocation :: CardLocation -> CardName -> GameMonad ()
+targetInLocation loc cn = validate cn (matchLocation loc)

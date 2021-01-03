@@ -7,7 +7,7 @@ module Dovin.Prelude
   )
   where
 
-import Control.Lens (assign, at, modifying, non, over, set, use, view)
+import Control.Lens (assign, at, modifying, non, over, set, use, view, alongside)
 import Control.Monad (foldM, forM_, unless, when)
 import Control.Monad.Except (catchError, throwError)
 

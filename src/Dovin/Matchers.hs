@@ -30,9 +30,10 @@ matchMinusOneCounters n = CardMatcher (show n <> " -1/-1 counters") $
 matchZone :: Zone -> CardMatcher
 matchZone loc = CardMatcher ("in zone " <> show loc) $
   (==) loc . view cardZone
+
 matchLocation :: CardLocation -> CardMatcher
 matchLocation loc = CardMatcher ("in location " <> show loc) $
-  (==) loc . view cardLocation
+  (==) loc . view (alongside cardController cardZone) . dup
 
 matchInPlay = CardMatcher "in play" $ \c -> view cardZone c == Play
 
@@ -51,7 +52,8 @@ matchOtherCreatures = matchOther creature
 
 matchOther :: CardAttribute -> Card -> CardMatcher
 matchOther attribute card =
-     matchLocation (view cardLocation card)
+     matchZone (view cardZone card)
+  <> matchController (view cardController card)
   <> matchAttribute attribute
   <> invert (matchName (view cardName card))
 

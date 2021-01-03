@@ -3,7 +3,9 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non)
+import Dovin.Prelude (dup)
+
+import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non, alongside, set)
 import Control.Monad.Reader (ReaderT, Reader)
 import Control.Monad.Identity (runIdentity, Identity)
 import Control.Monad.Except (ExceptT)
@@ -153,7 +155,6 @@ data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffectPart]
 
 data Card = Card
   { _cardName :: CardName
-  , _location :: (Player, Location)
   , _cardController :: Player
   , _cardZone :: Zone
   , _cardDefaultAttributes :: CardAttributes
@@ -253,7 +254,9 @@ mkStep id label state = Step
   }
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
-cardLocation = location
+cardLocation f parent = fmap
+  (\(controller, zone) -> (set cardController controller . set cardZone zone) parent)
+  (f . view (alongside cardController cardZone) . dup $ parent)
 
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
@@ -308,7 +311,6 @@ emptyCard = mkCard "" (Active, Hand)
 mkCard name location =
   Card
     { _cardName = name
-    , _location = location
     , _cardDefaultAttributes = mempty
     , _cardColors = mempty
     , _cardAttributes = mempty
