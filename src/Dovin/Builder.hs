@@ -69,7 +69,7 @@ addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name
 
 addArtifact :: CardName -> GameMonad ()
-addArtifact name = withAttribute artifact $ addEnchantment name
+addArtifact name = withAttribute artifact $ addCard name
 
 addCreature :: (Int, Int) -> CardName -> GameMonad ()
 addCreature strength name = local (set (envTemplate . cardStrength) $ mkStrength strength)
