@@ -24,22 +24,7 @@ module Dovin.V3
 
 import Dovin.V2 hiding (withEffect, cardStrengthModifier)
 import Dovin.Builder (withEffect)
-import Dovin.Effects
-  ( effectPTSet
-  , effectPTSetF
-  , effectPTAdjust
-  , effectPTAdjustF
-  , effectAddAbility
-  , effectNoAbilities
-  , effectAddType
-  , effectProtectionF
-  , effectControl
-  , effectControlF
-  , enabledInPlay
-  , viewSelf
-  , askSelf
-  , askCards
-  )
+import Dovin.Effects hiding (resolveEffects)
 
 -- | Now a no-op, removed in subsequent versions. Was unused.
 withOwner :: Player -> GameMonad () -> GameMonad ()
