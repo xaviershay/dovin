@@ -67,7 +67,7 @@ matchLesserPower n = CardMatcher ("power < " <> show n) $
 
 matchProtection :: Color -> CardMatcher
 matchProtection color = CardMatcher ("protection from " <> show color) $
-  (S.member color) . view cardProtection
+  S.member color . view cardProtection
 
 matchNone = CardMatcher "never match" (const False)
 

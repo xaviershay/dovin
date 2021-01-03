@@ -186,8 +186,8 @@ withCardTarget :: CardName -> GameMonad () -> GameMonad ()
 withCardTarget target = local (over (envTemplate . cardTargets) ((:) (TargetCard target)))
 
 withColors :: [Color] -> GameMonad () -> GameMonad ()
-withColors cs m =
-  local (set (envTemplate . cardColors) (S.fromList cs)) m
+withColors cs =
+  local (set (envTemplate . cardColors) (S.fromList cs))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

@@ -21,19 +21,19 @@ solution = do
     as (OpponentN 2) $ setLife 23
     as (OpponentN 3) $ setLife 46
 
-    as (OpponentN 1) $ do
+    as (OpponentN 1) $
       withZone Play $
         withAttribute flying
         $ addCreature (5, 5) "Archon of Coronation"
 
-    as (OpponentN 2) $ do
+    as (OpponentN 2) $
       withZone Play $ do
         withColors [Red]
           $ addCreature (5, 4) "Frenzied Saddlebrute"
         withColors [Red, White]
           $ addCreature (7, 5) "Dargo, the Shipwrecker"
 
-    as (OpponentN 3) $ do
+    as (OpponentN 3) $
       withZone Play $ do
         addCreature (4, 4) "Sengir, the Dark Baron"
         withColors [Black, Green, Blue]
@@ -64,8 +64,8 @@ solution = do
         addInstant "Soul's Fire"
         addInstant "Wrong Turn"
 
-      withZone Command $ do
-        withAttribute commander
+      withZone Command
+        $ withAttribute commander
           $ withColors [Red, Blue]
           $ addCreature (4, 4) "Kraum, Ludevic's Opus"
 
@@ -162,8 +162,7 @@ solution = do
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
-  step "Create treasures from Malcomn's trigger" $ do
-    resolveMalcolmTrigger
+  step "Create treasures from Malcomn's trigger" resolveMalcolmTrigger
 
   step "Cast Wrong Turn to give Archon back to P1" $ do
     tapForMana "U" "Treasure 1"
@@ -179,14 +178,8 @@ solution = do
     addEffect (effectControl (OpponentN 1)) "Archon of Coronation"
     gainAttribute summoned "Archon of Coronation"
 
-  step "Untap and another combat phase from Port Razer's trigger" $ do
-    resolve "Another combat phase"
-
-    forCards (matchInPlay <> matchController Active) $ \cn -> do
-      loseAttribute attacking cn
-      loseAttribute tapped cn
-
-    transitionToForced BeginCombat
+  step "Untap and another combat phase from Port Razer's trigger"
+    resolvePortRazerTrigger
 
   step "Third combat, move Confiscate & Greatsword to Saddlebrute" $ do
     trigger "Ardenn Attach" "Ardenn, Intrepid Archaeologist" >> resolveTop
@@ -212,16 +205,10 @@ solution = do
     trigger "Another combat phase" "Port Razer"
     trigger "Treasures" "Malcolm, Keen-Eyed Navigator"
 
-  step "Create treasures from Malcomn's trigger (unused)" $ do
-    resolveMalcolmTrigger
+  step "Create treasures from Malcomn's trigger (unused)" resolveMalcolmTrigger
 
-  step "Untap and another combat phase from Port Razer's trigger" $ do
-    resolve "Another combat phase"
-    forCards (matchInPlay <> matchController Active) $ \cn -> do
-      loseAttribute attacking cn
-      loseAttribute tapped cn
-
-    transitionToForced BeginCombat
+  step "Untap and another combat phase from Port Razer's trigger"
+    resolvePortRazerTrigger
 
   step "Fourth combat, move Greatsword to Angel" $ do
     trigger "Ardenn Attach" "Ardenn, Intrepid Archaeologist" >> resolveTop
@@ -243,6 +230,14 @@ solution = do
       [ "Angel 3"
       ]
 
+resolvePortRazerTrigger = do
+  resolve "Another combat phase"
+  forCards (matchInPlay <> matchController Active) $ \cn -> do
+    loseAttribute attacking cn
+    loseAttribute tapped cn
+
+  transitionToForced BeginCombat
+
 resolveMalcolmTrigger = do
   resolve "Treasures"
   n <- use malcolmCounter
@@ -259,7 +254,7 @@ resolveMalcolmTrigger = do
   assign malcolmCounter 0
 
 attach cn tn = do
-  c <- requireCard cn $ matchInPlay
+  c <- requireCard cn matchInPlay
 
   validate matchInPlay tn
 
