@@ -803,7 +803,7 @@ damage f t source = action "damage" $ do
 
   damage' dmg t c
   when (hasAttribute lifelink c) $
-    modifying (life . at (view cardController $ c) . non 0) (+ dmg)
+    modifying (life . at (view cardController c) . non 0) (+ dmg)
   resolveEffects
 
   where
