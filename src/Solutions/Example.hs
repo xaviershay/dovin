@@ -7,12 +7,12 @@ solution = do
   step "Initial state" $ do
     as Opponent $ setLife 3
 
-    withLocation Hand $ addInstant "Plummet"
-    withLocation Play $ do
+    withZone Hand $ addInstant "Plummet"
+    withZone Play $ do
       addLands 2 "Forest"
 
     as Opponent $ do
-      withLocation Play $ do
+      withZone Play $ do
         withAttributes [flying, token] $ addCreature (4, 4) "Angel"
         withAttributes [flying]
           $ withEffect
