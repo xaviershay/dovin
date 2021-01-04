@@ -35,7 +35,8 @@ solution = do
 formatter :: Step -> Formatter
 formatter step = case view stepNumber step of
   1 -> manaFormatter
-    <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
+    <> cardFormatter "opponent creatures"
+         (matchController Opponent <> matchZone Play)
   _ -> boardFormatter
 
 manaFormatter = attributeFormatter $ do

@@ -9,6 +9,8 @@ import Control.Lens (modifying, at, non, use, assign, Lens')
 
 import qualified Data.Set as S
 
+-- Note this solution does not account for the monarch effect present in the
+-- problem.
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do

@@ -20,6 +20,9 @@ V4 adds a lot of new flexibility while better aligning with the official rules:
 * Remove 'move'. Use one of the higher level functions instead (such as
   'moveTo')
 * 'addArtifact' was no longer adds the 'enchantment' attribute to cards.
+* 'OpponentN Int' constructor for 'Player' allows for multiplayer scenarios.
+* 'combatDamageTo' to send damage to a different player than the default
+  'Opponent'.
 -}
 module Dovin.V4
   ( module Dovin.V3
