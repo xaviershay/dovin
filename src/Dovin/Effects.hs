@@ -16,16 +16,20 @@ module Dovin.Effects
   , effectNoAbilities
   , effectAddAbility
   , effectAddAbilityF
+  , effectLoseAbility
+  , effectLoseAbilityF
   , effectAddType
   , effectAddTypeF
   , effectProtection
   , effectProtectionF
   , effectControl
   , effectControlF
+  , effectCopyPT
 
   , resolveEffects
 
   , enabledInPlay
+  , matchAttached
 
   , viewSelf
   , askCards
@@ -35,7 +39,7 @@ module Dovin.Effects
 
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Matchers (applyMatcher, matchInPlay)
+import Dovin.Matchers (applyMatcher, matchInPlay, matchAny, matchName)
 
 import Control.Lens (makeLenses, over, view, set, Lens')
 import qualified Data.HashMap.Strict as M
@@ -78,6 +82,13 @@ effectAddAbility = effectAddAbilityF . const . pure
 -- new 'CardAttribute'.
 effectAddAbilityF = effectF Layer6 cardAttributes S.insert
 
+-- | Constant variant of 'effectLoseAbilityF'
+effectLoseAbility = effectLoseAbilityF . const . pure
+
+-- | Layer 6 effect to add an ability to a card. In practice, it adds adds a
+-- new 'CardAttribute'.
+effectLoseAbilityF = effectF Layer6 cardAttributes S.delete
+
 -- | Layer 6 effect to remove all abilities from a card. This doesn't
 -- temporary abilities added by 'addEffect'.
 effectNoAbilities =
@@ -106,6 +117,17 @@ effectControl = effectControlF . const . pure
 effectControlF :: (Card -> EffectMonad Player) -> LayeredEffectPart
 effectControlF = effectF Layer2 cardController const
 
+-- | Layer 1A effect to copy the power and toughness of a card.
+effectCopyPT :: CardName -> LayeredEffectPart
+effectCopyPT targetName = LayeredEffectPart Layer1A $ \c -> do
+  targets <- askCards (matchName targetName)
+
+  case targets of
+    [target] -> return $ set cardStrength (view cardStrength target) c
+    -- We're not in an error monad here, so need to silently discard case where
+    -- the target card does not exist.
+    _        -> return c
+
 -- Private builder function for effects that affect a single card attribute.
 effectF ::
      Layer           -- ^ What layer the effect applies to
@@ -122,6 +144,16 @@ effectF layer lens overF f =
 -- | Effect enabled definition to apply when a card is in play.
 enabledInPlay :: EffectMonad Bool
 enabledInPlay = applyMatcher matchInPlay <$> askSelf
+
+-- | Applies to matcher that scopes the effect to cards the effect generating
+-- card is attached to.
+matchAttached :: EffectMonad CardMatcher
+matchAttached =
+  matchAny matchName . mapMaybe extractCardTarget <$> viewSelf cardTargets
+
+  where
+    extractCardTarget (TargetCard cn) = Just cn
+    extractCardTarget _ = Nothing
 
 -- | The card that is generating the effect being applied.
 askSelf :: EffectMonad Card

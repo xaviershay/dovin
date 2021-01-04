@@ -4,24 +4,23 @@ import Control.Monad.Except (throwError, when)
 import Control.Lens
 import qualified Data.Set as S
 
-import Dovin.V1
+import Dovin.V4
 
 -- http://www.possibilitystorm.com/089-guilds-of-ravnica-season-puzzle-7-2/
 solution :: GameMonad ()
 solution = do
   let black = "black"
 
-  -- This solutions relies on triggering Diamond Mare to gain life, which in
+  -- This solution relies on triggering Diamond Mare to gain life, which in
   -- turns triggers Epicure of Blood to cause the opponent to lose life. This
   -- helper can wrap cast actions with that combination.
   let withTriggers = \action name -> do
         action name
-        trigger "Diamond Mare"
-        c <- requireCard name mempty
+        trigger "Mare" "Diamond Mare" >> resolveTop
 
-        when (hasAttribute black c) $ do
+        whenMatch (matchAttribute black) name $ do
           gainLife 1
-          trigger "Epicure of Blood"
+          trigger "Epicure" "Epicure of Blood" >> resolveTop
           as Opponent $ loseLife 1
 
   -- Helper function to keep track of which permanent types have been cast
@@ -39,14 +38,14 @@ solution = do
           throwError $ "Already cast card of type with Muldrotha: " <> ptype
         else
           do
-            castFromLocation (Active, Graveyard) mana cn
+            castFromZone Graveyard mana cn
             resolve cn
             assign (counters . at counterName) (Just 1)
 
   step "Initial state" $ do
     as Opponent $ setLife 7
 
-    withLocation (Active, Play) $ do
+    withZone Play $ do
       addCreature (4, 4) "Epicure of Blood"
       addCreature (6, 6) "Muldrotha, the Gravetide"
 
@@ -54,17 +53,21 @@ solution = do
       addLands 4 "Watery Grave"
       addLands 4 "Overgrown Tomb"
 
-    withLocation (Active, Graveyard) $ do
+    withZone Graveyard $ do
       withAttribute artifact $ addCreature (1, 3) "Diamond Mare"
       addLand "Detection Tower"
       addArtifact "Mox Amber"
       withAttribute black $ addCreature (1, 2) "Vicious Conquistador"
       addCreature (1, 4) "Sailor of Means"
 
-    withLocation (Active, Hand) $ withAttribute black $ do
+    withZone Hand $ withAttribute black $ do
       addSorcery "March of the Drowned"
       addSorcery "Gruesome Menagerie"
-      addAura "Dead Weight"
+      withEffect
+        matchAttached
+        [ effectPTAdjust (-2, -2) ]
+        "-2/-2"
+        $ addAura "Dead Weight"
       addSorcery "Find"
 
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
@@ -87,10 +90,9 @@ solution = do
 
   step "Dead Weight on Vicious Conquistador" $ do
     tapForMana "B" "Memorial to Folly 3"
-    withTriggers (cast "B") "Dead Weight"
-    target "Vicious Conquistador"
-    resolve "Dead Weight"
-    modifyStrength (-2, -2) "Vicious Conquistador"
+    withTriggers (cast "B") "Dead Weight" >> resolveTop
+    withStateBasedActions $
+      attach "Dead Weight" "Vicious Conquistador"
     moveTo Graveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
@@ -105,15 +107,15 @@ solution = do
     targetInLocation (Active, Graveyard) "Sailor of Means"
     moveTo Play "Vicious Conquistador"
     moveTo Play "Sailor of Means"
-    withLocation (Active, Play)
+    withZone Play
       $ withAttribute token
       $ addArtifact "Treasure"
 
   step "Dead Weight on Vicious Conquistador" $ do
     tapForMana "B" "Overgrown Tomb 2"
     withTriggers (castWithMuldrotha "enchantment" "B") "Dead Weight"
-    target "Vicious Conquistador"
-    modifyStrength (-2, -2) "Vicious Conquistador"
+    withStateBasedActions $
+      attach "Dead Weight" "Vicious Conquistador"
     moveTo Graveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do
@@ -130,9 +132,11 @@ solution = do
     withTriggers (cast "B") "Vicious Conquistador"
     resolve "Vicious Conquistador"
 
-    validateLife Opponent 0
+    validateLife 0 Opponent
 
-formatter :: Int -> Formatter
-formatter _ = attributeFormatter $ do
+formatter = oldFormatter . view stepNumber
+
+oldFormatter :: Int -> Formatter
+oldFormatter _ = attributeFormatter $ do
   attribute "mana" $ countCards (matchAttribute "land" <> missingAttribute "tapped")
   attribute "life" $ countLife Opponent

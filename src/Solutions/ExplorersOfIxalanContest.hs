@@ -11,7 +11,7 @@ solution = do
   let lazav = "Lazav, the Multifarious"
   let shapeshift x = do
         activate "" lazav
-        targetInLocation (Active, Graveyard) "Adanto Vanguard"
+        targetInLocation (Active, Graveyard) x
 
   let goblinToken = withLocation (Active, Play)
         . withAttributes [token, goblin]

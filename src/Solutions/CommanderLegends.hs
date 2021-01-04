@@ -1,10 +1,7 @@
 module Solutions.CommanderLegends where
 import Dovin.V4
 
-import Data.Maybe (mapMaybe)
-
 import Control.Monad (forM_, foldM, when)
-import Control.Monad.Except (catchError)
 import Control.Lens (modifying, at, non, use, assign, Lens')
 
 import qualified Data.Set as S
@@ -251,25 +248,8 @@ resolveMalcolmTrigger = do
 
   assign malcolmCounter 0
 
-attach cn tn = do
-  c <- requireCard cn matchInPlay
-
-  validate matchInPlay tn
-
-  modifyCard cardTargets (const [TargetCard tn]) cn
-
 matchCanBlock =
   matchInPlay <> matchAttribute creature <> missingAttribute tapped
-
--- TODO: This probably belongs in core, let's find some other uses first
--- though.
-matchAttached :: EffectMonad CardMatcher
-matchAttached =
-  matchAny matchName . mapMaybe extractCardTarget <$> viewSelf cardTargets
-
-  where
-    extractCardTarget (TargetCard cn) = Just cn
-    extractCardTarget _ = Nothing
 
 attackPlayerTo :: Player -> Int -> [CardName] -> GameMonad ()
 attackPlayerTo opponent expectedLife attackers = do
@@ -330,7 +310,7 @@ attackPlayerWith player cs = do
                            (matchInPlay <> invert (matchController player))
                            "Frenzied Saddlebrute"
   let hasteMatcher =
-        if saddlebruteBackdoor then matchAll else matchAttribute haste
+        if saddlebruteBackdoor then mempty else matchAttribute haste
 
   forM_ cs $ \cn -> do
     c <- requireCard cn
