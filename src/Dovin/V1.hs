@@ -19,7 +19,14 @@ module Dovin.V1
   ) where
 
 import Dovin.Runner
-import Dovin.Actions hiding (validate, validateLife, activate, trigger, fork)
+import Dovin.Actions hiding
+  ( validate
+  , validateLife
+  , activate
+  , trigger
+  , fork
+  , whenMatch
+  )
 import qualified Dovin.Actions
 import Dovin.Attributes
 import Dovin.Builder hiding (withLocation, withEffect)

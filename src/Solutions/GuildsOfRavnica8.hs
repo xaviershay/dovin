@@ -11,15 +11,14 @@ solution :: GameMonad ()
 solution = do
   let black = "black"
 
-  -- This solutions relies on triggering Diamond Mare to gain life, which in
+  -- This solution relies on triggering Diamond Mare to gain life, which in
   -- turns triggers Epicure of Blood to cause the opponent to lose life. This
   -- helper can wrap cast actions with that combination.
   let withTriggers = \action name -> do
         action name
         trigger "Mare" "Diamond Mare" >> resolveTop
-        c <- requireCard name mempty
 
-        when (hasAttribute black c) $ do
+        whenMatch (matchAttribute black) name $ do
           gainLife 1
           trigger "Epicure" "Epicure of Blood" >> resolveTop
           as Opponent $ loseLife 1
@@ -64,7 +63,11 @@ solution = do
     withZone Hand $ withAttribute black $ do
       addSorcery "March of the Drowned"
       addSorcery "Gruesome Menagerie"
-      addAura "Dead Weight"
+      withEffect
+        matchAttached
+        [ effectPTAdjust (-2, -2) ]
+        "-2/-2"
+        $ addAura "Dead Weight"
       addSorcery "Find"
 
   step "Detection Tower, Mox Amber, Diamond Mare from graveyard" $ do
@@ -87,10 +90,9 @@ solution = do
 
   step "Dead Weight on Vicious Conquistador" $ do
     tapForMana "B" "Memorial to Folly 3"
-    withTriggers (cast "B") "Dead Weight"
-    target "Vicious Conquistador"
-    resolve "Dead Weight"
-    modifyStrength (-2, -2) "Vicious Conquistador"
+    withTriggers (cast "B") "Dead Weight" >> resolveTop
+    withStateBasedActions $
+      attach "Dead Weight" "Vicious Conquistador"
     moveTo Graveyard "Dead Weight"
 
   step "Gruesome Menagerie for Sailor of Means and Vicious Conquistador" $ do
@@ -112,8 +114,8 @@ solution = do
   step "Dead Weight on Vicious Conquistador" $ do
     tapForMana "B" "Overgrown Tomb 2"
     withTriggers (castWithMuldrotha "enchantment" "B") "Dead Weight"
-    target "Vicious Conquistador"
-    modifyStrength (-2, -2) "Vicious Conquistador"
+    withStateBasedActions $
+      attach "Dead Weight" "Vicious Conquistador"
     moveTo Graveyard "Dead Weight"
 
   step "Find for Vicous Conquistador" $ do

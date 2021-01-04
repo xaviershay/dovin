@@ -28,6 +28,7 @@ module Dovin.Actions (
   , activate
   , activatePlaneswalker
   , addEffect
+  , attach
   , attackWith
   , combatDamage
   , combatDamageTo
@@ -56,6 +57,7 @@ module Dovin.Actions (
   , validateLife
   , validatePhase
   , validateRemoved
+  , whenMatch
   -- * State-based Actions
   -- | Fine-grained control over when state-based actions are run. By default,
   -- all actions will 'runStateBasedEffects' on completion, so most of the time
@@ -491,8 +493,8 @@ with x f = f x
 -- [Effects]:
 --
 --     * Card moved to destination location.
---     * If card is leaving play, remove all damage, counters, and gained
---       attributes.
+--     * If card is leaving play, remove all damage, counters, targets, and
+--     gained attributes.
 --     * If card has 'exileWhenLeaveStack' attribute, move to exile and remove
 --       'exileWhenLeaveStack' instead.
 --     * If card has 'undying', is moving from play to graveyard, and has no
@@ -529,6 +531,7 @@ move from to name = action "move" $ do
     modifyCard cardDamage (const 0) name
     modifyCard cardAttributes (const $ view cardDefaultAttributes c) name
     modifyCard cardStrengthModifier (const mempty) name
+    modifyCard cardTargets (const mempty) name
 
   -- These conditionals are acting on the card state _before_ any of the above
   -- changes were applied.
@@ -625,6 +628,24 @@ activatePlaneswalker stackName loyalty targetName = do
     do
       modifyCard cardLoyalty (+ loyalty) targetName
       activate stackName "" targetName
+
+-- | Set the targets of a card to a single card target.
+--
+-- [Validates]
+--
+--   * Card being attached is in play.
+--
+-- [Effects]
+--
+--   * Targets the card being attached to (see 'target').
+--   * Sets the attaching card's targets to a singleton list of the target.
+attach :: CardName -> CardName -> GameMonad ()
+attach cn tn = do
+  c <- requireCard cn matchInPlay
+
+  target tn
+
+  modifyCard cardTargets (const [TargetCard tn]) cn
 
 -- | Start an attack with the given creatures.
 --
@@ -1118,6 +1139,16 @@ validateLife n player = do
       <> show current
       <> ", expected "
       <> show n
+
+-- | Run the given action when a card matches the supplied matcher.
+--
+-- > whenMatch (invert matchInPlay) "Soldier" $
+-- >   withZone Play $ addCreature (1, 1) "Soldier"
+whenMatch :: CardMatcher -> CardName -> GameMonad () -> GameMonad ()
+whenMatch f name action = do
+  match <- check f name
+
+  when match action
 
 -- | Pause running of state-based actions for the duration of the action,
 -- running them at the end.

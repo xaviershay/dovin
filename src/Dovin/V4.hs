@@ -23,6 +23,9 @@ V4 adds a lot of new flexibility while better aligning with the official rules:
 * 'OpponentN Int' constructor for 'Player' allows for multiplayer scenarios.
 * 'combatDamageTo' to send damage to a different player than the default
   'Opponent'.
+* Add 'attach' action of attaching equipment and aura to cards.
+* Add 'matchAttached' helper for creating equipment and aura effects.
+* Add 'whenMatch' helper for control flow.
 -}
 module Dovin.V4
   ( module Dovin.V3

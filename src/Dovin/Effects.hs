@@ -26,6 +26,7 @@ module Dovin.Effects
   , resolveEffects
 
   , enabledInPlay
+  , matchAttached
 
   , viewSelf
   , askCards
@@ -35,7 +36,7 @@ module Dovin.Effects
 
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Matchers (applyMatcher, matchInPlay)
+import Dovin.Matchers (applyMatcher, matchInPlay, matchAny, matchName)
 
 import Control.Lens (makeLenses, over, view, set, Lens')
 import qualified Data.HashMap.Strict as M
@@ -122,6 +123,16 @@ effectF layer lens overF f =
 -- | Effect enabled definition to apply when a card is in play.
 enabledInPlay :: EffectMonad Bool
 enabledInPlay = applyMatcher matchInPlay <$> askSelf
+
+-- | Applies to matcher that scopes the effect to cards the effect generating
+-- card is attached to.
+matchAttached :: EffectMonad CardMatcher
+matchAttached =
+  matchAny matchName . mapMaybe extractCardTarget <$> viewSelf cardTargets
+
+  where
+    extractCardTarget (TargetCard cn) = Just cn
+    extractCardTarget _ = Nothing
 
 -- | The card that is generating the effect being applied.
 askSelf :: EffectMonad Card
