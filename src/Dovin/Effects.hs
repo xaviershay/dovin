@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE Rank2Types #-}
 
 {-|
 Effects are continuous effects, such as "other creatures get +1/+1". Note that
@@ -14,7 +15,13 @@ module Dovin.Effects
   , effectPTAdjustF
   , effectNoAbilities
   , effectAddAbility
+  , effectAddAbilityF
   , effectAddType
+  , effectAddTypeF
+  , effectProtection
+  , effectProtectionF
+  , effectControl
+  , effectControlF
 
   , resolveEffects
 
@@ -30,7 +37,7 @@ import Dovin.Prelude
 import Dovin.Types
 import Dovin.Matchers (applyMatcher, matchInPlay)
 
-import Control.Lens (makeLenses, over, view, set)
+import Control.Lens (makeLenses, over, view, set, Lens')
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Control.Monad.Reader (ask, runReader)
@@ -54,9 +61,7 @@ effectPTSet = effectPTSetF . const . pure
 
 -- | Layer 7B effect to set the power and toughness of a creature.
 effectPTSetF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
-effectPTSetF f = LayeredEffectPart Layer7B $ \c -> do
-                   pt <- f c
-                   return $ set cardStrength (mkStrength pt) c
+effectPTSetF = effectF Layer7B cardStrength (const . mkStrength)
 
 -- | Constant variant of 'effectPTAdjustF'
 effectPTAdjust :: (Int, Int) -> LayeredEffectPart
@@ -64,21 +69,55 @@ effectPTAdjust = effectPTAdjustF . const . pure
 
 -- | Layer 7C effect to adjust the power and toughness of a creature.
 effectPTAdjustF :: (Card -> EffectMonad (Int, Int)) -> LayeredEffectPart
-effectPTAdjustF f = LayeredEffectPart Layer7C $ \c -> do
-                   pt <- f c
-                   return $ over cardStrength (mkStrength pt <>) c
+effectPTAdjustF = effectF Layer7C cardStrength ((<>) . mkStrength)
+
+-- | Constant variant of 'effectAddAbilityF'
+effectAddAbility = effectAddAbilityF . const . pure
 
 -- | Layer 6 effect to add an ability to a card. In practice, it adds adds a
 -- new 'CardAttribute'.
-effectAddAbility attr = LayeredEffectPart Layer6 (pure . over cardAttributes (S.insert attr))
+effectAddAbilityF = effectF Layer6 cardAttributes S.insert
 
 -- | Layer 6 effect to remove all abilities from a card. This doesn't
 -- temporary abilities added by 'addEffect'.
-effectNoAbilities = LayeredEffectPart Layer6 (pure . set cardPassiveEffects mempty)
+effectNoAbilities =
+  LayeredEffectPart Layer6 (pure . set cardPassiveEffects mempty)
+
+-- | Constant variant of effectAddTypeF
+effectAddType = effectAddTypeF . const . pure
 
 -- | Layer 4 effect to add a type to a card. Since card types are modeled
 -- explicitly, it instead adds a new 'CardAttribute'.
-effectAddType attr = LayeredEffectPart Layer4 (pure . over cardAttributes (S.insert attr))
+effectAddTypeF = effectF Layer4 cardAttributes S.insert
+
+-- | Constant variant of 'effectControlF'
+effectProtection = effectProtectionF . const . pure
+
+-- | Layer 6 effect to give a card protection from a color.
+effectProtectionF :: (Card -> EffectMonad Colors) -> LayeredEffectPart
+effectProtectionF = effectF Layer6 cardProtection (<>)
+
+-- | Constant variant of 'effectControlF'
+effectControl = effectControlF . const . pure
+
+-- | Layer 2 effect to change control of a card. Note that side-effects such as
+-- summoning sickness and removing from combat are not considered and must be
+-- handled manually.
+effectControlF :: (Card -> EffectMonad Player) -> LayeredEffectPart
+effectControlF = effectF Layer2 cardController const
+
+-- Private builder function for effects that affect a single card attribute.
+effectF ::
+     Layer           -- ^ What layer the effect applies to
+  -> Lens' Card b    -- ^ Lens for the card attribute the effect modifies
+  -> (a -> (b -> b))         -- ^ Transform the value from the definition into
+                             -- a function to apply over the value in the lens
+  -> (Card -> EffectMonad a) -- ^ The effect definition
+  -> LayeredEffectPart
+effectF layer lens overF f =
+  LayeredEffectPart layer $ \c -> do
+    p <- f c
+    return $ over lens (overF p) c
 
 -- | Effect enabled definition to apply when a card is in play.
 enabledInPlay :: EffectMonad Bool
@@ -193,8 +232,6 @@ resolveCounters board =
             Nothing
           else
             Just $ effectPTAdjust (p, t)
-
-        dup x = (x, x)
 
 collectNewEffectsAtLayer :: Layer -> (Board, Pile) -> (Board, Pile)
 collectNewEffectsAtLayer layer (board, pile) =

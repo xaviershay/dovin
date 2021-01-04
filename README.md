@@ -35,12 +35,12 @@ solution = do
   step "Initial state" $ do
     as Opponent $ setLife 3
 
-    withLocation Hand $ addInstant "Plummet"
-    withLocation Play $ do
+    withZone Hand $ addInstant "Plummet"
+    withZone Play $ do
       addLands 2 "Forest"
 
     as Opponent $ do
-      withLocation Play $ do
+      withZone Play $ do
         withAttributes [flying, token] $ addCreature (4, 4) "Angel"
         withAttributes [flying]
           $ withEffect
@@ -63,7 +63,8 @@ solution = do
 formatter :: Step -> Formatter
 formatter step = case view stepNumber step of
   1 -> manaFormatter
-    <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
+    <> cardFormatter "opponent creatures"
+         (matchController Opponent <> matchZone Play)
   _ -> boardFormatter
 
 manaFormatter = attributeFormatter $ do
@@ -112,6 +113,9 @@ solutions for published Possibility Storm puzzles!)
 * `ChannelFireball` automatically calculates High Tide mana.
 * `WarOfTheSpark2` shows how to define effects that depend on attributes of
   other cards.
+* `CommanderLegends` shows a large number of techniques: multiplayer, control
+  changing, equipment and aura effects, color protection, counters for dynamic
+  token generation, and more.
 
 ## Development
 

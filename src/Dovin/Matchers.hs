@@ -5,7 +5,7 @@ import Dovin.Attributes (creature)
 import Dovin.Types
 
 import qualified Data.Set as S
-import Control.Lens (_1)
+import Data.List (foldl', intercalate)
 
 -- CARD MATCHERS
 --
@@ -27,18 +27,22 @@ matchMinusOneCounters :: Int -> CardMatcher
 matchMinusOneCounters n = CardMatcher (show n <> " -1/-1 counters") $
   (==) n . view cardMinusOneCounters
 
+matchZone :: Zone -> CardMatcher
+matchZone loc = CardMatcher ("in zone " <> show loc) $
+  (==) loc . view cardZone
+
 matchLocation :: CardLocation -> CardMatcher
 matchLocation loc = CardMatcher ("in location " <> show loc) $
-  (==) loc . view cardLocation
+  (==) loc . view (alongside cardController cardZone) . dup
 
-matchInPlay = CardMatcher "in play" $ \c -> snd (view location c) == Play
+matchInPlay = CardMatcher "in play" $ \c -> view cardZone c == Play
 
 matchAttribute :: CardAttribute -> CardMatcher
 matchAttribute attr = CardMatcher ("has attribute " <> attr) $
   S.member attr . view cardAttributes
 
 matchAttributes :: [CardAttribute] -> CardMatcher
-matchAttributes = foldr ((<>) . matchAttribute) mempty
+matchAttributes = foldl' (flip $ (<>) . matchAttribute) mempty
 
 matchName :: CardName -> CardMatcher
 matchName n = CardMatcher ("has name " <> n) $ (==) n . view cardName
@@ -48,17 +52,25 @@ matchOtherCreatures = matchOther creature
 
 matchOther :: CardAttribute -> Card -> CardMatcher
 matchOther attribute card =
-     matchLocation (view cardLocation card)
+     matchZone (view cardZone card)
+  <> matchController (view cardController card)
   <> matchAttribute attribute
   <> invert (matchName (view cardName card))
 
 matchController player = CardMatcher ("has controller " <> show player) $
-  (==) player . view (location . _1)
+  (==) player . view cardController
 
 matchLesserPower n = CardMatcher ("power < " <> show n) $
   (< n) . view cardPower
 
+matchProtection :: Color -> CardMatcher
+matchProtection color = CardMatcher ("protection from " <> show color) $
+  S.member color . view cardProtection
+
 matchNone = CardMatcher "never match" (const False)
+
+matchAll :: CardMatcher
+matchAll = labelMatch "match all" mempty
 
 matchCard :: Card -> CardMatcher
 matchCard = matchName . view cardName
@@ -75,14 +87,25 @@ matchStrength :: (Int, Int) -> CardMatcher
 matchStrength (p, t) = labelMatch ("P/T = " <> show p <> "/" <> show t) $
   matchPower p <> matchToughness t
 
+-- Match all cards that have a the supplied target. Note this is distinct from
+-- "all cards that match a target". Use a name matcher for that after
+-- unwrapping the target.
 matchTarget :: Target -> CardMatcher
 matchTarget t = labelMatch ("target = " <> show t) $ CardMatcher ""
-  ((==) t . TargetCard . view cardName)
+  (elem t . view cardTargets)
+
+-- Matcher combinator for matching any of the given parameters with a specific
+-- matcher. The example matches card that have protection from Blue or Red:
+--
+-- > matchAny matchProtection [Blue, Red]
+matchAny :: (a -> CardMatcher) -> [a] -> CardMatcher
+matchAny f = foldl' (flip matchOr) (labelMatch "" matchNone) . map f
 
 missingAttribute = invert . matchAttribute
 
 (CardMatcher d1 f) `matchOr` (CardMatcher d2 g) =
-    CardMatcher (d1 <> " or " <> d2) $ \c -> f c || g c
+    CardMatcher (intercalate " or " . filter (not . null) $ [d1, d2])
+      $  \c -> f c || g c
 
 invert :: CardMatcher -> CardMatcher
 invert (CardMatcher d f) = CardMatcher ("not " <> d) $ not . f

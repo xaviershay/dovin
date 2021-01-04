@@ -18,7 +18,7 @@ test_Cases = testGroup "jumpstart"
         validateBoardEquals (manaPoolFor Active) mempty
   , refute
       "requires card in graveyard"
-      "in location (Active,Graveyard)" $ do
+      "in zone Graveyard" $ do
         withLocation Hand $ addInstant "Shock"
         withLocation Hand $ addLand "Mountain"
         jumpstart "" "Mountain" "Shock"

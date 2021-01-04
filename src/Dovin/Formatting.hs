@@ -8,8 +8,8 @@ import Dovin.Prelude
 import Dovin.Types
 
 import Control.Monad.Writer (Writer, execWriter, tell)
+import Control.Lens (alongside)
 
-import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Data.List (intercalate, sort, sortBy, nub)
 import Data.Ord (comparing)
@@ -57,8 +57,18 @@ cardFormatter title matcher board =
 formatCards = intercalate "\n" . map (("      " <>) . formatCard)
 
 formatCard c =
-  "  " <> view cardName c <>
-  " (" <> (intercalate "," . sort . S.toList $ view cardAttributes c) <> ")"
+  let
+    colors = view cardColors c
+    targets = view cardTargets c
+    protection = view cardProtection c
+  in
+  "  " <> view cardName c
+  <> formatColors colors
+  <> " ("
+  <> (intercalate "," . sort $ (
+       formatProtection protection <> S.toList (view cardAttributes c)
+     ))
+  <> ")"
   <> if hasAttribute "creature" c then
        " ("
          <> show (view cardPower c)
@@ -85,21 +95,48 @@ formatCard c =
          <> ")"
      else
       ""
+  <> if length targets > 0 then
+       " (targets: "
+       <> (intercalate "," . sort . map formatTarget $ targets)
+       <> ")"
+     else
+       ""
+  where
+    formatTarget (TargetCard cn) = cn
+    formatTarget (TargetPlayer p) = show p
+
+    formatColorSet = intercalate "" . sort . map show . S.toList
+
+    formatProtection protection =
+      if S.null protection then
+        []
+      else
+        ["protection " <> formatColorSet protection]
+
+    formatColors colors =
+      if S.null colors then
+        ""
+      else
+        " [" <> (intercalate "" . sort . map show . S.toList $ colors) <> "]"
 
 boardFormatter :: Formatter
 boardFormatter board =
-  let allLocations = nub . sort . map (view location) $ cs in
+  let
+    allLocations =
+      nub . sort . map (view (alongside cardController cardZone) . dup) $ cs
 
-  let formatters = map
-                     formatLocation
-                     allLocations in
+    formatters = map
+                   formatLocation
+                   allLocations
+  in
 
   mconcat formatters board
 
   where
     cs = let Right value = execMonad board allCards in value
     formatLocation (Active, Stack) = stackFormatter
-    formatLocation l = cardFormatter (show l) (matchLocation l)
+    formatLocation (controller, zone) = cardFormatter (show (controller, zone))
+      (matchController controller <> matchZone zone)
 
 attribute :: Show a => String -> GameMonad a -> FormatMonad ()
 attribute label m = tell [(label, show <$> m)]

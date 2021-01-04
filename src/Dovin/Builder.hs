@@ -28,9 +28,11 @@ module Dovin.Builder (
   , withEffect
   , withEffectWhen
   , withLocation
-  , withOwner
+  , withZone
   , withPlusOneCounters
   , withMinusOneCounters
+  , withCardTarget
+  , withColors
   ) where
 
 import Dovin.Attributes
@@ -41,7 +43,6 @@ import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
 import Control.Monad.Reader (local)
-import Control.Lens (_1)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 
@@ -54,11 +55,9 @@ addCard name = do
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
-      owner <- view envOwner
       modifying cards (M.insert name (BaseCard
         $ set cardName name
         . set cardTimestamp now
-        . set cardOwner (maybe (view (cardLocation . _1) template) id owner)
         $ template))
       resolveEffects
 
@@ -66,7 +65,7 @@ addAura :: CardName -> GameMonad ()
 addAura name = withAttribute aura $ addEnchantment name
 
 addArtifact :: CardName -> GameMonad ()
-addArtifact name = withAttribute artifact $ addEnchantment name
+addArtifact name = withAttribute artifact $ addCard name
 
 addCreature :: (Int, Int) -> CardName -> GameMonad ()
 addCreature strength name = local (set (envTemplate . cardStrength) $ mkStrength strength)
@@ -96,7 +95,10 @@ addSorcery name = withAttribute sorcery $ addCard name
 
 -- | Perform action as the specified player.
 as :: Player -> GameMonad () -> GameMonad ()
-as player = local (set envActor player)
+as p = local (
+    set envActor p
+    . set (envTemplate . cardController) p
+  )
 
 -- | Add an attribute to the created card, as identified by a string.
 -- Attributes with that special meaning to Dovin built-ins (such as flying) are
@@ -155,12 +157,23 @@ withLocation :: Location -> GameMonad () -> GameMonad ()
 withLocation loc m = do
   p <- view envActor
 
-  local (set (envTemplate . cardLocation) (p, loc)) m
+  local (
+        set (envTemplate . cardController) p
+      . set (envTemplate . cardZone) loc
+    ) m
 
--- | Set the owner for the created card. If not specified, defaults to the
--- owner of the card location.
-withOwner :: Player -> GameMonad () -> GameMonad ()
-withOwner owner = local (set envOwner (Just owner))
+-- | Place the created card into a specific zone.
+withZone :: Zone -> GameMonad () -> GameMonad ()
+withZone n =
+  local (set (envTemplate . cardZone) n)
+
+-- | Add a target to the created card.
+withCardTarget :: CardName -> GameMonad () -> GameMonad ()
+withCardTarget target = local (over (envTemplate . cardTargets) ((:) (TargetCard target)))
+
+withColors :: [Color] -> GameMonad () -> GameMonad ()
+withColors cs =
+  local (set (envTemplate . cardColors) (S.fromList cs))
 
 -- | Set the number of +1/+1 counters of the created card.
 withPlusOneCounters :: Int -> GameMonad () -> GameMonad ()

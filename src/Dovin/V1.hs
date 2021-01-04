@@ -14,6 +14,8 @@ module Dovin.V1
   , trigger
   , fork
   , withEffect
+  , castFromLocation
+  , targetInLocation
   ) where
 
 import Dovin.Runner
@@ -55,7 +57,11 @@ validateLife = flip Dovin.Actions.validateLife
 
 -- | Set the location of the created card.
 withLocation :: CardLocation -> GameMonad () -> GameMonad ()
-withLocation loc = local (set (envTemplate . cardLocation) loc)
+withLocation (p, loc) = local (
+      set (envTemplate . cardLocation) (p, loc)
+    . set (envTemplate . cardController) p
+    . set (envTemplate . cardZone) loc
+  )
 
 activate mana targetName = do
   card <- requireCard targetName mempty
@@ -100,3 +106,10 @@ withEffect applyCondition matcher action = do
   let name = "legacy V2 effect"
 
   withEffectWhen applyConditionV3 matcherV3 actionV3 name
+
+castFromLocation :: CardLocation -> ManaPool -> CardName -> GameMonad ()
+castFromLocation (player, zone) mana =
+  as player . castFromZone zone mana
+
+targetInLocation :: CardLocation -> CardName -> GameMonad ()
+targetInLocation loc cn = validate cn (matchLocation loc)

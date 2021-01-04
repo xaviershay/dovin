@@ -3,7 +3,9 @@
 
 module Dovin.Types where
 
-import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non)
+import Dovin.Prelude (dup)
+
+import Control.Lens (Lens', makeLenses, over, view, _1, _2, at, non, alongside, set)
 import Control.Monad.Reader (ReaderT, Reader)
 import Control.Monad.Identity (runIdentity, Identity)
 import Control.Monad.Except (ExceptT)
@@ -14,19 +16,31 @@ import Data.Hashable (Hashable)
 import qualified Data.Set as S
 import GHC.Generics
 
-data Color = Red | Green | Blue | Black | White deriving (Show, Eq, Ord)
+data Color = Red | Green | Blue | Black | White
+  deriving (Eq, Ord, Enum, Bounded)
 type Colors = S.Set Color
+
+instance Show Color where
+  show Red = "R"
+  show Green = "G"
+  show Blue = "U"
+  show Black = "B"
+  show White = "W"
+
+allColors :: Colors
+allColors = S.fromList [minBound..maxBound]
 
 type CardName = String
 type CardAttribute = String
-data Player = Active | Opponent deriving (Show, Eq, Generic, Ord)
+data Player = Active | Opponent | OpponentN Integer deriving (Show, Eq, Generic, Ord)
 -- This is pretty dodgy - one char per mana - but works for now.
 type ManaPool = String
 type ManaString = String
 -- TODO: Stack shouldn't be in here because there is only one of them
-data Location = Hand | Graveyard | Play | Stack | Exile | Deck
+data Location = Hand | Graveyard | Play | Stack | Exile | Deck | Command
   deriving (Show, Eq, Ord)
 
+type Zone = Location
 -- The original CardEffect type. This is deprecated as of V3, replaced by
 -- LayeredEffect.
 data CardEffect = CardEffect
@@ -88,7 +102,7 @@ mkEffect enabled filter action = CardEffect
   -- For an effect to be enabled, it's host card must currently match this
   -- matcher.
   { _effectEnabled = enabled
-  -- If the effect is enabled, this filter determines wheter any particular
+  -- If the effect is enabled, this filter determines whether any particular
   -- card is affected by it.
   , _effectFilter = filter
   -- The action to apply to affected cards.
@@ -141,8 +155,8 @@ data AbilityEffect = AbilityEffect Timestamp EffectDuration [LayeredEffectPart]
 
 data Card = Card
   { _cardName :: CardName
-  , _location :: (Player, Location)
-  , _cardOwner :: Player
+  , _cardController :: Player
+  , _cardZone :: Zone
   , _cardDefaultAttributes :: CardAttributes
   , _cardAttributes :: CardAttributes
   , _cardStrength :: CardStrength
@@ -152,6 +166,7 @@ data Card = Card
   , _cardEffects :: [CardEffect]
   , _cardCmc :: Int
   , _cardColors :: Colors
+  , _cardProtection :: Colors
   , _cardTargets :: [Target]
 
   , _cardTimestamp :: Timestamp
@@ -203,7 +218,6 @@ data Env = Env
   { _envTemplate :: Card
   , _envSBAEnabled :: Bool
   , _envActor :: Player
-  , _envOwner :: Maybe Player
   }
 
 type StepIdentifier = (Maybe String, Int)
@@ -240,7 +254,9 @@ mkStep id label state = Step
   }
 
 cardLocation :: Control.Lens.Lens' Card (Player, Location)
-cardLocation = location
+cardLocation f parent = fmap
+  (\(controller, zone) -> (set cardController controller . set cardZone zone) parent)
+  (f . view (alongside cardController cardZone) . dup $ parent)
 
 -- TODO: How to define these lenses using built-in Lens primitives
 -- (Control.Lens.Wrapped?)
@@ -259,9 +275,6 @@ cardToughness f parent = fmap
   where
     setToughness t (CardStrength p _) = CardStrength p t
     toughness (CardStrength _ t) = t
-
-cardController :: Control.Lens.Lens' Card Player
-cardController = cardLocation . _1
 
 manaPoolFor p = manaPool . at p . non mempty
 
@@ -291,7 +304,6 @@ emptyEnv = Env
   { _envTemplate = emptyCard
   , _envSBAEnabled = True
   , _envActor = Active
-  , _envOwner = Nothing
   }
 
 mkStrength (p, t) = CardStrength p t
@@ -299,8 +311,6 @@ emptyCard = mkCard "" (Active, Hand)
 mkCard name location =
   Card
     { _cardName = name
-    , _location = location
-    , _cardOwner = fst location
     , _cardDefaultAttributes = mempty
     , _cardColors = mempty
     , _cardAttributes = mempty
@@ -316,6 +326,9 @@ mkCard name location =
     , _cardPassiveEffects = mempty
     , _cardAbilityEffects = mempty
     , _cardTimestamp = 0
+    , _cardController = fst location
+    , _cardZone = Play
+    , _cardProtection = mempty
     }
 
 opposing :: Player -> Player

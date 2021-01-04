@@ -11,7 +11,6 @@ import Data.List (sort)
 import qualified Data.HashMap.Strict as M
 import qualified Data.Set as S
 import Control.Lens (ASetter, _Just)
-import Control.Monad.Reader (ask)
 
 import Text.Parsec
 

@@ -7,12 +7,12 @@ solution = do
   step "Initial state" $ do
     as Opponent $ setLife 3
 
-    withLocation Hand $ addInstant "Plummet"
-    withLocation Play $ do
+    withZone Hand $ addInstant "Plummet"
+    withZone Play $ do
       addLands 2 "Forest"
 
     as Opponent $ do
-      withLocation Play $ do
+      withZone Play $ do
         withAttributes [flying, token] $ addCreature (4, 4) "Angel"
         withAttributes [flying]
           $ withEffect
@@ -35,7 +35,8 @@ solution = do
 formatter :: Step -> Formatter
 formatter step = case view stepNumber step of
   1 -> manaFormatter
-    <> cardFormatter "opponent creatures" (matchLocation (Opponent, Play))
+    <> cardFormatter "opponent creatures"
+         (matchController Opponent <> matchZone Play)
   _ -> boardFormatter
 
 manaFormatter = attributeFormatter $ do
