@@ -26,55 +26,6 @@ test_Test = testGroup "Actions"
           withLocation (Active, Play) $ addCreature (1, 1) "Zombie"
           cast "" "Zombie"
     ]
-  , testGroup "castFromLocation"
-    [ prove "places card on top of stack, spending mana" $ do
-        withLocation (Active, Graveyard) $ addCreature (1, 1) "Zombie"
-        addMana "B"
-        castFromLocation (Active, Graveyard) "B" "Zombie"
-        validate "Zombie" $ matchLocation (Active, Stack)
-        validateBoardEquals (manaPoolFor Active) mempty
-
-    , refute
-        "requires mana be available"
-        "Mana pool () does not contain (B)" $ do
-          withLocation (Active, Hand) $ addCreature (1, 1) "Zombie"
-          castFromLocation (Active, Hand) "B" "Zombie"
-
-    , prove "can cast non-instant in second main" $ do
-        withLocation (Active, Hand) $ addSorcery "Lava Spike"
-        transitionTo SecondMain
-        castFromLocation (Active, Hand) "" "Lava Spike"
-
-    , refute
-        "requires main phase for non-instant"
-        "not in a main phase" $ do
-          withLocation (Active, Hand) $ addSorcery "Lava Spike"
-          transitionTo BeginCombat
-          castFromLocation (Active, Hand) "" "Lava Spike"
-
-    , refute
-        "requires stack to be empty for non-instant"
-        "stack is not empty" $ do
-          withLocation (Active, Hand) $ addInstant "Shock"
-          withLocation (Active, Hand) $ addSorcery "Lava Spike"
-
-          castFromLocation (Active, Hand) "" "Shock"
-          castFromLocation (Active, Hand) "" "Lava Spike"
-
-    , prove "increases storm count if instant" $ do
-        withLocation (Active, Hand) $ addInstant "Shock"
-        castFromLocation (Active, Hand) "" "Shock"
-        validateBoardEquals (counters . at "storm" . non 0) 1
-
-    , prove "increases storm count if sorcery" $ do
-        withLocation (Active, Hand) $ addSorcery "Lava Spike"
-        castFromLocation (Active, Hand) "" "Lava Spike"
-
-    , prove "does not increase storm count otherwise" $ do
-        withLocation (Active, Hand) $ addArtifact "Mox Amber"
-        castFromLocation (Active, Hand) "" "Mox Amber"
-        validateBoardEquals (counters . at "storm" . non 0) 0
-    ]
   , testGroup "spendMana"
     [ prove "removes colored mana from pool" $ do
         addMana "BBRRRWW"
