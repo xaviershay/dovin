@@ -16,6 +16,8 @@ module Dovin.Effects
   , effectNoAbilities
   , effectAddAbility
   , effectAddAbilityF
+  , effectLoseAbility
+  , effectLoseAbilityF
   , effectAddType
   , effectAddTypeF
   , effectProtection
@@ -79,6 +81,13 @@ effectAddAbility = effectAddAbilityF . const . pure
 -- | Layer 6 effect to add an ability to a card. In practice, it adds adds a
 -- new 'CardAttribute'.
 effectAddAbilityF = effectF Layer6 cardAttributes S.insert
+
+-- | Constant variant of 'effectLoseAbilityF'
+effectLoseAbility = effectLoseAbilityF . const . pure
+
+-- | Layer 6 effect to add an ability to a card. In practice, it adds adds a
+-- new 'CardAttribute'.
+effectLoseAbilityF = effectF Layer6 cardAttributes S.delete
 
 -- | Layer 6 effect to remove all abilities from a card. This doesn't
 -- temporary abilities added by 'addEffect'.
