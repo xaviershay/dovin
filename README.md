@@ -94,8 +94,8 @@ See `src/Solutions` for more extensive usage (spoiler alert: these are
 solutions for published Possibility Storm puzzles!)
 
 * `Dominaria5` uses a planeswalker.
-* `RivalsOfIxalan7` uses `withEffect` to model `exert`
-  effects, and shows how to verify multiple blocking scenarios.
+* `RivalsOfIxalan7` uses exert and copy effects, and shows how to verify
+  multiple blocking scenarios.
 * `Core19_9` has a fancy formatter to correctly track how much
   mana is available when working with `Powerstone Shard`, as well as spell
   tracking for `Aetherflux Reservoir`.

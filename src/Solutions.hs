@@ -31,7 +31,7 @@ all = [
   ("ExplorersOfIxalanContest", Solutions.ExplorersOfIxalanContest.solution, Solutions.ExplorersOfIxalanContest.formatter . view stepNumber),
   ("GuildsOfRavnica1", Solutions.GuildsOfRavnica1.solution, Solutions.GuildsOfRavnica1.formatter . view stepNumber),
   ("GuildsOfRavnica3", Solutions.GuildsOfRavnica3.solution, Solutions.GuildsOfRavnica3.formatter . view stepNumber),
-  ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter . view stepNumber),
+  ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter),
   ("GuildsOfRavnica9", Solutions.GuildsOfRavnica9.solution, Solutions.GuildsOfRavnica9.formatter . view stepNumber),
   ("GuildsOfRavnicaPre2", Solutions.GuildsOfRavnicaPre2.solution, Solutions.GuildsOfRavnicaPre2.formatter . view stepNumber),
   ("RavnicaAllegiance3", Solutions.RavnicaAllegiance3.solution, Solutions.RavnicaAllegiance3.formatter),
@@ -39,7 +39,7 @@ all = [
   ("RavnicaAllegiance5", Solutions.RavnicaAllegiance5.solution, Solutions.RavnicaAllegiance5.formatter),
   ("RavnicaAllegiance7", Solutions.RavnicaAllegiance7.solution, Solutions.RavnicaAllegiance7.formatter),
   ("RavnicaAllegiancePre2", Solutions.RavnicaAllegiancePre2.solution, Solutions.RavnicaAllegiancePre2.formatter),
-  ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter . view stepNumber),
+  ("RivalsOfIxalan7", Solutions.RivalsOfIxalan7.solution, Solutions.RivalsOfIxalan7.formatter),
   ("UltimateMasters", Solutions.UltimateMasters.solution, Solutions.UltimateMasters.formatter),
   ("WarOfTheSpark2", Solutions.WarOfTheSpark2.solution, Solutions.WarOfTheSpark2.formatter)
   ]

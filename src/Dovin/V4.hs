@@ -13,6 +13,7 @@ V4 adds a lot of new flexibility while better aligning with the official rules:
 * Cards can have protection from colors with 'effectProtection' and
   'effectProtectionF' (layer 6). This is not respected by any built-in effects
   currently, but can be used in your own effects and validations.
+* Add 'effectCopyPT' effect.
 * Add 'check' as a non-terminal version of 'validate' that returns a boolean
   rather than throwing an error. This can be used to write dynamic solutions
   based on the state of the board.

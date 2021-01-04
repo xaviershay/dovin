@@ -134,7 +134,9 @@ solution = do
 
     validateLife 0 Opponent
 
-formatter :: Int -> Formatter
-formatter _ = attributeFormatter $ do
+formatter = oldFormatter . view stepNumber
+
+oldFormatter :: Int -> Formatter
+oldFormatter _ = attributeFormatter $ do
   attribute "mana" $ countCards (matchAttribute "land" <> missingAttribute "tapped")
   attribute "life" $ countLife Opponent

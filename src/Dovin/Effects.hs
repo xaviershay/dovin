@@ -22,6 +22,7 @@ module Dovin.Effects
   , effectProtectionF
   , effectControl
   , effectControlF
+  , effectCopyPT
 
   , resolveEffects
 
@@ -106,6 +107,17 @@ effectControl = effectControlF . const . pure
 -- handled manually.
 effectControlF :: (Card -> EffectMonad Player) -> LayeredEffectPart
 effectControlF = effectF Layer2 cardController const
+
+-- | Layer 1A effect to copy the power and toughness of a card.
+effectCopyPT :: CardName -> LayeredEffectPart
+effectCopyPT targetName = LayeredEffectPart Layer1A $ \c -> do
+  targets <- askCards (matchName targetName)
+
+  case targets of
+    [target] -> return $ set cardStrength (view cardStrength target) c
+    -- We're not in an error monad here, so need to silently discard case where
+    -- the target card does not exist.
+    _        -> return c
 
 -- Private builder function for effects that affect a single card attribute.
 effectF ::
