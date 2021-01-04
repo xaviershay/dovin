@@ -158,3 +158,12 @@ test_CombatDamage = testGroup "combatDamage"
         attackWith ["Angel"]
         as Opponent $ combatDamage [] "Angel"
   ]
+
+test_CombatDamageTo = testGroup "combatDamageTo"
+  [ prove "damages opponent when no blockers" $ do
+      withLocation (Active, Play) $ addCreature (4, 4) "Angel"
+      attackWith ["Angel"]
+      combatDamageTo (TargetPlayer $ OpponentN 1) [] "Angel"
+      validateLife Opponent 0
+      validateLife (OpponentN 1) (-4)
+  ]
