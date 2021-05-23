@@ -606,7 +606,7 @@ activate stackName mana targetName = do
 -- | Activate a loyalty ability of a planeswalker. Typically you will want to
 -- `resolve` after activating.
 --
--- > activatePlaneswalker2 "Get a card" (-1) "Karn, Scion of Urza" >> resolveTop
+-- > activatePlaneswalker "Get a card" (-1) "Karn, Scion of Urza" >> resolveTop
 --
 -- [Validates]
 --
