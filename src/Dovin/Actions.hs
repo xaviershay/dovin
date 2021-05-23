@@ -511,6 +511,9 @@ move from to name = action "move" $ do
   when (from == to) $
     throwError $ "cannot move to same location: " <> show from
 
+  when (snd to == Deck) $
+    throwError "cannot move directly to deck"
+
   when (snd to == Stack) $
     throwError "cannot move directly to stack"
 
@@ -522,6 +525,10 @@ move from to name = action "move" $ do
 
   when (snd from == Stack) $
     modifying stack (filter (/= name))
+
+  -- TODO: Unit test for this
+  when (snd from == Deck) $
+    modifying (deck . at (fst from) . non []) (filter (/= name))
 
   when (snd to == Play) $
     gainAttribute summoned name

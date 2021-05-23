@@ -74,6 +74,12 @@ test_Move = testGroup "move/moveTo"
 
         move (Active, Hand) (Active, Stack) "Shock"
   , refute
+      "cannot move to deck"
+      "cannot move directly to deck" $ do
+        withLocation (Active, Graveyard) $ addInstant "Shock"
+
+        move (Active, Graveyard) (Active, Deck) "Shock"
+  , refute
       "requires card exists"
       "Card does not exist: Forest" $ do
         move (Active, Hand) (Active, Exile) "Forest"

@@ -55,10 +55,19 @@ addCard name = do
     Just _ -> throwError $ "Card should be removed: " <> name
     Nothing -> do
       template <- view envTemplate
+      let location = view cardLocation template
       modifying cards (M.insert name (BaseCard
         $ set cardName name
         . set cardTimestamp now
         $ template))
+
+      case location of
+        (player, Deck) ->
+          modifying
+            (deck . at (view cardController template) . non [])
+            ((:) name)
+        _ -> return ()
+
       resolveEffects
 
 addAura :: CardName -> GameMonad ()

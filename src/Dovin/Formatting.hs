@@ -44,6 +44,16 @@ stackFormatter board =
     lookupCard cn =
       let Right value = execMonad board (requireCard cn mempty) in value
 
+-- TODO: Collapse unknown cards
+deckFormatter :: Player -> Formatter
+deckFormatter player board =
+  let matchingCs = map lookupCard $ view (deck . at player . non []) board in
+
+  "\n      Deck:\n" <> formatCards matchingCs
+
+  where
+    lookupCard cn =
+      let Right value = execMonad board (requireCard cn mempty) in value
 
 cardFormatter :: String -> CardMatcher -> Formatter
 cardFormatter title matcher board =
@@ -135,6 +145,7 @@ boardFormatter board =
   where
     cs = let Right value = execMonad board allCards in value
     formatLocation (Active, Stack) = stackFormatter
+    formatLocation (player, Deck) = deckFormatter player
     formatLocation (controller, zone) = cardFormatter (show (controller, zone))
       (matchController controller <> matchZone zone)
 
