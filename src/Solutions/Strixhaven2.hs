@@ -61,6 +61,8 @@ solution = do
       addCreature (1, 1) "Wolf 3"
 
   step "Plumb the Forbidden sacrificing wolves and Eyetwitch" $ do
+    -- NOTE: Ignoring Lorescale triggers, not relevant
+
     tapForMana "B" "Necroblossom Snarl 1"
     tapForMana "B" "Necroblossom Snarl 2"
     cast "1B" "Plumb the Forbidden"
@@ -93,7 +95,7 @@ solution = do
 
     resolve "Plumb the Forbidden"
     loseLife 1
-    draw 1 -- TODO: Lorescale trigger
+    draw 1
   step "Cast Quandrix Command" $ do
     tapForMana "G" "Necroblossom Snarl 3"
     tapForMana "U" "Vineglimmer Snarl 2"
