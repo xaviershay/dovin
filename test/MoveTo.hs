@@ -1,4 +1,4 @@
-module Move where
+module MoveTo where
 
 import TestPrelude.V4
 
