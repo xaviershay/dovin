@@ -67,6 +67,16 @@ test_Move = testGroup "move/moveTo"
 
       move (Active, Play) (Opponent, Play) "Treasure"
       validate (matchZone Play) "Treasure"
+  , prove "moving from deck removes from ordering" $ do
+      withLocation Deck $ addLand "Forest"
+      withLocation Deck $ addLand "Mountain"
+      moveTo Hand "Forest"
+
+      xs <- use $ deck . at Active
+
+      case xs of
+        Just ["Mountain"] -> return mempty
+        xs' -> throwError $ "Deck ordering was not correct: " <> (show xs')
   , refute
       "cannot move to stack"
       "cannot move directly to stack" $ do

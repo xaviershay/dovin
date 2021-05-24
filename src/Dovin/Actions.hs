@@ -526,7 +526,6 @@ move from to name = action "move" $ do
   when (snd from == Stack) $
     modifying stack (filter (/= name))
 
-  -- TODO: Unit test for this
   when (snd from == Deck) $
     modifying (deck . at (fst from) . non []) (filter (/= name))
 
