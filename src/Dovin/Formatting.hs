@@ -47,7 +47,7 @@ stackFormatter board =
 -- TODO: Collapse unknown cards
 deckFormatter :: Player -> Formatter
 deckFormatter player board =
-  let matchingCs = map lookupCard $ view (deck . at player . non []) board in
+  let matchingCs = map lookupCard $ view (deckFor player) board in
 
   "\n      Deck:\n" <> formatCards matchingCs
 

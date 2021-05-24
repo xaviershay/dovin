@@ -38,7 +38,7 @@ module Dovin.Builder (
 import Dovin.Attributes
 import Dovin.Prelude
 import Dovin.Types
-import Dovin.Helpers (getTimestamp)
+import Dovin.Helpers (getTimestamp, deckFor)
 import Dovin.Matchers (matchNone)
 import Dovin.Effects (resolveEffects, enabledInPlay)
 
@@ -64,7 +64,7 @@ addCard name = do
       case location of
         (player, Deck) ->
           modifying
-            (deck . at (view cardController template) . non [])
+            (deckFor (view cardController template))
             ((:) name)
         _ -> return ()
 

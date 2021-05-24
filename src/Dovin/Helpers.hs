@@ -16,6 +16,8 @@ import Text.Parsec
 
 hasAttribute attr = S.member attr . view cardAttributes
 
+deckFor p = deck . at p . non []
+
 manaSpec = mconcat <$> many (colorless <|> colored)
   where
     colorless = do

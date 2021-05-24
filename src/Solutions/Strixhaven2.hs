@@ -5,8 +5,7 @@ import Dovin
 
 
 import Dovin.Types
-import Control.Monad.Except (throwError)
-import Control.Lens (assign, at, non, use, modifying)
+import Control.Lens (at, non, modifying)
 
 garruk = "garruk"
 
@@ -129,21 +128,6 @@ solution = do
     combatDamage [] "Gingerbrute"
     validateLife 0 Opponent
 
--- TODO: Promote to Actions
-draw :: Int -> GameMonad ()
-draw n = do
-  actor <- view envActor
-
-  forM_ [1..n] $ \_ -> do
-    s <- use (deck . at actor . non [])
-
-    case s of
-      [] -> throwError "No card to draw"
-      (x:xs) -> do
-        c <- requireCard x mempty
-
-        moveTo Hand x
-        assign (deck . at actor . non []) xs
 
 -- TODO: Promote to Actions
 shuffleIn cn = do

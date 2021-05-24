@@ -15,6 +15,7 @@ module Dovin.Actions (
   , cast
   , castFromZone
   , counter
+  , draw
   , flashback
   , jumpstart
   , resolve
@@ -194,6 +195,32 @@ counter expectedName = do
   modifying
     stack
     (Data.List.delete expectedName)
+
+-- | Move cards from actor's deck to hand.
+--
+-- > draw 1
+--
+-- [Validates]
+--
+--   * Deck has enough cards
+--
+-- [Effects]
+--
+--   * Cards are moved to hand.
+draw :: Int -> GameMonad ()
+draw n = do
+  actor <- view envActor
+
+  forM_ [1..n] $ \_ -> do
+    s <- use (deckFor actor)
+
+    case s of
+      [] -> throwError "no card to draw"
+      (x:xs) -> do
+        c <- requireCard x mempty
+
+        moveTo Hand x
+        assign (deckFor actor) xs
 
 -- | Cast a card from actor's graveyard, exiling it when it leaves
 -- the stack. See 'castFromZone' for further specification.
@@ -527,7 +554,7 @@ move from to name = action "move" $ do
     modifying stack (filter (/= name))
 
   when (snd from == Deck) $
-    modifying (deck . at (fst from) . non []) (filter (/= name))
+    modifying (deckFor (fst from)) (filter (/= name))
 
   when (snd to == Play) $
     gainAttribute summoned name
