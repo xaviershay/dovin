@@ -116,6 +116,8 @@ solutions for published Possibility Storm puzzles!)
 * `CommanderLegends` shows a large number of techniques: multiplayer, control
   changing, equipment and aura effects, color protection, counters for dynamic
   token generation, and more.
+* `ForgottenRealms1` uses equipment effects and different types of
+  power/toughness effects.
 
 ## Development
 

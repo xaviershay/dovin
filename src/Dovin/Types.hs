@@ -130,6 +130,9 @@ data CardStrength = CardStrength Int Int deriving (Eq)
 instance Show CardStrength where
   show (CardStrength p t) = show p <> "/" <> show t
 
+toTuple :: CardStrength -> (Int, Int)
+toTuple (CardStrength p t) = (p, t)
+
 -- | A phase or step in a turn. Phases and steps are not distinguished between
 -- because haven't seen a need to.
 data Phase

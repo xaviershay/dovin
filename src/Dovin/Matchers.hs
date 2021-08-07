@@ -60,8 +60,14 @@ matchOther attribute card =
 matchController player = CardMatcher ("has controller " <> show player) $
   (==) player . view cardController
 
-matchLesserPower n = CardMatcher ("power < " <> show n) $
-  (< n) . view cardPower
+matchPower n = matchPowerF ("= " <> show n) (n ==)
+matchPowerLT n = matchPowerF ("< " <> show n) (n >)
+matchPowerLTE n = matchPowerF ("<= " <> show n) (n >=)
+matchPowerGT n = matchPowerF ("> " <> show n) (n <)
+matchPowerGTE n = matchPowerF (">= " <> show n) (n <=)
+
+matchPowerF :: String -> (Int -> Bool) -> CardMatcher
+matchPowerF desc f = CardMatcher ("power " <> desc) $ f . view cardPower
 
 matchProtection :: Color -> CardMatcher
 matchProtection color = CardMatcher ("protection from " <> show color) $
@@ -78,10 +84,6 @@ matchCard = matchName . view cardName
 matchToughness :: Int -> CardMatcher
 matchToughness n = labelMatch ("toughness = " <> show n) $ CardMatcher ""
   ((== n) . view cardToughness) <> matchAttribute creature
-
-matchPower :: Int -> CardMatcher
-matchPower n = labelMatch ("power = " <> show n) $ CardMatcher ""
-  ((== n) . view cardPower) <> matchAttribute creature
 
 matchStrength :: (Int, Int) -> CardMatcher
 matchStrength (p, t) = labelMatch ("P/T = " <> show p <> "/" <> show t) $

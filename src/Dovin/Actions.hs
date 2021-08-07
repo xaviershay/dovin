@@ -325,7 +325,7 @@ resolveMentor targetName sourceName = do
   source <- requireCard sourceName mempty
   _      <- requireCard targetName $
                  matchAttribute attacking
-              <> matchLesserPower (view cardPower source)
+              <> matchPowerLT (view cardPower source)
 
   modifyStrength (1, 1) targetName
 
@@ -463,7 +463,7 @@ triggerMentor targetName sourceName = do
   source <- requireCard sourceName $ matchAttributes [attacking, mentor]
   _      <- requireCard targetName $
                  matchAttribute attacking
-              <> matchLesserPower (view cardPower source)
+              <> matchPowerLT (view cardPower source)
 
   trigger ("Mentor " <> targetName <> " from " <> sourceName) sourceName
 
