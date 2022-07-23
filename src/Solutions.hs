@@ -8,6 +8,7 @@ import qualified Solutions.Core19_9
 import qualified Solutions.Dominaria5
 import qualified Solutions.Example
 import qualified Solutions.ExplorersOfIxalanContest
+import qualified Solutions.ForgottenRealms1
 import qualified Solutions.GuildsOfRavnica1
 import qualified Solutions.GuildsOfRavnica3
 import qualified Solutions.GuildsOfRavnica8
@@ -29,6 +30,7 @@ all = [
   ("Dominaria5", Solutions.Dominaria5.solution, Solutions.Dominaria5.formatter . view stepNumber),
   ("Example", Solutions.Example.solution, Solutions.Example.formatter),
   ("ExplorersOfIxalanContest", Solutions.ExplorersOfIxalanContest.solution, Solutions.ExplorersOfIxalanContest.formatter . view stepNumber),
+  ("ForgottenRealms1", Solutions.ForgottenRealms1.solution, Solutions.ForgottenRealms1.formatter),
   ("GuildsOfRavnica1", Solutions.GuildsOfRavnica1.solution, Solutions.GuildsOfRavnica1.formatter . view stepNumber),
   ("GuildsOfRavnica3", Solutions.GuildsOfRavnica3.solution, Solutions.GuildsOfRavnica3.formatter . view stepNumber),
   ("GuildsOfRavnica8", Solutions.GuildsOfRavnica8.solution, Solutions.GuildsOfRavnica8.formatter),
