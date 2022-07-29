@@ -1,6 +1,10 @@
 module Solutions.BaldursGate2 where
 import Dovin.V4
 
+-- NOTE: This solution is wrong (it doesn't match the published one), I'm pretty
+-- sure because Astarion is dealing player damage in second combat where it
+-- shouldn't because it was blocked in the first one.
+
 solution :: GameMonad ()
 solution = do
   step "Initial state" $ do
